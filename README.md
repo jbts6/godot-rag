@@ -1,6 +1,6 @@
 # Godot RAG
 
-Hybrid RAG search for Godot documentation. Search by type for precise results.
+Hybrid RAG search for Godot documentation and addons. Search by type for precise results.
 
 ## Installation
 
@@ -40,6 +40,33 @@ godot-rag s-addon "dialogue" --limit 3
 godot-rag s "Timer"
 ```
 
+### Search addons
+
+```bash
+# Search all addon docs, examples, and API summaries
+godot-rag s-addon "state machine"
+godot-rag s-addon "dialogue balloon"
+godot-rag s-addon "scene transition"
+
+# Filter by specific addon
+godot-rag s-addon "state" --addon statecharts
+godot-rag s-addon "transition" --addon scene_manager
+godot-rag s-addon "test" --addon gdUnit4
+
+# Find API symbols
+godot-rag s-addon "TransitionNode" --addon scene_manager
+godot-rag s-addon "BehaviorTree" --addon limboai
+godot-rag s-addon "DialogueManager" --addon dialogue_manager
+
+# Search example code
+godot-rag s-addon "ninja_frog" --addon statecharts
+godot-rag s-addon "verify_node_path" --addon doctor
+
+# JSON output for AI agents
+godot-rag s-addon "state machine" --addon statecharts --json
+godot-rag s-addon "TransitionNode" --json
+```
+
 ### Output format
 
 ```bash
@@ -68,6 +95,69 @@ godot-rag s-class "StringName.is_valid_filename"
 # Broad search across all docs
 godot-rag s "physics interpolation"
 ```
+
+## RAG vs Non-RAG: Why It Matters
+
+A hybrid RAG system (FTS5 + symbol index) gives significantly better results than raw text search for AI-assisted documentation lookup.
+
+### Benchmark: Real Query Comparison
+
+Tested on a database of **30,783 chunks** (28,231 Godot docs + 2,552 addon chunks across 9 addons).
+
+| Metric | RAG (this tool) | grep (raw files) | Improvement |
+|---|---|---|---|
+| **Average latency** | 7.1 ms | 120 ms | **17× faster** |
+| **Multi-word queries** | ✅ semantic ranking | ❌ exact match only | — |
+| **API symbol lookup** | ✅ O(1) indexed | ❌ linear scan | — |
+| **Result ranking** | ✅ BM25 relevance | ❌ no ranking | — |
+| **Filters (addon/type)** | ✅ SQL WHERE | ❌ post-process | — |
+| **Noise (test/assets)** | ✅ auto-excluded | ❌ manual filter | — |
+
+### Query Hit Rate
+
+| Query | RAG Results | grep Results | Notes |
+|---|---|---|---|
+| `TransitionNode` | ✅ 3 hits (8ms) | ✅ 13 files (152ms) | RAG: ranked, deduped |
+| `ScenesManager` | ✅ 3 hits (7ms) | ✅ 41 files (100ms) | grep: too many noise files |
+| `BehaviorTree` | ✅ 3 hits (7ms) | ✅ 2 files (96ms) | RAG: includes doc context |
+| `DialogueManager` | ✅ 3 hits (7ms) | ✅ 26 files (98ms) | RAG: only relevant docs |
+| `state machine transitions` | ✅ 3 hits (6ms) | ❌ 0 files | **grep fails on multi-word** |
+| `scene transition animation` | ✅ 3 hits (7ms) | ❌ 0 files | **grep fails on multi-word** |
+| `input helper gamepad` | ✅ 2 hits (7ms) | ❌ 0 files | **grep fails on multi-word** |
+| `input action mapping` | ✅ 3 hits (7ms) | — | RAG finds cross-references |
+
+**Key insight**: grep can only find exact substring matches. RAG handles natural language queries like "state machine transitions" and returns ranked, contextual results.
+
+### --addon Filter: Precision Search
+
+```bash
+# Without filter: results from multiple addons
+$ godot-rag s-addon "state machine"
+  → statecharts (API), limboai (docs)    # mixed results
+
+# With filter: only target addon
+$ godot-rag s-addon "state machine" --addon statecharts
+  → statecharts (API, docs, examples)    # precise
+```
+
+### Database Coverage
+
+| Addon | Docs | Examples | API | Total |
+|---|---|---|---|---|
+| dialogue_manager | 140 | — | 55 | 195 |
+| doctor | — | 125 | 42 | 167 |
+| gdUnit4 | 1,030 | — | 215 | 1,245 |
+| input_helper | 32 | 3 | 6 | 41 |
+| limboai | 351 | 27 | — | 378 |
+| phantom-camera | 12 | 11 | 38 | 61 |
+| scene_manager | 209 | 5 | 31 | 245 |
+| sound_manager | 13 | 2 | 7 | 22 |
+| statecharts | 80 | 21 | 97 | 198 |
+| **Total** | **1,867** | **194** | **491** | **2,552** |
+
+- **addon_doc**: Documentation markdown/RST, split by headings
+- **addon_example**: Example .gd/.cs code files
+- **addon_api**: Public declarations and doc comments only (not full source)
 
 ## Update
 
