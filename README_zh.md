@@ -106,7 +106,7 @@ godot-rag s "physics interpolation"
 
 ### 基准测试：真实查询对比
 
-测试数据库：**30,545 个 chunk**（28,231 个 Godot 文档 + 2,314 个 addon chunk，覆盖 9 个 addon）。
+测试数据库：**30,581 个 chunk**（28,231 个 Godot 文档 + 2,350 个 addon chunk，覆盖 9 个 addon）。
 
 | 指标 | RAG（本工具） | grep（原始文件） | 提升 |
 |---|---|---|---|
@@ -149,8 +149,8 @@ $ godot-rag s-addon "state machine" --addon statecharts
 
 | Addon | 文档 | 示例 | API | 总计 |
 |---|---|---|---|---|
-| dialogue_manager | 140 | — | 55 | 195 |
-| doctor | — | 125 | 41 | 166 |
+| dialogue_manager | 140 | 2 | 55 | 197 |
+| doctor | 34 | 125 | 41 | 200 |
 | gdUnit4 | 1,030 | — | 214 | 1,244 |
 | input_helper | 32 | 3 | 6 | 41 |
 | limboai | 351 | 27 | — | 378 |
@@ -158,7 +158,7 @@ $ godot-rag s-addon "state machine" --addon statecharts
 | scene_manager | 1 | 2 | 5 | 8 |
 | sound_manager | 13 | 2 | 7 | 22 |
 | statecharts | 80 | 21 | 98 | 199 |
-| **总计** | **1,659** | **191** | **464** | **2,314** |
+| **总计** | **1,693** | **193** | **464** | **2,350** |
 
 - **addon_doc**：文档 markdown/RST，按标题分段
 - **addon_example**：示例 .gd/.cs 代码文件
