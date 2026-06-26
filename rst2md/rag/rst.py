@@ -17,6 +17,103 @@ WRAPPER_TAGS = (
 FENCE_RE = re.compile(r"^\s*(```|~~~)")
 
 
+def _indent_width(line: str) -> int:
+    return len(line) - len(line.lstrip(" "))
+
+
+def _is_indented_under(line: str, parent_indent: int) -> bool:
+    return not line.strip() or _indent_width(line) > parent_indent
+
+
+def _convert_tabs_block(lines: list[str], start: int) -> tuple[list[str], int]:
+    tabs_indent = _indent_width(lines[start])
+    i = start + 1
+    block: list[str] = []
+
+    while i < len(lines) and _is_indented_under(lines[i], tabs_indent):
+        block.append(lines[i])
+        i += 1
+
+    converted: list[str] = []
+    j = 0
+    while j < len(block):
+        line = block[j]
+        stripped = line.strip()
+        if not stripped.startswith(".. code-tab::"):
+            j += 1
+            continue
+
+        directive_indent = _indent_width(line)
+        args = stripped.removeprefix(".. code-tab::").strip().split()
+        language = args[0] if args else "text"
+
+        body: list[str] = []
+        j += 1
+        while j < len(block):
+            candidate = block[j]
+            candidate_stripped = candidate.strip()
+            if (
+                candidate_stripped.startswith(".. code-tab::")
+                and _indent_width(candidate) <= directive_indent
+            ):
+                break
+            body.append(candidate)
+            j += 1
+
+        while body and not body[0].strip():
+            body.pop(0)
+        while body and not body[-1].strip():
+            body.pop()
+
+        body_indent = min((_indent_width(item) for item in body if item.strip()), default=directive_indent + 1)
+        converted.append(f"{' ' * tabs_indent}.. code-block:: {language}")
+        converted.append("")
+        for body_line in body:
+            if body_line.strip():
+                converted.append(" " * (tabs_indent + 3) + body_line[body_indent:])
+            else:
+                converted.append("")
+        converted.append("")
+
+    while converted and not converted[-1].strip():
+        converted.pop()
+    if converted:
+        converted.append("")
+    return converted, i
+
+
+def _preprocess_rst(rst_text: str) -> str:
+    lines = rst_text.splitlines()
+    keep_trailing_newline = rst_text.endswith("\n")
+    out: list[str] = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        if line.strip() == ":github_url: hide":
+            i += 1
+            if i < len(lines) and not lines[i].strip():
+                i += 1
+            continue
+
+        if line.strip() == ".. tabs::":
+            converted, i = _convert_tabs_block(lines, i)
+            out.extend(converted)
+            # 如果没有更多内容，删除尾部空行
+            if i >= len(lines):
+                while out and not out[-1].strip():
+                    out.pop()
+            continue
+
+        out.append(line)
+        i += 1
+
+    text = "\n".join(out)
+    if keep_trailing_newline:
+        text += "\n"
+    return text
+
+
 def _fallback_rst_to_md(rst_text: str) -> str:
     """Best-effort RST to Markdown conversion when pandoc is unavailable."""
     lines = rst_text.splitlines()
@@ -42,6 +139,7 @@ def _fallback_rst_to_md(rst_text: str) -> str:
 
 
 def convert_rst_to_md(rst_text: str, *, allow_fallback: bool = False) -> str:
+    rst_text = _preprocess_rst(rst_text)
     if not shutil.which("pandoc"):
         if allow_fallback:
             return _fallback_rst_to_md(rst_text)
@@ -75,7 +173,19 @@ def clean_markdown_segment(text: str) -> str:
 
     text = re.sub(r"\s*`🔗<[^`>]+>`", "", text)
     text = re.sub(r"`([^`\n<>]+)<[^`\n<>]+>`", r"`\1`", text)
+    text = re.sub(
+        r"`const \(This method has no side effects[^`]*\)`",
+        "`const`",
+        text,
+    )
+    text = re.sub(
+        r"`vararg \(This method accepts any number of arguments[^`]*\)`",
+        "`vararg`",
+        text,
+    )
     text = text.replace(r"\<", "<")
+    text = text.replace(r"\#", "#")
+    text = text.replace(r"\*", "*")
 
     text = re.sub(r"\.\.\s+(\w+)::", r"**\1:**", text)
     text = re.sub(r"^\.\.\s.*$", "", text, flags=re.MULTILINE)
@@ -91,6 +201,12 @@ def clean_markdown_segment(text: str) -> str:
     text = re.sub(r"^\s*classref[-\w]*\s*$", "", text, flags=re.MULTILINE)
 
     text = re.sub(r"^\s*[\|\-][\|\-:\s]*$", "", text, flags=re.MULTILINE)
+    text = re.sub(
+        r"^## (Properties|Constructors|Methods|Operators)\s*\n+(?=(## |\Z))",
+        "",
+        text,
+        flags=re.MULTILINE,
+    )
     text = re.sub(r"\n{3,}", "\n\n", text)
 
     lines = [line.rstrip() for line in text.split("\n")]

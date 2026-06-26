@@ -1,0 +1,14 @@
+{
+  "change": "cleanup-rst-extraction-noise",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "833854ccc9e92cd6a572c749c8c7795547345aa2c0a1add0bc63719c4e1ab352",
+  "files": [
+    { "path": "openspec/changes/cleanup-rst-extraction-noise/proposal.md", "sha256": "6b0d16c6aef0ea8de17775a2a1ef988999e8c21bceefd6965ca87504a1f9a031" },
+    { "path": "openspec/changes/cleanup-rst-extraction-noise/design.md", "sha256": "c77b2d30d835c07edcd1228791bfa9a867502790ef07d8fd96be379f2d039a13" },
+    { "path": "openspec/changes/cleanup-rst-extraction-noise/tasks.md", "sha256": "c37a0fdd189b3b982517f74c6d3a3ae7c6ff91cdd6359b3251f7090bfeb6b45c" },
+    { "path": "openspec/changes/cleanup-rst-extraction-noise/specs/rst-markdown-noise-cleanup/spec.md", "sha256": "0cf6a056910d0255bc8d720691028477caf719e6183454f9434d2ed749ab1435" }
+  ]
+}

@@ -30,3 +30,5 @@ dist/
 
 # Build cache (wiki clones, etc.)
 .cache/
+
+node_modules

@@ -1,3 +1,9 @@
+---
+comet_change: cleanup-rst-extraction-noise
+role: technical-design
+canonical_spec: openspec
+---
+
 # RST Extraction Noise Cleanup
 
 ## Problem
