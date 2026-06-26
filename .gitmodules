@@ -1,4 +1,28 @@
-[submodule "tools/godot-docs"]
-	path = tools/godot-docs
+[submodule "godot-docs"]
+	path = godot-docs
 	url = https://github.com/godotengine/godot-docs.git
 	branch = stable
+[submodule "addons/limboai"]
+	path = addons/limboai
+	url = https://github.com/limbonaut/limboai
+[submodule "addons/statecharts"]
+	path = addons/statecharts
+	url = https://github.com/derkork/godot-statecharts
+[submodule "addons/dialogue_manager"]
+	path = addons/dialogue_manager
+	url = https://github.com/nathanhoad/godot_dialogue_manager
+[submodule "addons/sound_manager"]
+	path = addons/sound_manager
+	url = https://github.com/nathanhoad/godot_sound_manager
+[submodule "addons/input_helper"]
+	path = addons/input_helper
+	url = https://github.com/nathanhoad/godot_input_helper
+[submodule "addons/phantom-camera"]
+	path = addons/phantom-camera
+	url = https://github.com/ramokz/phantom-camera
+[submodule "addons/gdUnit4"]
+	path = addons/gdUnit4
+	url = https://github.com/godot-gdunit-labs/gdUnit4
+[submodule "addons/doctor"]
+	path = addons/doctor
+	url = https://github.com/codevogel/godot_doctor

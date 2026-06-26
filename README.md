@@ -1,10 +1,8 @@
 # Godot RAG
 
-Hybrid RAG search for Godot documentation. One command to search all Godot docs.
+Hybrid RAG search for Godot documentation. Search by type for precise results.
 
 ## Installation
-
-### Using uv (recommended)
 
 ```bash
 uv pip install godot-rag
@@ -13,47 +11,61 @@ uv pip install godot-rag
 Or from wheel:
 
 ```bash
-uv pip install godot_rag-4.4.0-py3-none-any.whl
-```
-
-### Using pip
-
-```bash
-pip install godot-rag
+uv pip install godot_rag-4.7.0-py3-none-any.whl
 ```
 
 ## Usage
 
-### Search documentation
+### Search by type
 
 ```bash
-# Basic search
-godot-rag search "Timer"
+# Search class reference (API docs only)
+godot-rag s-class "Node.add_child"
+godot-rag s-class "Signal.emit" --limit 3
 
-# Limit results
-godot-rag search "Timer" --limit 3
+# Search tutorials (tutorials + getting started guides)
+godot-rag s-tutorial "how to use signals"
+godot-rag s-tutorial "2D pathfinding" --limit 5
 
-# JSON output (for AI Agent)
-godot-rag search "StringName.is_valid_filename" --json
+# Search engine details (architecture, file formats, GDExtension, etc.)
+godot-rag s-engine "GDExtension"
+godot-rag s-engine "IDE debugging" --limit 3
+
+# Search addon docs and examples
+godot-rag s-addon "state machine"
+godot-rag s-addon "state machine" --addon statecharts
+godot-rag s-addon "dialogue" --limit 3
+
+# Search all docs (no type filter)
+godot-rag s "Timer"
 ```
 
-### Show info
+### Output format
 
 ```bash
-godot-rag info
+# JSON output (for AI Agent)
+godot-rag s-class "Vector3.normalized" --json
+
+# Limit results
+godot-rag s-tutorial "C# Variant" --limit 3
 ```
 
 ## Examples
 
 ```bash
-# Search for API
-godot-rag search "Vector3.normalized" --limit 3
+# AI workflow: look up tutorial first, then API details
+godot-rag s-tutorial "scene tree" --json
+godot-rag s-class "Node.get_children" --json
 
-# Search for concept
-godot-rag search "2D pathfinding" --limit 5
+# AI workflow: check addon docs and examples
+godot-rag s-addon "state machine" --addon statecharts --json
+godot-rag s-addon "dialogue balloon" --addon dialogue_manager --json
 
-# Search for tutorial
-godot-rag search "C# Variant" --limit 3
+# Quick API lookup
+godot-rag s-class "StringName.is_valid_filename"
+
+# Broad search across all docs
+godot-rag s "physics interpolation"
 ```
 
 ## Update
@@ -62,15 +74,15 @@ When Godot releases a new version:
 
 ```bash
 # Update godot-docs submodule
-cd tools/godot-docs && git pull origin stable
+cd godot-docs && git pull origin stable
 
 # Rebuild docs and RAG
 ./build.sh
 
 # Or manually:
-python3 tools/godot-docs-rst2md/rst2md_batch.py --src tools/godot-docs --out godot_rag/docs-md
-python3 tools/godot-docs-rst2md/rag/cli.py build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite
-python3 -m build --wheel
+uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
+uv run python3 rst2md/rag/cli.py build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite
+uv run python3 -m build --wheel
 ```
 
 ## License
