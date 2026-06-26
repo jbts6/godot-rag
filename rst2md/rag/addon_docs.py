@@ -43,8 +43,15 @@ _CSHARP_MEMBER_RE = re.compile(
     r"^\s*public\s+(?:(?:static|override|virtual|async|partial|new)\s+)*"
     r"[\w<>\[\],?.]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(|\{)"
 )
-_GDSCRIPT_SYMBOL_RE = re.compile(
-    r"^\s*(?:class_name|func|signal|enum|const|@export\s+var|var)\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+_GDSCRIPT_CLASS_NAME_RE = re.compile(r"^\s*class_name\s+([A-Za-z_][A-Za-z0-9_]*)\b")
+_GDSCRIPT_FUNC_RE = re.compile(
+    r"^\s*(?:@(?:onready|export)\s+)?(?:static\s+)?func\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+)
+_GDSCRIPT_SIGNAL_RE = re.compile(r"^\s*signal\s+([A-Za-z_][A-Za-z0-9_]*)\b")
+_GDSCRIPT_ENUM_RE = re.compile(r"^\s*enum\s+([A-Za-z_][A-Za-z0-9_]*)\b")
+_GDSCRIPT_CONST_RE = re.compile(r"^\s*const\s+([A-Za-z_][A-Za-z0-9_]*)\b")
+_GDSCRIPT_VAR_RE = re.compile(
+    r"^\s*(?:@(?:onready|export)\s+)?var\s+([A-Za-z_][A-Za-z0-9_]*)\b"
 )
 
 
@@ -317,22 +324,39 @@ def _doc_comment_start(lines: List[str], index: int) -> int:
     return start
 
 
-def _extract_api_lines(code: str, suffix: str) -> tuple[str, List[str]]:
+def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tuple[str, List[str]]:
     lines = code.split("\n")
     selected: List[tuple[int, str]] = []
-    symbols: List[str] = []
+    primary_symbol = ""
 
     for idx, line in enumerate(lines):
-        match = None
         if suffix == ".cs":
             match = _CSHARP_TYPE_RE.match(line) or _CSHARP_MEMBER_RE.match(line)
+            if not match:
+                continue
+            symbol = match.group(1)
+            primary_symbol = primary_symbol or symbol
         elif suffix == ".gd":
-            match = _GDSCRIPT_SYMBOL_RE.match(line)
-        if not match:
+            match = (
+                _GDSCRIPT_CLASS_NAME_RE.match(line)
+                or _GDSCRIPT_FUNC_RE.match(line)
+                or _GDSCRIPT_SIGNAL_RE.match(line)
+                or _GDSCRIPT_ENUM_RE.match(line)
+                or _GDSCRIPT_CONST_RE.match(line)
+                or _GDSCRIPT_VAR_RE.match(line)
+            )
+            if not match:
+                continue
+            symbol = match.group(1)
+            if symbol.startswith("_"):
+                continue
+            if _GDSCRIPT_CLASS_NAME_RE.match(line):
+                primary_symbol = symbol
+            elif not primary_symbol:
+                primary_symbol = fallback_symbol
+        else:
             continue
 
-        symbol = match.group(1)
-        symbols.append(symbol)
         start = _doc_comment_start(lines, idx)
         for line_idx in range(start, idx + 1):
             selected.append((line_idx + 1, lines[line_idx].rstrip()))
@@ -346,13 +370,12 @@ def _extract_api_lines(code: str, suffix: str) -> tuple[str, List[str]]:
         seen.add(key)
         deduped.append(f"{line_no}: {text}")
 
-    primary_symbol = symbols[0] if symbols else ""
-    return primary_symbol, deduped
+    return primary_symbol or fallback_symbol, deduped
 
 
 def chunk_api_file(addon_name: str, display_name: str, rel_path: str, code: str) -> List[Chunk]:
     """Chunk public declarations from implementation code without indexing bodies."""
-    symbol, api_lines = _extract_api_lines(code, Path(rel_path).suffix)
+    symbol, api_lines = _extract_api_lines(code, Path(rel_path).suffix, Path(rel_path).stem)
     if not api_lines:
         return []
 

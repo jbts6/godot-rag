@@ -7,6 +7,14 @@
 
 set -e
 
+PUBLISH=0
+if [ "${1:-}" = "--publish" ] || [ "${1:-}" = "publish" ]; then
+    PUBLISH=1
+elif [ -n "${1:-}" ]; then
+    echo "用法: $0 [--publish]"
+    exit 1
+fi
+
 echo "=== 构建 Godot RAG ==="
 
 # 更新子模块
@@ -25,7 +33,29 @@ if [ -z "$GODOT_VERSION" ]; then
     echo "错误: 无法从 conf.py 提取 Godot 版本"
     exit 1
 fi
-PKG_VERSION="${GODOT_VERSION}.0"
+
+# 版本策略: Godot 版本不变时自动递增 postN
+# 4.7.0 → 4.7.0.post1 → 4.7.0.post2 → ...
+# Godot 版本变化时重置为 4.8.0.post1
+PKG_VERSION=$(python3 -c "
+import re
+from pathlib import Path
+
+godot_ver = '${GODOT_VERSION}'
+base = godot_ver + '.0'
+text = Path('pyproject.toml').read_text(encoding='utf-8')
+match = re.search(r'^version\\s*=\\s*\"([^\"]+)\"', text, re.MULTILINE)
+cur = match.group(1) if match else ''
+
+# 匹配当前 Godot 版本的 postN
+m = re.match(r'^' + re.escape(base) + r'(?:\\.post(\\d+))?$', cur)
+if m:
+    n = int(m.group(1) or 0) + 1
+else:
+    n = 1
+print(f'{base}.post{n}')
+")
+
 python3 -c "
 import re, sys
 p = sys.argv[1]; v = sys.argv[2]
@@ -76,11 +106,17 @@ for f in glob.glob(sys.argv[1] + '/*.py'):
 echo "4. 构建 wheel..."
 uv build --wheel
 
+if [ "$PUBLISH" -eq 1 ]; then
+    echo "5. 发布到 PyPI..."
+    uvx twine upload dist/*
+fi
+
 echo ""
 echo "=== 构建完成 ==="
 echo "版本: ${PKG_VERSION}"
 echo "Wheel: dist/godot_rag-${PKG_VERSION}-py3-none-any.whl"
 echo ""
-echo "发布: uv publish --token <token>"
+echo "发布: ./build.sh --publish"
+echo "认证: TWINE_USERNAME=__token__ TWINE_PASSWORD=<token> ./build.sh --publish"
 echo "安装: uv pip install godot-rag"
 echo "测试: godot-rag search Timer --limit 3"

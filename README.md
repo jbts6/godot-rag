@@ -50,11 +50,13 @@ godot-rag s-addon "scene transition"
 
 # Filter by specific addon
 godot-rag s-addon "state" --addon statecharts
-godot-rag s-addon "transition" --addon scene_manager
+godot-rag s-addon "change_scene" --addon scene_manager
 godot-rag s-addon "test" --addon gdUnit4
 
 # Find API symbols
-godot-rag s-addon "TransitionNode" --addon scene_manager
+godot-rag s-addon "SceneManager" --addon scene_manager
+godot-rag s-addon "change_scene" --addon scene_manager
+godot-rag s-addon "scene_loaded" --addon scene_manager
 godot-rag s-addon "BehaviorTree" --addon limboai
 godot-rag s-addon "DialogueManager" --addon dialogue_manager
 
@@ -64,7 +66,7 @@ godot-rag s-addon "verify_node_path" --addon doctor
 
 # JSON output for AI agents
 godot-rag s-addon "state machine" --addon statecharts --json
-godot-rag s-addon "TransitionNode" --json
+godot-rag s-addon "change_scene" --json
 ```
 
 ### Output format
@@ -72,7 +74,7 @@ godot-rag s-addon "TransitionNode" --json
 ```bash
 # JSON output (for AI Agent)
 godot-rag s-class "Vector3.normalized" --json
-godot-rag s-addon "TransitionNode" --addon scene_manager --json
+godot-rag s-addon "change_scene" --addon scene_manager --json
 
 # Limit results
 godot-rag s-tutorial "C# Variant" --limit 3
@@ -117,8 +119,8 @@ Tested on a database of **30,783 chunks** (28,231 Godot docs + 2,552 addon chunk
 
 | Query | RAG Results | grep Results | Notes |
 |---|---|---|---|
-| `TransitionNode` | ✅ 3 hits (8ms) | ✅ 13 files (152ms) | RAG: ranked, deduped |
-| `ScenesManager` | ✅ 3 hits (7ms) | ✅ 41 files (100ms) | grep: too many noise files |
+| `change_scene` | ✅ 3 hits (8ms) | ✅ 13 files (152ms) | RAG: ranked, deduped |
+| `SceneManager` | ✅ 3 hits (7ms) | ✅ 41 files (100ms) | grep: too many noise files |
 | `BehaviorTree` | ✅ 3 hits (7ms) | ✅ 2 files (96ms) | RAG: includes doc context |
 | `DialogueManager` | ✅ 3 hits (7ms) | ✅ 26 files (98ms) | RAG: only relevant docs |
 | `state machine transitions` | ✅ 3 hits (6ms) | ❌ 0 files | **grep fails on multi-word** |

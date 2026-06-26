@@ -133,15 +133,15 @@ class TestAddonDiscovery(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "scene_manager"
             root.mkdir()
-            plugin_dir = root / "addons" / "ScenesManager"
+            plugin_dir = root / "addons" / "scene_manager"
             docs = plugin_dir / "Docs"
             docs.mkdir(parents=True)
             demo = root / "demo"
             demo.mkdir()
             (plugin_dir / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
             (docs / "quick-start.md").write_text("# Quick Start\n", encoding="utf-8")
-            (demo / "Menu.cs").write_text("public partial class Menu {}\n", encoding="utf-8")
-            (plugin_dir / "ScenesManager.cs").write_text("public partial class ScenesManager {}\n", encoding="utf-8")
+            (demo / "Menu.gd").write_text("extends Node\n", encoding="utf-8")
+            (plugin_dir / "SceneManager.gd").write_text("extends Node\nclass_name SceneManager\n", encoding="utf-8")
 
             layout = discover_addon(root)
 
@@ -283,30 +283,32 @@ class TestAddonChunker(unittest.TestCase):
         self.assertEqual(len(chunks), 0)
 
     def test_api_file_extracts_public_declarations_only(self):
-        code = """using Godot;
+        code = """extends Node2D
 
-/// <summary>
-/// Main scene manager.
-/// </summary>
-public partial class ScenesManager : Node
-{
-    private int hidden;
-    public void ChangeScene(string sceneName) {}
-}
+signal scene_loaded
+signal transition_finished
+
+var is_transitioning := false
+
+func change_scene(path: Variant, setted_options: Dictionary = {}) -> void:
+\tpass
+
+func _load_scene_resource(path: Variant) -> Resource:
+\tpass
 """
         chunks = chunk_api_file(
             "scene_manager",
             "SceneManager",
-            "addons/scene_manager/addons/ScenesManager/ScenesManager.cs",
+            "addons/scene_manager/addons/scene_manager/SceneManager.gd",
             code,
         )
 
         self.assertEqual(len(chunks), 1)
         self.assertEqual(chunks[0].chunk_type, "addon_api")
-        self.assertEqual(chunks[0].symbol, "ScenesManager")
-        self.assertIn("public partial class ScenesManager", chunks[0].text)
-        self.assertIn("public void ChangeScene", chunks[0].text)
-        self.assertNotIn("private int hidden", chunks[0].text)
+        self.assertEqual(chunks[0].symbol, "SceneManager")
+        self.assertIn("signal scene_loaded", chunks[0].text)
+        self.assertIn("func change_scene", chunks[0].text)
+        self.assertNotIn("_load_scene_resource", chunks[0].text)
 
     def test_example_readme_tagged_as_example(self):
         md = "# Examples\n\nSome examples.\n\n## Basic\n\nBasic usage.\n"
@@ -389,14 +391,14 @@ class TestAddonIntegration(unittest.TestCase):
         # Addon 3: scene_manager with nested plugin docs and API source
         sm = addons / "scene_manager"
         sm.mkdir()
-        sm_plugin = sm / "addons" / "ScenesManager"
+        sm_plugin = sm / "addons" / "scene_manager"
         sm_plugin.mkdir(parents=True)
         (sm_plugin / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
         sm_docs = sm_plugin / "Docs"
         sm_docs.mkdir()
-        (sm_docs / "quick-start.md").write_text("# Quick Start\n\nUse TransitionNode.\n", encoding="utf-8")
-        (sm_plugin / "TransitionNode.cs").write_text(
-            "using Godot;\n\npublic partial class TransitionNode : Node {}\n",
+        (sm_docs / "quick-start.md").write_text("# Quick Start\n\nUse change_scene.\n", encoding="utf-8")
+        (sm_plugin / "SceneManager.gd").write_text(
+            "extends Node2D\n\nsignal scene_loaded\n\nfunc change_scene(path):\n\tpass\n",
             encoding="utf-8",
         )
 
@@ -445,7 +447,7 @@ class TestAddonIntegration(unittest.TestCase):
     def test_nested_addon_docs_and_api_are_searchable(self):
         with tempfile.TemporaryDirectory() as tmp:
             db_path = self._build_db(tmp)
-            results = search_database(db_path, "TransitionNode", limit=10, addon="scene_manager")
+            results = search_database(db_path, "change_scene", limit=10, addon="scene_manager")
             chunk_types = {r.chunk_type for r in results}
 
             self.assertIn("addon_doc", chunk_types)
