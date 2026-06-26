@@ -54,6 +54,9 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
+
       - name: Build docs and database
         run: |
           PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
