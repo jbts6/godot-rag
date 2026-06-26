@@ -161,22 +161,27 @@ def discover_addon(addon_dir: Path) -> AddonLayout:
         for candidate in _DOC_DIR_CANDIDATES:
             _append_unique(layout.doc_dirs, root / candidate)
 
-    # Root README
+    # Root README (fallback to .github/README.md)
     readme = addon_dir / "README.md"
     if readme.is_file():
         layout.doc_files.append(readme)
+    else:
+        gh_readme = addon_dir / ".github" / "README.md"
+        if gh_readme.is_file():
+            layout.doc_files.append(gh_readme)
 
     # Example directories, including project-specific "*examples*" folders.
     for root in roots:
         for candidate in _EXAMPLE_DIR_CANDIDATES:
             _append_unique(layout.example_dirs, root / candidate)
 
-    for child in addon_dir.iterdir():
-        if not child.is_dir():
-            continue
-        name = child.name.lower()
-        if "example" in name or name.endswith("_demo"):
-            _append_unique(layout.example_dirs, child)
+    for root in roots:
+        for child in root.iterdir():
+            if not child.is_dir():
+                continue
+            name = child.name.lower()
+            if "example" in name or name.endswith("_demo"):
+                _append_unique(layout.example_dirs, child)
 
     # Public API summaries from nested plugin implementation roots. These are
     # declaration-only chunks, not full-source indexing.
