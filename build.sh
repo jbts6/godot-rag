@@ -15,6 +15,7 @@ usage() {
   --no-bump      构建时不递增 pyproject.toml 版本
   --publish      构建并发布到 PyPI
   --test-pypi    构建并发布到 TestPyPI
+  --with-wiki    拉取 Scene Manager wiki 文档并纳入 RAG 构建
   -h, --help     显示帮助
 
 认证示例:
@@ -24,6 +25,7 @@ EOF
 
 NO_BUMP=0
 PUBLISH_TARGET=""
+WITH_WIKI=0
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -43,6 +45,9 @@ while [ "$#" -gt 0 ]; do
                 exit 1
             fi
             PUBLISH_TARGET="testpypi"
+            ;;
+        --with-wiki)
+            WITH_WIKI=1
             ;;
         -h|--help)
             usage
@@ -142,6 +147,24 @@ if [ ! -d "godot_rag/docs-md" ] || [ "$SUBMODULE_MTIME" -gt "$DOCS_MTIME" ]; the
         -o godot_rag/docs-md
 else
     echo "1. 转换 Markdown... 跳过（未过期）"
+fi
+
+# 可选：拉取 Scene Manager wiki 文档
+if [ "$WITH_WIKI" -eq 1 ]; then
+    echo "2a. 拉取 Scene Manager wiki..."
+    WIKI_CACHE=".cache/addon-wikis/scene_manager"
+    if [ -d "$WIKI_CACHE/.git" ]; then
+        git -C "$WIKI_CACHE" pull --ff-only || echo "警告: wiki 更新失败，使用缓存"
+    else
+        mkdir -p ".cache/addon-wikis"
+        git clone --depth 1 https://github.com/glass-brick/Scene-Manager.wiki.git "$WIKI_CACHE"
+    fi
+    # 复制到 addon 目录供 discovery 发现
+    rm -rf addons/scene_manager/docs_wiki
+    cp -r "$WIKI_CACHE" addons/scene_manager/docs_wiki
+    # 清理 .git 目录（不需要在 addon 内保留）
+    rm -rf addons/scene_manager/docs_wiki/.git
+    echo "   wiki 已同步到 addons/scene_manager/docs_wiki/"
 fi
 
 # 构建 RAG 数据库（含 addons）

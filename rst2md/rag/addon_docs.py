@@ -27,7 +27,7 @@ _SKIP_FILES = {
 # Code file extensions for examples
 _CODE_EXTENSIONS = {".gd", ".cs"}
 _DOC_EXTENSIONS = {".md", ".rst"}
-_DOC_DIR_CANDIDATES = ("docs", "Docs", "documentation", "Documentation", "doc/source")
+_DOC_DIR_CANDIDATES = ("docs", "Docs", "documentation", "Documentation", "doc/source", "docs_wiki")
 _EXAMPLE_DIR_CANDIDATES = ("examples", "demo", "dev_scenes")
 _API_SKIP_PARTS = {
     "docs", "documentation", "doc", "examples", "demo", "dev_scenes",
