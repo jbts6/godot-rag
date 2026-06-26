@@ -26,7 +26,13 @@ if [ -z "$GODOT_VERSION" ]; then
     exit 1
 fi
 PKG_VERSION="${GODOT_VERSION}.0"
-sed -i '' "s/^version = .*/version = \"${PKG_VERSION}\"/" pyproject.toml
+python3 -c "
+import re, sys
+p = sys.argv[1]; v = sys.argv[2]
+t = open(p).read()
+t = re.sub(r'^version = .*$', f'version = \"{v}\"', t, count=1, flags=re.MULTILINE)
+open(p, 'w').write(t)
+" pyproject.toml "${PKG_VERSION}"
 echo "版本: ${PKG_VERSION} (Godot ${GODOT_VERSION})"
 
 # 清理旧的构建产物（保留 docs-md）
@@ -34,7 +40,7 @@ rm -rf godot_rag/rag dist
 
 # 转换 Markdown（子模块提交时间晚于 docs-md 修改时间则重新生成）
 SUBMODULE_MTIME=$(git -C tools/godot-docs log -1 --format=%ct)
-DOCS_MTIME=$(stat -f %m godot_rag/docs-md 2>/dev/null || echo 0)
+DOCS_MTIME=$(python3 -c "import os,sys; print(int(os.path.getmtime(sys.argv[1]))) if os.path.exists(sys.argv[1]) else print(0)" godot_rag/docs-md)
 
 if [ ! -d "godot_rag/docs-md" ] || [ "$SUBMODULE_MTIME" -gt "$DOCS_MTIME" ]; then
     echo "1. 转换 Markdown...（子模块已更新，重新生成）"
@@ -58,7 +64,12 @@ PYTHONPATH=tools/godot-docs-rst2md uv run python3 -m rag.cli build \
 echo "3. 组装 RAG 包..."
 touch godot_rag/__init__.py
 cp tools/godot-docs-rst2md/rag/*.py godot_rag/rag/
-sed -i '' 's/from rag\./from godot_rag.rag./g' godot_rag/rag/*.py
+python3 -c "
+import glob, sys
+for f in glob.glob(sys.argv[1] + '/*.py'):
+    t = open(f).read().replace('from rag.', 'from godot_rag.rag.')
+    open(f, 'w').write(t)
+" godot_rag/rag
 
 # 构建 wheel
 echo "4. 构建 wheel..."

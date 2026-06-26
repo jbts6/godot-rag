@@ -12,6 +12,25 @@ CLASSREF_LINE_RE = re.compile(r"^\s*classref-\S+\s*$", re.MULTILINE)
 ANCHOR_RE = re.compile(r"`([^`<]+)<class_[^>]+>`")
 
 
+_FTS5_SPECIAL = set('"*+-:()^')
+
+def _escape_fts5(query: str) -> str:
+    """Escape FTS5 special characters so the query is treated as literal text.
+
+    FTS5 does not support backslash escaping. Tokens containing special
+    characters are wrapped in double quotes (phrase matching). Plain tokens
+    are left as-is so multi-word queries retain implicit AND semantics.
+    """
+    tokens = []
+    for token in query.split():
+        if any(c in _FTS5_SPECIAL for c in token):
+            escaped = token.replace('"', '""')
+            tokens.append(f'"{escaped}"')
+        else:
+            tokens.append(token)
+    return ' '.join(tokens)
+
+
 def clean_chunk_text(text: str) -> str:
     """Clean chunk text by removing classref noise and internal anchors."""
     # Remove standalone classref-* lines
@@ -207,9 +226,10 @@ def search_database(db_path: Path, query: str, limit: int = 8) -> List[SearchRes
 
     # 4. FTS5 search (bm25 → 0-40 score)
     try:
+        escaped_query = _escape_fts5(query)
         fts_rows = conn.execute(
             "SELECT c.*, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ? ORDER BY rank LIMIT ?",
-            (query, limit * 3),
+            (escaped_query, limit * 3),
         ).fetchall()
         for row in fts_rows:
             cid = row["id"]

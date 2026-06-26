@@ -92,6 +92,27 @@ def _chunk_class_document(path: str, lines: List[str]) -> List[Chunk]:
     member_start = None
     member_symbol = None
     member_type = None
+    in_enum = False  # True when inside an enum block (skip enum values as properties)
+
+    def _save_member(end_line):
+        nonlocal member_start, member_symbol, member_type
+        if member_start is not None and member_symbol:
+            member_text = "\n".join(lines[member_start:end_line]).strip()
+            if member_text:
+                chunks.append(Chunk(
+                    path=path,
+                    doc_type="class",
+                    chunk_type=member_type,
+                    symbol=member_symbol,
+                    heading=current_heading,
+                    breadcrumb=f"classes > {class_name} > {member_symbol.split('.')[-1]}",
+                    start_line=member_start + 1,
+                    end_line=end_line,
+                    text=member_text,
+                ))
+        member_start = None
+        member_symbol = None
+        member_type = None
 
     for i in range(first_member_idx, len(lines)):
         line = lines[i]
@@ -101,52 +122,56 @@ def _chunk_class_document(path: str, lines: List[str]) -> List[Chunk]:
         if heading_match:
             current_heading = heading_match.group(2).strip()
             current_heading_line = i + 1
+            in_enum = False
+            continue
+
+        # Check for enum declaration (before signal/method/property)
+        enum_match = ENUM_RE.search(line)
+        if enum_match:
+            _save_member(i)
+            enum_name = enum_match.group(1)
+            member_symbol = f"{class_name}.{enum_name}"
+            member_type = "enum"
+            member_start = i
+            in_enum = True
+            continue
+
+        # Check for signal (bold name with parens, no backtick type prefix)
+        signal_match = SIGNAL_RE.search(line)
+        if signal_match:
+            _save_member(i)
+            signal_name = signal_match.group(1)
+            member_symbol = f"{class_name}.{signal_name}"
+            member_type = "signal"
+            member_start = i
+            in_enum = False
+            continue
+
+        # Check for constant (bold uppercase name with = under Constants heading)
+        constant_match = CONSTANT_RE.search(line)
+        if constant_match and current_heading.lower() == "constants":
+            _save_member(i)
+            const_name = constant_match.group(1)
+            member_symbol = f"{class_name}.{const_name}"
+            member_type = "constant"
+            member_start = i
             continue
 
         # Check for method
         method_match = METHOD_RE.search(line)
         if method_match:
-            # Save previous member if exists
-            if member_start is not None and member_symbol:
-                member_text = "\n".join(lines[member_start:i]).strip()
-                if member_text:
-                    chunks.append(Chunk(
-                        path=path,
-                        doc_type="class",
-                        chunk_type=member_type,
-                        symbol=member_symbol,
-                        heading=current_heading,
-                        breadcrumb=f"classes > {class_name} > {member_symbol.split('.')[-1]}",
-                        start_line=member_start + 1,
-                        end_line=i,
-                        text=member_text,
-                    ))
-
+            _save_member(i)
             method_name = method_match.group(1)
             member_symbol = f"{class_name}.{method_name}"
             member_type = "method"
             member_start = i
+            in_enum = False
             continue
 
-        # Check for property
+        # Check for property (skip enum values to avoid misclassification)
         prop_match = PROPERTY_RE.search(line)
-        if prop_match and "(" not in line:
-            # Save previous member if exists
-            if member_start is not None and member_symbol:
-                member_text = "\n".join(lines[member_start:i]).strip()
-                if member_text:
-                    chunks.append(Chunk(
-                        path=path,
-                        doc_type="class",
-                        chunk_type=member_type,
-                        symbol=member_symbol,
-                        heading=current_heading,
-                        breadcrumb=f"classes > {class_name} > {member_symbol.split('.')[-1]}",
-                        start_line=member_start + 1,
-                        end_line=i,
-                        text=member_text,
-                    ))
-
+        if prop_match and "(" not in line and not in_enum:
+            _save_member(i)
             prop_name = prop_match.group(1)
             member_symbol = f"{class_name}.{prop_name}"
             member_type = "property"
@@ -154,20 +179,7 @@ def _chunk_class_document(path: str, lines: List[str]) -> List[Chunk]:
             continue
 
     # Save last member
-    if member_start is not None and member_symbol:
-        member_text = "\n".join(lines[member_start:]).strip()
-        if member_text:
-            chunks.append(Chunk(
-                path=path,
-                doc_type="class",
-                chunk_type=member_type,
-                symbol=member_symbol,
-                heading=current_heading,
-                breadcrumb=f"classes > {class_name} > {member_symbol.split('.')[-1]}",
-                start_line=member_start + 1,
-                end_line=len(lines),
-                text=member_text,
-            ))
+    _save_member(len(lines))
 
     return chunks
 

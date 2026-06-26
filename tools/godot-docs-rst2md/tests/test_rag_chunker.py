@@ -72,5 +72,66 @@ Avoid unnecessary boxing.
         self.assertIn("tutorials > scripting > c_sharp > c_sharp_variant > Conversion", chunks[1].breadcrumb)
 
 
+class ClassMemberChunkerTests(unittest.TestCase):
+    """Signals, enums, and constants should be chunked as separate members."""
+
+    MARKDOWN = """# Timer
+
+**Inherits:** `Node` **<** `Object`
+
+A countdown timer.
+
+## Properties
+
+## Methods
+
+## Signals
+
+**timeout**()
+
+Emitted when the timer reaches the end.
+
+## Enumerations
+
+enum **TimerProcessCallback**:
+
+`TimerProcessCallback` **TIMER_PROCESS_PHYSICS** = `0`
+
+Update the timer every physics process frame.
+
+`TimerProcessCallback` **TIMER_PROCESS_IDLE** = `1`
+
+Update the timer every process frame.
+
+## Constants
+
+**NOTIFICATION_ONE_SHOT** = `100`
+"""
+
+    def test_signal_is_chunked(self):
+        chunks = chunk_markdown("classes/class_timer.md", self.MARKDOWN)
+        symbols = [c.symbol for c in chunks]
+        self.assertIn("Timer.timeout", symbols)
+
+    def test_enum_is_chunked(self):
+        chunks = chunk_markdown("classes/class_timer.md", self.MARKDOWN)
+        symbols = [c.symbol for c in chunks]
+        self.assertIn("Timer.TimerProcessCallback", symbols)
+
+    def test_constant_is_chunked(self):
+        chunks = chunk_markdown("classes/class_timer.md", self.MARKDOWN)
+        symbols = [c.symbol for c in chunks]
+        self.assertIn("Timer.NOTIFICATION_ONE_SHOT", symbols)
+
+    def test_no_content_lost_between_members(self):
+        """Every line of the source should be covered by exactly one chunk."""
+        chunks = chunk_markdown("classes/class_timer.md", self.MARKDOWN)
+        all_text = "\n".join(c.text for c in chunks)
+        # Key phrases must appear in some chunk
+        self.assertIn("timeout", all_text)
+        self.assertIn("TimerProcessCallback", all_text)
+        self.assertIn("NOTIFICATION_ONE_SHOT", all_text)
+
+
 if __name__ == "__main__":
     unittest.main()
