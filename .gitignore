@@ -24,3 +24,9 @@ Thumbs.db
 godot_rag/
 dist/
 *.sqlite
+
+# Local scratch notes
+.scratch/
+
+# Build cache (wiki clones, etc.)
+.cache/
