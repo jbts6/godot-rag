@@ -108,7 +108,7 @@ def _plugin_roots(addon_dir: Path) -> List[Path]:
         if len(rel_parts) > 4:
             continue
         parent = cfg.parent
-        if parent not in roots:
+        if not any(_same_path(parent, r) for r in roots):
             roots.append(parent)
     return roots
 
@@ -184,12 +184,13 @@ def collect_doc_files(layout: AddonLayout) -> List[Path]:
     """Collect all documentation .md/.rst files from doc_dirs and doc_files."""
     files = []
     for doc_dir in layout.doc_dirs:
-        for doc in sorted(doc_dir.rglob("*")):
-            if not doc.is_file() or doc.suffix.lower() not in _DOC_EXTENSIONS:
-                continue
-            rel = str(doc.relative_to(layout.root))
-            if not _is_excluded(rel):
-                files.append(doc)
+        for ext in _DOC_EXTENSIONS:
+            for doc in sorted(doc_dir.rglob(f"*{ext}")):
+                if not doc.is_file():
+                    continue
+                rel = str(doc.relative_to(layout.root))
+                if not _is_excluded(rel):
+                    files.append(doc)
     for f in layout.doc_files:
         files.append(f)
     return files

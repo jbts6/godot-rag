@@ -66,10 +66,11 @@ Godot 插件（addons/）各自带有独立的文档和示例代码。当前 RAG
 
 ### 3.1 Schema 变更
 
-`chunks` 表新增一列：
+`chunks` 表新增两列：
 
 ```sql
-addon TEXT NOT NULL DEFAULT ''
+addon TEXT NOT NULL DEFAULT ''       -- 插件目录名（如 "statecharts"）
+addon_name TEXT NOT NULL DEFAULT ''  -- 插件显示名（如 "Godot State Charts"，来自 plugin.cfg）
 ```
 
 完整 chunks 表定义：
@@ -82,6 +83,7 @@ CREATE TABLE IF NOT EXISTS chunks (
   doc_type TEXT NOT NULL,
   chunk_type TEXT NOT NULL,
   addon TEXT NOT NULL DEFAULT '',
+  addon_name TEXT NOT NULL DEFAULT '',
   symbol TEXT NOT NULL DEFAULT '',
   heading TEXT NOT NULL DEFAULT '',
   breadcrumb TEXT NOT NULL DEFAULT '',
@@ -98,9 +100,10 @@ CREATE TABLE IF NOT EXISTS chunks (
 | doc_type | "class"/"tutorial"/"engine_detail"/"getting_started" | "addon" | "addon" | "addon" |
 | chunk_type | "class_summary"/"method"/"property"/"tutorial_section" | "addon_doc" | "addon_example" | "addon_api" |
 | addon | "" | "statecharts" | "statecharts" | "scene_manager" |
+| addon_name | "" | "Godot State Charts" | "Godot State Charts" | "Scene Manager" |
 | symbol | "Node.add_child" | "" | "addons/statecharts/examples/ant.gd" | "TransitionNode" |
 | heading | "Methods" | "Installation" | "ant.gd" | "TransitionNode.cs" |
-| breadcrumb | "classes > Node > add_child" | "addons > statecharts > Installation" | "addons > statecharts > examples/ant.gd" | "addons > SceneManager > API > ..." |
+| breadcrumb | "classes > Node > add_child" | "addons > Godot State Charts > Installation" | "addons > Godot State Charts > examples/ant.gd" | "addons > Scene Manager > API > ..." |
 
 ### 3.3 documents 表
 
@@ -128,6 +131,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 @dataclass
 class AddonLayout:
     name: str                    # 插件目录名，如 "statecharts"
+    display_name: str            # 插件显示名，如 "Godot State Charts"（来自 plugin.cfg）
     root: Path                   # 插件根目录
     doc_dirs: List[Path]         # 文档目录列表
     doc_files: List[Path]        # 单独的文档文件（如根 README.md）
@@ -197,7 +201,7 @@ class AddonLayout:
 复用现有 `chunker.py` 的 `_chunk_tutorial_document()` 逻辑：
 
 ```
-输入：addon_name: str, rel_path: str, markdown: str
+输入：addon_name: str（目录名）, display_name: str（显示名）, rel_path: str, markdown: str
 输出：List[Chunk]
 
 1. 按 markdown heading（# ## ###）分段
@@ -206,9 +210,10 @@ class AddonLayout:
    - doc_type = "addon"
    - chunk_type = "addon_doc"
    - addon = addon_name
+   - addon_name = display_name
    - symbol = ""
    - heading = 段落标题
-   - breadcrumb = "addons > {addon_name} > {标题}"
+   - breadcrumb = "addons > {display_name} > {标题}"
    - start_line / end_line = 段落在原文中的行号
    - text = 段落内容
 ```
@@ -326,7 +331,8 @@ class SearchResult:
     end_line: int
     doc_type: str
     chunk_type: str
-    addon: str          # 新增
+    addon: str          # 插件目录名
+    addon_name: str     # 插件显示名（来自 plugin.cfg）
     symbol: str
     heading: str
     breadcrumb: str

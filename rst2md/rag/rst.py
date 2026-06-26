@@ -31,7 +31,10 @@ def _fallback_rst_to_md(rst_text: str) -> str:
             i += 2
             continue
         if line.lstrip().startswith(".. "):
+            # Skip directive header and its indented body
             i += 1
+            while i < len(lines) and lines[i] and (lines[i][0] in " \t"):
+                i += 1
             continue
         out.append(line)
         i += 1

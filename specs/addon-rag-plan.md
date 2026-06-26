@@ -257,7 +257,59 @@ class TestAddonCLI(unittest.TestCase):
 - [x] 更新 README.md，加 s-addon 使用说明和开发测试命令
 - [x] 更新 specs/addon-rag.md 中的验证清单
 - [x] 两个副本（rst2md/ 和 godot_rag/）代码同步（build.sh 步骤 3 自动处理）
-- [ ] git commit
+- [x] git commit (25e7b72)
+
+---
+
+## Phase 7: Review 修复
+
+基于 code review 发现的问题，逐一修复。
+
+### 7.1 Bug: `cmd_build` 缺 `--db` 时 crash
+
+**问题**：`cli.py` 的 `cmd_build` 直接 `Path(args.db)`，若 `--db` 为 None 会 TypeError。
+**修复**：给 build 子命令的 `--db` 加 `required=True`，或提供默认路径。
+
+- [x] 修复 `cli.py` 中 `cmd_build` 的 `--db` 处理
+
+### 7.2 Spec 同步: `addon_name` / `display_name` 字段
+
+**问题**：实现中加了 `addon_name`（Chunk、SearchResult）和 `display_name`（AddonLayout），但 spec 未记录。
+**修复**：更新 `specs/addon-rag.md` 中 schema、字段约定、AddonLayout、SearchResult 定义。
+
+- [x] 更新 §3.1 schema 定义
+- [x] 更新 §3.2 字段约定表
+- [x] 更新 §4.1 AddonLayout 定义
+- [x] 更新 §5.1 breadcrumb 伪代码
+- [x] 更新 §6.3 SearchResult 定义
+
+### 7.3 测试: README→addon_example 端到端测试
+
+**问题**：`test_example_readme_tagged_as_example` 只测了 `chunk_addon_markdown`，没测 `chunk_addon` 的转换。
+**修复**：加一个端到端测试，用 `chunk_addon` 处理含 examples/README.md 的目录。
+
+- [x] 添加端到端测试 (`test_chunk_addon_readme_in_examples_becomes_addon_example`)
+
+### 7.4 小问题: RST fallback directive 处理
+
+**问题**：`_fallback_rst_to_md` 只跳过 `.. ` 开头行，directive body 泄漏。
+**修复**：跳过 directive 头及其后续缩进 body。
+
+- [x] 修复 `_fallback_rst_to_md`
+
+### 7.5 小问题: `_plugin_roots` case-sensitive 比较
+
+**问题**：`if parent not in roots` 用 `Path.__eq__`（case-sensitive），而其他地方用 `_same_path`。
+**修复**：改用 `_same_path` 检查。
+
+- [x] 修复 `_plugin_roots` 中的路径比较
+
+### 7.6 小问题: `collect_doc_files` rglob 效率
+
+**问题**：`rglob("*")` 遍历所有文件再过滤，不如 `rglob("*.md") + rglob("*.rst")` 高效。
+**修复**：改为两次 rglob。
+
+- [x] 优化 `collect_doc_files` 的 rglob
 
 ---
 
@@ -275,6 +327,8 @@ Phase 4 (CLI)
 Phase 5 (tests)
   ↓
 Phase 6 (收尾)
+  ↓
+Phase 7 (review 修复) ← 当前
 ```
 
 每 Phase 完成后跑全部测试，确认无回归再进入下一 Phase。

@@ -316,6 +316,26 @@ public partial class ScenesManager : Node
             self.assertEqual(c.chunk_type, "addon_doc")  # raw function returns addon_doc
         # But after chunk_addon processing, they become addon_example
 
+    def test_chunk_addon_readme_in_examples_becomes_addon_example(self):
+        """End-to-end: README.md inside examples/ gets chunk_type='addon_example'."""
+        with tempfile.TemporaryDirectory() as tmp:
+            addon = Path(tmp) / "myaddon"
+            addon.mkdir()
+            examples = addon / "examples"
+            examples.mkdir()
+            (examples / "README.md").write_text(
+                "# Examples\n\nSome examples.\n\n## Basic\n\nBasic usage.\n",
+                encoding="utf-8",
+            )
+            (examples / "demo.gd").write_text("func _ready():\n    pass\n", encoding="utf-8")
+
+            chunks = chunk_addon(addon)
+            readme_chunks = [c for c in chunks if "README" in c.heading]
+            self.assertTrue(len(readme_chunks) > 0, "Should find README chunks")
+            for c in readme_chunks:
+                self.assertEqual(c.chunk_type, "addon_example",
+                    f"README in examples/ should be addon_example, got {c.chunk_type}")
+
 
 class TestAddonIntegration(unittest.TestCase):
     """End-to-end: build database with addons and search."""
