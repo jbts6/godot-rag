@@ -46,7 +46,7 @@ if [ ! -d "godot_rag/docs-md" ] || [ "$SUBMODULE_MTIME" -gt "$DOCS_MTIME" ]; the
     echo "1. 转换 Markdown...（子模块已更新，重新生成）"
     rm -rf godot_rag/docs-md
     mkdir -p godot_rag
-    uv run python3 rst2md/rst2md_batch.py \
+    PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py \
         -i godot-docs \
         -o godot_rag/docs-md
 else

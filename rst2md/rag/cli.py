@@ -5,8 +5,18 @@ import argparse
 import json
 import sys
 from pathlib import Path
+from importlib import resources
 
 from rag.store import build_database, search_database
+
+
+def default_db_path() -> Path:
+    """Return the bundled database path for installed package usage."""
+    return Path(resources.files("godot_rag.rag") / "godot_docs.sqlite")
+
+
+def _db_path_from_args(args) -> Path:
+    return Path(args.db) if args.db else default_db_path()
 
 
 def cmd_build(args):
@@ -61,7 +71,7 @@ def _print_results(results, as_json: bool):
 
 def cmd_search(args):
     """Search the RAG database (all doc types)."""
-    db_path = Path(args.db)
+    db_path = _db_path_from_args(args)
 
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
@@ -73,7 +83,7 @@ def cmd_search(args):
 
 def cmd_search_class(args):
     """Search class reference docs only."""
-    db_path = Path(args.db)
+    db_path = _db_path_from_args(args)
 
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
@@ -85,7 +95,7 @@ def cmd_search_class(args):
 
 def cmd_search_tutorial(args):
     """Search tutorial and getting-started docs only."""
-    db_path = Path(args.db)
+    db_path = _db_path_from_args(args)
 
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
@@ -99,7 +109,7 @@ def cmd_search_tutorial(args):
 
 def cmd_search_engine(args):
     """Search engine detail docs only."""
-    db_path = Path(args.db)
+    db_path = _db_path_from_args(args)
 
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
@@ -113,7 +123,7 @@ def cmd_search_engine(args):
 
 def cmd_search_addon(args):
     """Search addon docs and examples."""
-    db_path = Path(args.db)
+    db_path = _db_path_from_args(args)
 
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
@@ -129,7 +139,7 @@ def cmd_search_addon(args):
 def _add_search_args(parser):
     """Add common search arguments to a subparser."""
     parser.add_argument("query", help="Search query")
-    parser.add_argument("--db", required=True, help="Path to SQLite database")
+    parser.add_argument("--db", help="Path to SQLite database")
     parser.add_argument("--limit", type=int, default=8, help="Max results")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 

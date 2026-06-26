@@ -6,14 +6,14 @@ Godot 插件（addons/）各自带有独立的文档和示例代码。当前 RAG
 
 ### 1.1 目标
 
-- 将 8 个插件的文档和示例代码纳入 `godot_docs.sqlite`
+- 将 `addons/` 下当前可发现插件的文档、示例代码和公开 API 摘要纳入 `godot_docs.sqlite`
 - 通过 `addon` 字段区分插件来源
 - 支持按插件名过滤搜索
 - 与现有 Godot 官方文档共存于同一数据库
 
 ### 1.2 非目标
 
-- 不处理插件的源码（addons/xxx/addons/ 下的 .gd 实现代码）
+- 不索引完整插件实现源码；仅从实现代码中提取公开声明和文档注释作为 `addon_api`
 - 不处理 .tscn、.tres、.uid 等 Godot 资源文件
 - 不为每个插件建独立数据库
 
@@ -31,6 +31,7 @@ Godot 插件（addons/）各自带有独立的文档和示例代码。当前 RAG
 | input_helper | docs/ (5 文件) | MD | examples/ (2 .gd, 1 .cs) | .gd .cs | 最小示例集 |
 | limboai | doc/source/ (103 文件) | **RST** | demo/ (27 .gd) | .gd | 唯一 RST 格式，需转换 |
 | phantom-camera | 无 | — | dev_scenes/ (2 .gd) | .gd | 只有根 README，无 docs/ |
+| scene_manager | addons/ScenesManager/Docs/ (9 文件) | MD | demo/ (5 .cs) | .cs | 文档和插件实现位于嵌套 plugin 根 |
 | sound_manager | docs/ (4 文件) | MD | examples/ (1 .gd, 1 .cs) | .gd .cs | 最小文档集 |
 | statecharts | docs/_docs/ (12 文件) | MD | godot_state_charts_examples/ (19 .gd, 2 .cs) | .gd .cs | 示例目录有 README.md |
 
@@ -45,6 +46,7 @@ Godot 插件（addons/）各自带有独立的文档和示例代码。当前 RAG
 | 示例 .gd | examples/、demo/、dev_scenes/ | addon_example | 整个文件一个 chunk |
 | 示例 .cs | examples/、demo/、dev_scenes/ | addon_example | 整个文件一个 chunk |
 | 示例 README | 示例目录内 | addon_example | 按 heading 分 chunk |
+| 公开 API 摘要 | 嵌套 plugin 根下的 .gd/.cs | addon_api | 只提取公开声明和文档注释 |
 
 **跳过的内容：**
 
@@ -91,14 +93,14 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 ### 3.2 字段约定
 
-| 字段 | Godot 官方文档 | 插件文档 | 插件示例 |
-|---|---|---|---|
-| doc_type | "class"/"tutorial"/"engine_detail"/"getting_started" | "addon" | "addon" |
-| chunk_type | "class_summary"/"method"/"property"/"tutorial_section" | "addon_doc" | "addon_example" |
-| addon | "" | "statecharts" | "statecharts" |
-| symbol | "Node.add_child" | "" | "addons/statecharts/examples/ant.gd" |
-| heading | "Methods" | "Installation" | "ant.gd" |
-| breadcrumb | "classes > Node > add_child" | "addons > statecharts > Installation" | "addons > statecharts > examples/ant.gd" |
+| 字段 | Godot 官方文档 | 插件文档 | 插件示例 | 插件公开 API |
+|---|---|---|---|---|
+| doc_type | "class"/"tutorial"/"engine_detail"/"getting_started" | "addon" | "addon" | "addon" |
+| chunk_type | "class_summary"/"method"/"property"/"tutorial_section" | "addon_doc" | "addon_example" | "addon_api" |
+| addon | "" | "statecharts" | "statecharts" | "scene_manager" |
+| symbol | "Node.add_child" | "" | "addons/statecharts/examples/ant.gd" | "TransitionNode" |
+| heading | "Methods" | "Installation" | "ant.gd" | "TransitionNode.cs" |
+| breadcrumb | "classes > Node > add_child" | "addons > statecharts > Installation" | "addons > statecharts > examples/ant.gd" | "addons > SceneManager > API > ..." |
 
 ### 3.3 documents 表
 
@@ -106,7 +108,7 @@ CREATE TABLE IF NOT EXISTS chunks (
 
 ### 3.4 symbols 表
 
-插件示例代码的 symbol 为文件路径（如 `"addons/statecharts/examples/ant.gd"`），normalized 为小写。这样 `s-addon "ant.gd"` 能精确匹配。
+插件示例代码的 symbol 为文件路径（如 `"addons/statecharts/examples/ant.gd"`），normalized 为小写。这样 `s-addon "ant.gd"` 能精确匹配。插件公开 API 的 symbol 为文件内第一个公开类/声明名，其余公开声明通过 FTS 命中。
 
 ### 3.5 FTS5 索引
 
@@ -130,26 +132,28 @@ class AddonLayout:
     doc_dirs: List[Path]         # 文档目录列表
     doc_files: List[Path]        # 单独的文档文件（如根 README.md）
     example_dirs: List[Path]     # 示例目录列表
-    is_rst: bool                 # 是否为 RST 格式（limboai）
+    api_dirs: List[Path]         # 嵌套 plugin 根，用于提取公开 API 摘要
 ```
 
 **发现逻辑：**
 
 ```
 1. name = addon_dir.name
-2. doc_dirs = []
-   - 若 addon_dir/docs/ 存在 → 加入 doc_dirs
-   - 若 addon_dir/documentation/ 存在 → 加入 doc_dirs
-   - 若 addon_dir/doc/source/ 存在 → 加入 doc_dirs
-3. doc_files = []
+2. plugin_roots = [addon_dir] + addon_dir 下 4 层内 plugin.cfg 所在目录
+3. doc_dirs = []
+   - 对每个 plugin_root，若 docs/、Docs/ 存在 → 加入 doc_dirs
+   - 对每个 plugin_root，若 documentation/、Documentation/ 存在 → 加入 doc_dirs
+   - 对每个 plugin_root，若 doc/source/ 存在 → 加入 doc_dirs
+4. doc_files = []
    - 若 addon_dir/README.md 存在 → 加入 doc_files
-4. example_dirs = []
+5. example_dirs = []
    - 若 addon_dir/examples/ 存在 → 加入 example_dirs
    - 若 addon_dir/demo/ 存在 → 加入 example_dirs
    - 若 addon_dir/dev_scenes/ 存在 → 加入 example_dirs
+   - 若 addon_dir 直接子目录名包含 example 或以 _demo 结尾 → 加入 example_dirs
    - 注意：gdUnit4 的 test/ 不算示例，不加入
-5. is_rst = (addon_dir/doc/source/index.rst 存在)
-6. 返回 AddonLayout
+6. api_dirs = 嵌套 plugin_roots（不含 addon_dir）
+7. 返回 AddonLayout
 ```
 
 ### 4.2 内容收集
@@ -158,10 +162,10 @@ class AddonLayout:
 
 ```
 输入：doc_dirs: List[Path], doc_files: List[Path]
-输出：List[Path]（所有 .md 文件，若 is_rst 则包含转换后的 .md）
+输出：List[Path]（所有 .md/.rst 文件）
 
 对每个 doc_dir：
-  递归扫描 *.md（RST 情况先转换）
+  递归扫描 *.md、*.rst（RST 在 chunk 阶段转换）
   排除路径包含以下任一的文件：
     _includes/  _layouts/  assets/  .github/  pages/
     CONTRIBUTING  CODE_OF_CONDUCT  SECURITY  CHANGELOG
@@ -246,9 +250,21 @@ class AddonLayout:
 ### 5.4 limboai RST 处理
 
 ```
-1. 对 doc/source/ 下的 .rst 文件，调用 rst2md_batch.py 的转换单元
+1. 对 doc/source/ 下的 .rst 文件，调用 rag.rst 的转换单元
 2. 转换为 .md 后，按 5.1 逻辑 chunk
 3. classes/ 下的 auto-generated class ref 文件，按 class 文档逻辑处理
+```
+
+### 5.5 公开 API 摘要 → addon_api
+
+嵌套 plugin 根（例如 `addons/scene_manager/addons/ScenesManager/`）中的 `.gd/.cs` 文件不作为完整源码入库，而是提取公开声明和紧邻文档注释：
+
+```
+1. 扫描 public class/interface/struct/enum、public 方法/属性，以及 GDScript class_name/func/signal/enum/const/export/var 声明
+2. 保留声明行和其上方连续的 ///、##、attribute 注释
+3. 每个文件生成一个 addon_api chunk
+4. symbol = 文件中的第一个公开类/声明名；其余声明通过 FTS 命中
+5. text 不包含 private 字段和函数体内部实现
 ```
 
 ---
@@ -426,10 +442,12 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 |---|---|---|
 | rst2md/rag/models.py | 修改 | SearchResult 加 addon 字段 |
 | rst2md/rag/store.py | 修改 | SCHEMA 加 addon 列，search_database 加 addon 参数，build_database 加 addons_dir 参数 |
-| rst2md/rag/addon_docs.py | **新建** | discover_addon()、chunk_addon_docs()、chunk_code_file() |
-| rst2md/rag/cli.py | 修改 | 新增 s-addon 子命令 |
+| rst2md/rag/addon_docs.py | **新建** | discover_addon()、chunk_addon()、chunk_code_file()、chunk_api_file() |
+| rst2md/rag/rst.py | **新建** | 共享 RST 转换和 Markdown 清理逻辑 |
+| rst2md/rag/cli.py | 修改 | 新增 s-addon 子命令，搜索默认使用包内数据库 |
 | rst2md/tests/test_rag_addon.py | **新建** | 发现、chunk、搜索、CLI 测试 |
 | rst2md/tests/test_rag_search.py | 修改 | SearchResult 构造加 addon="" |
+| pyproject.toml | 修改 | 新增 pytest 配置和 dev 依赖 |
 | build.sh | 修改 | 新增 addon 处理步骤 |
 | godot_rag/rag/models.py | 修改 | 同步 models.py |
 | godot_rag/rag/store.py | 修改 | 同步 store.py |
@@ -451,9 +469,11 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 | TestAddonChunker | .gd 文件整体为一个 chunk | 写入含 ## 注释的 .gd 文件 |
 | TestAddonChunker | .cs 文件整体为一个 chunk | 写入含 /// 注释的 .cs 文件 |
 | TestAddonChunker | 示例 README 按 heading 分 chunk | 写入 examples/README.md |
+| TestAddonChunker | 公开 API 摘要只含声明和注释 | 写入含 public/private 的 .cs 文件 |
 | TestAddonSearch | s-addon 搜所有插件 | 建库含两个插件数据 |
 | TestAddonSearch | s-addon --addon 过滤单个插件 | 同上 |
 | TestAddonSearch | s-addon 与 s 互不干扰 | 建库含 Godot 文档 + 插件数据 |
+| TestAddonSearch | 示例文件 symbol 指向自身 chunk | addon 文档 chunk 在前、example chunk 在后 |
 | TestAddonCLI | s-addon --help 输出正确 | subprocess 调用 |
 
 ### 10.2 集成测试
@@ -462,10 +482,11 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 |---|---|
 | 完整构建 | 对 addons/statecharts/ 建库，验证 addon_doc 和 addon_example 均存在 |
 | 搜索验证 | 搜 "state machine" --addon statecharts，验证只返回 statecharts 结果 |
+| 真实 addon 抽样 | 对当前 addons/ 建临时库，验证 9 个 addon 均入库 |
 
 ### 10.3 回归测试
 
-现有 25 个测试必须全部通过，addon 列对旧数据为空字符串，不影响现有行为。
+现有测试必须全部通过，addon 列对旧数据为空字符串，不影响现有行为。当前验证结果为 `rtk uv run pytest -q`：56 passed。
 
 ---
 

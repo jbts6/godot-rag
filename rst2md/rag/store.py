@@ -150,10 +150,12 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
         ).fetchall()]
 
         symbols = extract_symbols(chunks)
-        for sym, chunk_id in zip(symbols, chunk_ids[:len(symbols)]):
+        for sym in symbols:
+            if sym.chunk_id >= len(chunk_ids):
+                continue
             conn.execute(
                 "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
-                (sym.name, sym.normalized_name, sym.kind, chunk_id, sym.path),
+                (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
             )
 
     # Process addons
@@ -194,10 +196,12 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
             ).fetchall()]
 
             symbols = extract_symbols(addon_chunks)
-            for sym, chunk_id in zip(symbols, chunk_ids[:len(symbols)]):
+            for sym in symbols:
+                if sym.chunk_id >= len(chunk_ids):
+                    continue
                 conn.execute(
                     "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
-                    (sym.name, sym.normalized_name, sym.kind, chunk_id, sym.path),
+                    (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
                 )
 
     # Sync FTS index
@@ -241,12 +245,6 @@ def search_database(
         addon_filter = " AND c.addon = ?"
         addon_params = [addon]
 
-    # 1. Exact symbol match (+100)
-    rows = conn.execute(
-        "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
-        + type_filter + addon_filter,
-        [normalized] + type_params + addon_params,
-    ).fetchall()
     def _make_result(row, score):
         return {
             "score": score,

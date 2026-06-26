@@ -6,6 +6,11 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = []
 
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
 [project.scripts]
 godot-rag = "godot_rag.rag.cli:main"
 
@@ -19,3 +24,7 @@ exclude = ["godot_rag/docs-md/**"]
 
 [tool.hatch.build]
 ignore-vcs = true
+
+[tool.pytest.ini_options]
+pythonpath = ["rst2md"]
+testpaths = ["rst2md/tests"]

@@ -45,8 +45,8 @@ def search_database(
 ```
 
 **验证**：
-- [ ] 现有 25 个测试全部通过（addon 列默认空字符串，不影响）
-- [ ] 建库后 PRAGMA table_info(chunks) 包含 addon 列
+- [x] 现有测试全部通过（addon 列默认空字符串，不影响）
+- [x] 建库后 PRAGMA table_info(chunks) 包含 addon 列
 
 ---
 
@@ -67,7 +67,7 @@ class AddonLayout:
     doc_dirs: List[Path]
     doc_files: List[Path]
     example_dirs: List[Path]
-    is_rst: bool
+    api_dirs: List[Path]
 
 def discover_addon(addon_dir: Path) -> AddonLayout:
     """自动发现单个插件的文档和示例目录。"""
@@ -89,6 +89,10 @@ def chunk_code_file(addon_name: str, rel_path: str, code: str) -> List[Chunk]:
     """示例 .gd/.cs 整体为一个 chunk，chunk_type="addon_example"。"""
     ...
 
+def chunk_api_file(addon_name: str, rel_path: str, code: str) -> List[Chunk]:
+    """实现 .gd/.cs 的公开声明摘要，chunk_type="addon_api"。"""
+    ...
+
 def chunk_addon(addon_dir: Path) -> List[Chunk]:
     """对单个插件，发现 + 收集 + chunk，返回所有 chunks。"""
     ...
@@ -105,11 +109,14 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
 - breadcrumb = "addons > {addon_name} > {相对路径}"
 
 **验证**：
-- [ ] 对 statecharts 插件，discover_addon 发现 docs/_docs/ 和 godot_state_charts_examples/
-- [ ] 对 phantom-camera，discover_addon 只发现 README.md
-- [ ] 对 gdUnit4，discover_addon 发现 documentation/ 但不包含 test/
-- [ ] chunk_code_file 对含 ## 注释的 .gd 文件，chunk 包含完整注释
-- [ ] chunk_addon_markdown 对含 ## 的 .md 文件，按 heading 分成多 chunk
+- [x] 对 statecharts 插件，discover_addon 发现 docs/ 和 godot_state_charts_examples/
+- [x] 对 phantom-camera，discover_addon 发现 README.md 和 dev_scenes/
+- [x] 对 gdUnit4，discover_addon 发现 documentation/ 但不包含 test/
+- [x] 对 scene_manager，discover_addon 发现嵌套 addons/ScenesManager/Docs 和 api_dirs
+- [x] 对 limboai，collect_doc_files 收集 .rst 文档
+- [x] chunk_code_file 对含 ## 注释的 .gd 文件，chunk 包含完整注释
+- [x] chunk_api_file 仅提取公开声明和文档注释
+- [x] chunk_addon_markdown 对含 ## 的 .md 文件，按 heading 分成多 chunk
 
 ---
 
@@ -161,8 +168,8 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 ```
 
 **验证**：
-- [ ] build.sh 执行后，godot_docs.sqlite 包含 addon 类型数据
-- [ ] 查询 SELECT DISTINCT addon FROM chunks WHERE doc_type='addon' 返回 8 个插件名
+- [x] 临时建库后，godot_docs.sqlite 包含 addon 类型数据
+- [x] 查询 SELECT DISTINCT addon FROM chunks WHERE doc_type='addon' 返回当前 9 个插件名
 
 ---
 
@@ -178,7 +185,7 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 
 ```python
 def cmd_search_addon(args):
-    db_path = Path(args.db)
+    db_path = Path(args.db) if args.db else default_db_path()
     if not db_path.exists():
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
@@ -199,9 +206,10 @@ addon_parser.set_defaults(func=cmd_search_addon)
 ```
 
 **验证**：
-- [ ] `s-addon --help` 显示正确
-- [ ] `s-addon "state" --addon statecharts` 只返回 statecharts 结果
-- [ ] `s-addon "state" --json` 输出包含 addon 字段
+- [x] `s-addon --help` 显示正确
+- [x] `s-addon "state" --addon statecharts` 只返回 statecharts 结果（测试覆盖 addon 过滤）
+- [x] `s-addon "state" --json` 输出包含 addon 字段（JSON 输出结构包含 addon）
+- [x] 搜索命令不传 --db 时默认使用包内数据库路径
 
 ---
 
@@ -238,16 +246,17 @@ class TestAddonCLI(unittest.TestCase):
 ```
 
 **验证**：
-- [ ] 全部新增测试通过
-- [ ] 现有 25 个测试全部通过（回归验证）
+- [x] 全部新增测试通过
+- [x] 现有测试全部通过（回归验证）
+- [x] `rtk uv run pytest -q`：56 passed
 
 ---
 
 ## Phase 6: 收尾
 
-- [ ] 更新 README.md，加 s-addon 使用说明
-- [ ] 更新 specs/addon-rag.md 中的验证清单
-- [ ] 两个副本（rst2md/ 和 godot_rag/）代码同步
+- [x] 更新 README.md，加 s-addon 使用说明和开发测试命令
+- [x] 更新 specs/addon-rag.md 中的验证清单
+- [x] 两个副本（rst2md/ 和 godot_rag/）代码同步（build.sh 步骤 3 自动处理）
 - [ ] git commit
 
 ---

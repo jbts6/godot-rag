@@ -2,10 +2,16 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
+from unittest.mock import patch
 
+from rag.cli import _db_path_from_args
 from rag.chunker import chunk_markdown
 from rag.store import build_database, search_database
+
+
+TEST_ENV = {**os.environ, "PYTHONPATH": "rst2md"}
 
 
 class SearchTests(unittest.TestCase):
@@ -144,6 +150,7 @@ class CliTests(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
 
         self.assertEqual(result.returncode, 0)
@@ -155,6 +162,7 @@ class CliTests(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("query", result.stdout)
@@ -164,6 +172,7 @@ class CliTests(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "s-tutorial", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("query", result.stdout)
@@ -173,9 +182,17 @@ class CliTests(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "s-engine", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("query", result.stdout)
+
+    def test_search_args_default_to_bundled_database(self):
+        class Args:
+            db = None
+
+        with patch("rag.cli.default_db_path", return_value=Path("/tmp/godot_docs.sqlite")):
+            self.assertEqual(_db_path_from_args(Args()), Path("/tmp/godot_docs.sqlite"))
 
 
 if __name__ == "__main__":

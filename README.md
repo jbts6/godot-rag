@@ -45,6 +45,7 @@ godot-rag s "Timer"
 ```bash
 # JSON output (for AI Agent)
 godot-rag s-class "Vector3.normalized" --json
+godot-rag s-addon "TransitionNode" --addon scene_manager --json
 
 # Limit results
 godot-rag s-tutorial "C# Variant" --limit 3
@@ -80,9 +81,15 @@ cd godot-docs && git pull origin stable
 ./build.sh
 
 # Or manually:
-uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
-uv run python3 rst2md/rag/cli.py build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite
-uv run python3 -m build --wheel
+PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
+PYTHONPATH=rst2md uv run python3 -m rag.cli build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite --addons addons
+uv build --wheel
+```
+
+## Development
+
+```bash
+uv run pytest -q
 ```
 
 ## License

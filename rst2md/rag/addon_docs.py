@@ -1,4 +1,4 @@
-"""Discover and chunk addon documentation and examples."""
+"""Discover and chunk addon documentation, examples, and public API summaries."""
 
 import re
 from dataclasses import dataclass, field
@@ -12,6 +12,10 @@ _EXCLUDE_DIRS = {
     "_includes", "_layouts", "assets", ".github", "pages",
     "test", "tests", ".git",
 }
+_ALLOWED_UNDERSCORE_DIRS = {
+    "_docs", "_first_steps", "_testing", "_advanced_testing",
+    "_tutorials", "_faq", "_csharp_project_setup",
+}
 
 # Non-doc files to skip
 _SKIP_FILES = {
@@ -22,6 +26,26 @@ _SKIP_FILES = {
 
 # Code file extensions for examples
 _CODE_EXTENSIONS = {".gd", ".cs"}
+_DOC_EXTENSIONS = {".md", ".rst"}
+_DOC_DIR_CANDIDATES = ("docs", "Docs", "documentation", "Documentation", "doc/source")
+_EXAMPLE_DIR_CANDIDATES = ("examples", "demo", "dev_scenes")
+_API_SKIP_PARTS = {
+    "docs", "documentation", "doc", "examples", "demo", "dev_scenes",
+    "test", "tests", ".git", "assets",
+}
+
+_CSHARP_TYPE_RE = re.compile(
+    r"^\s*(?:public|protected|internal)?\s*"
+    r"(?:(?:static|abstract|sealed|partial)\s+)*"
+    r"(?:class|interface|struct|enum)\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+)
+_CSHARP_MEMBER_RE = re.compile(
+    r"^\s*public\s+(?:(?:static|override|virtual|async|partial|new)\s+)*"
+    r"[\w<>\[\],?.]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(|\{)"
+)
+_GDSCRIPT_SYMBOL_RE = re.compile(
+    r"^\s*(?:class_name|func|signal|enum|const|@export\s+var|var)\s+([A-Za-z_][A-Za-z0-9_]*)\b"
+)
 
 
 @dataclass
@@ -33,20 +57,60 @@ class AddonLayout:
     doc_dirs: List[Path] = field(default_factory=list)
     doc_files: List[Path] = field(default_factory=list)
     example_dirs: List[Path] = field(default_factory=list)
+    api_dirs: List[Path] = field(default_factory=list)
 
 
 def _is_excluded(rel_path: str) -> bool:
     """Check if a relative path should be excluded."""
     parts = Path(rel_path).parts
     for part in parts:
-        if part in _EXCLUDE_DIRS:
+        part_lower = part.lower()
+        if part_lower in _EXCLUDE_DIRS:
             return True
-        if part.startswith("_") and part not in ("_docs", "_first_steps", "_testing", "_advanced_testing", "_tutorials", "_faq", "_csharp_project_setup"):
+        if part.startswith("_") and part not in _ALLOWED_UNDERSCORE_DIRS:
             return True
     filename = Path(rel_path).name.lower()
     if filename in _SKIP_FILES:
         return True
     return False
+
+
+def _same_path(left: Path, right: Path) -> bool:
+    try:
+        return str(left.resolve()).casefold() == str(right.resolve()).casefold()
+    except OSError:
+        return str(left).casefold() == str(right).casefold()
+
+
+def _existing_path(path: Path) -> Path:
+    """Return the existing directory path with on-disk casing when possible."""
+    try:
+        for child in path.parent.iterdir():
+            if _same_path(child, path):
+                return child
+    except OSError:
+        pass
+    return path
+
+
+def _append_unique(paths: List[Path], path: Path) -> None:
+    if path.is_dir() and not any(_same_path(path, existing) for existing in paths):
+        paths.append(_existing_path(path))
+
+
+def _plugin_roots(addon_dir: Path) -> List[Path]:
+    roots = [addon_dir]
+    for cfg in sorted(addon_dir.rglob("plugin.cfg")):
+        try:
+            rel_parts = cfg.relative_to(addon_dir).parts
+        except ValueError:
+            continue
+        if len(rel_parts) > 4:
+            continue
+        parent = cfg.parent
+        if parent not in roots:
+            roots.append(parent)
+    return roots
 
 
 def _read_plugin_name(addon_dir: Path) -> Optional[str]:
@@ -83,34 +147,49 @@ def discover_addon(addon_dir: Path) -> AddonLayout:
         root=addon_dir,
     )
 
-    # Doc directories
-    for candidate in ["docs", "documentation", "doc/source"]:
-        d = addon_dir / candidate
-        if d.is_dir():
-            layout.doc_dirs.append(d)
+    roots = _plugin_roots(addon_dir)
+
+    # Doc directories from addon root and nested plugin roots.
+    for root in roots:
+        for candidate in _DOC_DIR_CANDIDATES:
+            _append_unique(layout.doc_dirs, root / candidate)
 
     # Root README
     readme = addon_dir / "README.md"
     if readme.is_file():
         layout.doc_files.append(readme)
 
-    # Example directories
-    for candidate in ["examples", "demo", "dev_scenes"]:
-        d = addon_dir / candidate
-        if d.is_dir():
-            layout.example_dirs.append(d)
+    # Example directories, including project-specific "*examples*" folders.
+    for root in roots:
+        for candidate in _EXAMPLE_DIR_CANDIDATES:
+            _append_unique(layout.example_dirs, root / candidate)
+
+    for child in addon_dir.iterdir():
+        if not child.is_dir():
+            continue
+        name = child.name.lower()
+        if "example" in name or name.endswith("_demo"):
+            _append_unique(layout.example_dirs, child)
+
+    # Public API summaries from nested plugin implementation roots. These are
+    # declaration-only chunks, not full-source indexing.
+    for root in roots:
+        if root != addon_dir:
+            _append_unique(layout.api_dirs, root)
 
     return layout
 
 
 def collect_doc_files(layout: AddonLayout) -> List[Path]:
-    """Collect all documentation .md files from doc_dirs and doc_files."""
+    """Collect all documentation .md/.rst files from doc_dirs and doc_files."""
     files = []
     for doc_dir in layout.doc_dirs:
-        for md in sorted(doc_dir.rglob("*.md")):
-            rel = str(md.relative_to(layout.root))
+        for doc in sorted(doc_dir.rglob("*")):
+            if not doc.is_file() or doc.suffix.lower() not in _DOC_EXTENSIONS:
+                continue
+            rel = str(doc.relative_to(layout.root))
             if not _is_excluded(rel):
-                files.append(md)
+                files.append(doc)
     for f in layout.doc_files:
         files.append(f)
     return files
@@ -130,6 +209,23 @@ def collect_example_files(layout: AddonLayout) -> List[Path]:
                 files.append(f)
             elif f.name.lower() == "readme.md":
                 files.append(f)
+    return files
+
+
+def collect_api_files(layout: AddonLayout) -> List[Path]:
+    """Collect code files used for declaration-only public API chunks."""
+    files = []
+    for api_dir in layout.api_dirs:
+        for f in sorted(api_dir.rglob("*")):
+            if not f.is_file() or f.suffix not in _CODE_EXTENSIONS:
+                continue
+            rel = str(f.relative_to(layout.root))
+            if _is_excluded(rel):
+                continue
+            parts = [p.lower() for p in Path(rel).parts]
+            if any(part in _API_SKIP_PARTS or "example" in part for part in parts):
+                continue
+            files.append(f)
     return files
 
 
@@ -209,6 +305,83 @@ def chunk_code_file(addon_name: str, display_name: str, rel_path: str, code: str
     )]
 
 
+def _doc_comment_start(lines: List[str], index: int) -> int:
+    start = index
+    while start > 0:
+        prev = lines[start - 1].strip()
+        if prev.startswith("///") or prev.startswith("##") or prev.startswith("["):
+            start -= 1
+            continue
+        break
+    return start
+
+
+def _extract_api_lines(code: str, suffix: str) -> tuple[str, List[str]]:
+    lines = code.split("\n")
+    selected: List[tuple[int, str]] = []
+    symbols: List[str] = []
+
+    for idx, line in enumerate(lines):
+        match = None
+        if suffix == ".cs":
+            match = _CSHARP_TYPE_RE.match(line) or _CSHARP_MEMBER_RE.match(line)
+        elif suffix == ".gd":
+            match = _GDSCRIPT_SYMBOL_RE.match(line)
+        if not match:
+            continue
+
+        symbol = match.group(1)
+        symbols.append(symbol)
+        start = _doc_comment_start(lines, idx)
+        for line_idx in range(start, idx + 1):
+            selected.append((line_idx + 1, lines[line_idx].rstrip()))
+
+    deduped = []
+    seen = set()
+    for line_no, text in selected:
+        key = (line_no, text)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(f"{line_no}: {text}")
+
+    primary_symbol = symbols[0] if symbols else ""
+    return primary_symbol, deduped
+
+
+def chunk_api_file(addon_name: str, display_name: str, rel_path: str, code: str) -> List[Chunk]:
+    """Chunk public declarations from implementation code without indexing bodies."""
+    symbol, api_lines = _extract_api_lines(code, Path(rel_path).suffix)
+    if not api_lines:
+        return []
+
+    filename = Path(rel_path).name
+    text = "\n".join(api_lines)
+    return [Chunk(
+        path=rel_path,
+        doc_type="addon",
+        chunk_type="addon_api",
+        addon=addon_name,
+        addon_name=display_name,
+        symbol=symbol or rel_path,
+        heading=filename,
+        breadcrumb=f"addons > {display_name} > API > {rel_path}",
+        start_line=1,
+        end_line=len(code.split("\n")),
+        text=text,
+    )]
+
+
+def _read_doc_as_markdown(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.lower() != ".rst":
+        return text
+
+    from rag.rst import clean_markdown, convert_rst_to_md
+
+    return clean_markdown(convert_rst_to_md(text, allow_fallback=True))
+
+
 def chunk_addon(addon_dir: Path) -> List[Chunk]:
     """Discover and chunk all docs and examples for a single addon."""
     layout = discover_addon(addon_dir)
@@ -220,10 +393,13 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
     for md_file in collect_doc_files(layout):
         rel_path = str(md_file.relative_to(addon_dir))
         try:
-            markdown = md_file.read_text(encoding="utf-8")
+            markdown = _read_doc_as_markdown(md_file)
         except (UnicodeDecodeError, OSError):
             continue
-        file_chunks = chunk_addon_markdown(addon_name, display_name, f"addons/{addon_name}/{rel_path}", markdown)
+        chunk_path = f"addons/{addon_name}/{rel_path}"
+        if md_file.suffix.lower() == ".rst":
+            chunk_path = str(Path(chunk_path).with_suffix(".md"))
+        file_chunks = chunk_addon_markdown(addon_name, display_name, chunk_path, markdown)
         chunks.extend(file_chunks)
 
     # Process examples
@@ -253,5 +429,15 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
                     end_line=c.end_line,
                     text=c.text,
                 ))
+
+    # Process declaration-only public API summaries from implementation code.
+    for api_file in collect_api_files(layout):
+        rel_path = str(api_file.relative_to(addon_dir))
+        full_path = f"addons/{addon_name}/{rel_path}"
+        try:
+            content = api_file.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        chunks.extend(chunk_api_file(addon_name, display_name, full_path, content))
 
     return chunks

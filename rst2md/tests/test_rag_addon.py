@@ -4,18 +4,24 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import os
 from pathlib import Path
 
 from rag.addon_docs import (
     AddonLayout,
+    chunk_api_file,
     chunk_addon,
     chunk_addon_markdown,
     chunk_code_file,
+    collect_api_files,
     collect_doc_files,
     collect_example_files,
     discover_addon,
 )
 from rag.store import build_database, search_database
+
+
+TEST_ENV = {**os.environ, "PYTHONPATH": "rst2md"}
 
 
 class TestAddonDiscovery(unittest.TestCase):
@@ -123,6 +129,41 @@ class TestAddonDiscovery(unittest.TestCase):
             layout = discover_addon(root)
             self.assertEqual(layout.display_name, "Godot State Charts")
 
+    def test_nested_plugin_docs_examples_and_api_dirs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "scene_manager"
+            root.mkdir()
+            plugin_dir = root / "addons" / "ScenesManager"
+            docs = plugin_dir / "Docs"
+            docs.mkdir(parents=True)
+            demo = root / "demo"
+            demo.mkdir()
+            (plugin_dir / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
+            (docs / "quick-start.md").write_text("# Quick Start\n", encoding="utf-8")
+            (demo / "Menu.cs").write_text("public partial class Menu {}\n", encoding="utf-8")
+            (plugin_dir / "ScenesManager.cs").write_text("public partial class ScenesManager {}\n", encoding="utf-8")
+
+            layout = discover_addon(root)
+
+            self.assertIn(docs, layout.doc_dirs)
+            self.assertIn(demo, layout.example_dirs)
+            self.assertIn(plugin_dir, layout.api_dirs)
+            self.assertEqual(len(collect_doc_files(layout)), 1)
+            self.assertEqual(len(collect_example_files(layout)), 1)
+            self.assertEqual(len(collect_api_files(layout)), 1)
+
+    def test_discovers_named_examples_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "statecharts"
+            root.mkdir()
+            examples = root / "godot_state_charts_examples"
+            examples.mkdir()
+            (examples / "ant.gd").write_text("extends Node\n", encoding="utf-8")
+
+            layout = discover_addon(root)
+
+            self.assertIn(examples, layout.example_dirs)
+
 
 class TestCollectFiles(unittest.TestCase):
     """collect_doc_files and collect_example_files should filter correctly."""
@@ -178,6 +219,20 @@ class TestCollectFiles(unittest.TestCase):
             names = [f.name for f in files]
             self.assertIn("README.md", names)
 
+    def test_collect_doc_files_finds_rst(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "limboai"
+            root.mkdir()
+            docs = root / "doc" / "source"
+            docs.mkdir(parents=True)
+            (docs / "index.rst").write_text("LimboAI\n=======\n\nBehavior trees.\n", encoding="utf-8")
+
+            layout = discover_addon(root)
+            files = collect_doc_files(layout)
+
+            self.assertEqual(len(files), 1)
+            self.assertEqual(files[0].suffix, ".rst")
+
 
 class TestAddonChunker(unittest.TestCase):
     """chunk_addon_markdown and chunk_code_file should produce correct chunks."""
@@ -226,6 +281,32 @@ class TestAddonChunker(unittest.TestCase):
     def test_empty_gd_file_skipped(self):
         chunks = chunk_code_file("myaddon", "My Addon", "addons/myaddon/examples/empty.gd", "")
         self.assertEqual(len(chunks), 0)
+
+    def test_api_file_extracts_public_declarations_only(self):
+        code = """using Godot;
+
+/// <summary>
+/// Main scene manager.
+/// </summary>
+public partial class ScenesManager : Node
+{
+    private int hidden;
+    public void ChangeScene(string sceneName) {}
+}
+"""
+        chunks = chunk_api_file(
+            "scene_manager",
+            "SceneManager",
+            "addons/scene_manager/addons/ScenesManager/ScenesManager.cs",
+            code,
+        )
+
+        self.assertEqual(len(chunks), 1)
+        self.assertEqual(chunks[0].chunk_type, "addon_api")
+        self.assertEqual(chunks[0].symbol, "ScenesManager")
+        self.assertIn("public partial class ScenesManager", chunks[0].text)
+        self.assertIn("public void ChangeScene", chunks[0].text)
+        self.assertNotIn("private int hidden", chunks[0].text)
 
     def test_example_readme_tagged_as_example(self):
         md = "# Examples\n\nSome examples.\n\n## Basic\n\nBasic usage.\n"
@@ -285,6 +366,20 @@ class TestAddonIntegration(unittest.TestCase):
         dm_docs.mkdir()
         (dm_docs / "api.md").write_text("# API\n\nUse `DialogueManager`.\n", encoding="utf-8")
 
+        # Addon 3: scene_manager with nested plugin docs and API source
+        sm = addons / "scene_manager"
+        sm.mkdir()
+        sm_plugin = sm / "addons" / "ScenesManager"
+        sm_plugin.mkdir(parents=True)
+        (sm_plugin / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
+        sm_docs = sm_plugin / "Docs"
+        sm_docs.mkdir()
+        (sm_docs / "quick-start.md").write_text("# Quick Start\n\nUse TransitionNode.\n", encoding="utf-8")
+        (sm_plugin / "TransitionNode.cs").write_text(
+            "using Godot;\n\npublic partial class TransitionNode : Node {}\n",
+            encoding="utf-8",
+        )
+
         db_path = Path(tmp) / "test.sqlite"
         build_database(docs, db_path, addons_dir=addons)
         return db_path
@@ -327,6 +422,29 @@ class TestAddonIntegration(unittest.TestCase):
             results = search_database(db_path, "dialogue", limit=10, addon="dialogue_manager")
             self.assertGreater(len(results), 0)
 
+    def test_nested_addon_docs_and_api_are_searchable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "TransitionNode", limit=10, addon="scene_manager")
+            chunk_types = {r.chunk_type for r in results}
+
+            self.assertIn("addon_doc", chunk_types)
+            self.assertIn("addon_api", chunk_types)
+
+    def test_addon_example_symbol_points_to_own_chunk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(
+                db_path,
+                "addons/statecharts/examples/player.gd",
+                limit=3,
+                addon="statecharts",
+            )
+
+            self.assertGreater(len(results), 0)
+            self.assertEqual(results[0].chunk_type, "addon_example")
+            self.assertEqual(results[0].path, "addons/statecharts/examples/player.gd")
+
 
 class TestAddonCLI(unittest.TestCase):
     def test_saddon_help(self):
@@ -334,6 +452,7 @@ class TestAddonCLI(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "s-addon", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("query", result.stdout)
@@ -344,6 +463,7 @@ class TestAddonCLI(unittest.TestCase):
             [sys.executable, "-m", "rag.cli", "build", "--help"],
             text=True,
             capture_output=True,
+            env=TEST_ENV,
         )
         self.assertEqual(result.returncode, 0)
         self.assertIn("--addons", result.stdout)
