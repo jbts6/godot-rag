@@ -61,6 +61,12 @@ jobs:
       - name: Install pandoc
         run: sudo apt-get install -y pandoc
 
+      - name: Fetch Scene Manager wiki
+        run: |
+          git clone --depth 1 https://github.com/glass-brick/Scene-Manager.wiki.git .cache/addon-wikis/scene_manager
+          cp -r .cache/addon-wikis/scene_manager addons/scene_manager/docs_wiki
+          rm -rf addons/scene_manager/docs_wiki/.git
+
       - name: Build database
         run: |
           PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
