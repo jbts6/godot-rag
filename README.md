@@ -106,7 +106,7 @@ A hybrid RAG system (FTS5 + symbol index) gives significantly better results tha
 
 ### Benchmark: Real Query Comparison
 
-Tested on a database of **30,627 chunks** (28,231 Godot docs + 2,396 addon chunks across 9 addons).
+Tested on a database of **30,631 chunks** (28,235 Godot docs + 2,396 addon chunks across 9 addons).
 
 | Metric | RAG (this tool) | grep (raw files) | Improvement |
 |---|---|---|---|

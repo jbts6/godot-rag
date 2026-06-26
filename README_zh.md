@@ -106,7 +106,7 @@ godot-rag s "physics interpolation"
 
 ### 基准测试：真实查询对比
 
-测试数据库：**30,627 个 chunk**（28,231 个 Godot 文档 + 2,396 个 addon chunk，覆盖 9 个 addon）。
+测试数据库：**30,631 个 chunk**（28,235 个 Godot 文档 + 2,396 个 addon chunk，覆盖 9 个 addon）。
 
 | 指标 | RAG（本工具） | grep（原始文件） | 提升 |
 |---|---|---|---|
