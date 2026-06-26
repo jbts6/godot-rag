@@ -7,7 +7,7 @@
 - `addons/scene_manager` 从旧 C# addon 切换到 `glass-brick/Scene-Manager.git` 的 `main` 分支。
 - `requires-python` 保持 `>=3.9`。
 - `build.sh` 已避免使用 Python 3.11+ 的 `tomllib`。
-- `build.sh --publish` 已接入 `uvx twine upload dist/*`。
+- `build.sh --publish` 已接入 `uv run --with twine python -m twine upload`。
 - README 和 addon 测试已从旧 `TransitionNode` / `ScenesManager` 示例切换到 GDScript `SceneManager` / `change_scene` / `scene_loaded`。
 - 当前测试基线：`uv run pytest -q` 为 `57 passed`。
 
@@ -24,6 +24,16 @@
 ---
 
 ## P0-1：强化 `build.sh` 发布护栏
+
+状态：已完成。
+
+完成记录：
+
+- `build.sh` 支持 `--no-bump`、`--publish`、`--test-pypi`、`--help`。
+- 发布模式要求起步工作区干净。
+- 构建后只检查/上传当前版本 wheel。
+- twine 通过 `uv run --with twine python -m twine ...` 调用，避开 `uvx twine` shim 在当前 macOS 环境的 `realpath` 问题。
+- 已验证：`bash -n build.sh`、`./build.sh --help`、`./build.sh --no-bump`、`uv run pytest -q`。
 
 ### 目标
 
@@ -56,11 +66,11 @@
 5. 发布前运行：
    - `uv run pytest -q`
    - `bash -n build.sh`
-   - `uvx twine check dist/*`
+   - `uv run --with twine python -m twine check dist/*`
 6. PyPI 发布：
-   - `uvx twine upload "$WHEEL_PATH"`
+   - `uv run --with twine python -m twine upload "$WHEEL_PATH"`
 7. TestPyPI 发布：
-   - `uvx twine upload --repository testpypi "$WHEEL_PATH"`
+   - `uv run --with twine python -m twine upload --repository testpypi "$WHEEL_PATH"`
 8. 结尾提示更新：
    - 普通发布命令。
    - TestPyPI 发布命令。

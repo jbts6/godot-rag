@@ -7,11 +7,59 @@
 
 set -e
 
-PUBLISH=0
-if [ "${1:-}" = "--publish" ] || [ "${1:-}" = "publish" ]; then
-    PUBLISH=1
-elif [ -n "${1:-}" ]; then
-    echo "用法: $0 [--publish]"
+usage() {
+    cat <<EOF
+用法: $0 [选项]
+
+选项:
+  --no-bump      构建时不递增 pyproject.toml 版本
+  --publish      构建并发布到 PyPI
+  --test-pypi    构建并发布到 TestPyPI
+  -h, --help     显示帮助
+
+认证示例:
+  TWINE_USERNAME=__token__ TWINE_PASSWORD=<token> $0 --publish
+EOF
+}
+
+NO_BUMP=0
+PUBLISH_TARGET=""
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --no-bump)
+            NO_BUMP=1
+            ;;
+        --publish|publish)
+            if [ -n "$PUBLISH_TARGET" ]; then
+                echo "错误: --publish 和 --test-pypi 不能同时使用"
+                exit 1
+            fi
+            PUBLISH_TARGET="pypi"
+            ;;
+        --test-pypi)
+            if [ -n "$PUBLISH_TARGET" ]; then
+                echo "错误: --publish 和 --test-pypi 不能同时使用"
+                exit 1
+            fi
+            PUBLISH_TARGET="testpypi"
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "错误: 未知参数 $1"
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+if [ -n "$PUBLISH_TARGET" ] && [ -n "$(git status --porcelain)" ]; then
+    echo "错误: 发布前工作区必须干净"
+    git status --short
     exit 1
 fi
 
@@ -34,10 +82,22 @@ if [ -z "$GODOT_VERSION" ]; then
     exit 1
 fi
 
-# 版本策略: Godot 版本不变时自动递增 postN
-# 4.7.0 → 4.7.0.post1 → 4.7.0.post2 → ...
-# Godot 版本变化时重置为 4.8.0.post1
-PKG_VERSION=$(python3 -c "
+if [ "$NO_BUMP" -eq 1 ]; then
+    PKG_VERSION=$(python3 -c "
+import re
+from pathlib import Path
+
+text = Path('pyproject.toml').read_text(encoding='utf-8')
+match = re.search(r'^version\\s*=\\s*\"([^\"]+)\"', text, re.MULTILINE)
+if not match:
+    raise SystemExit('pyproject.toml missing version')
+print(match.group(1))
+")
+else
+    # 版本策略: Godot 版本不变时自动递增 postN
+    # 4.7.0 → 4.7.0.post1 → 4.7.0.post2 → ...
+    # Godot 版本变化时重置为 4.8.0.post1
+    PKG_VERSION=$(python3 -c "
 import re
 from pathlib import Path
 
@@ -56,13 +116,14 @@ else:
 print(f'{base}.post{n}')
 ")
 
-python3 -c "
+    python3 -c "
 import re, sys
 p = sys.argv[1]; v = sys.argv[2]
 t = open(p).read()
 t = re.sub(r'^version = .*$', f'version = \"{v}\"', t, count=1, flags=re.MULTILINE)
 open(p, 'w').write(t)
 " pyproject.toml "${PKG_VERSION}"
+fi
 echo "版本: ${PKG_VERSION} (Godot ${GODOT_VERSION})"
 
 # 清理旧的构建产物（保留 docs-md）
@@ -105,18 +166,32 @@ for f in glob.glob(sys.argv[1] + '/*.py'):
 # 构建 wheel
 echo "4. 构建 wheel..."
 uv build --wheel
+WHEEL_PATH="dist/godot_rag-${PKG_VERSION}-py3-none-any.whl"
+if [ ! -f "$WHEEL_PATH" ]; then
+    echo "错误: 未找到当前版本 wheel: $WHEEL_PATH"
+    exit 1
+fi
 
-if [ "$PUBLISH" -eq 1 ]; then
-    echo "5. 发布到 PyPI..."
-    uvx twine upload dist/*
+echo "5. 检查 wheel..."
+uv run --with twine python -m twine check "$WHEEL_PATH"
+
+if [ "$PUBLISH_TARGET" = "pypi" ]; then
+    echo "6. 发布到 PyPI..."
+    uv run pytest -q
+    uv run --with twine python -m twine upload "$WHEEL_PATH"
+elif [ "$PUBLISH_TARGET" = "testpypi" ]; then
+    echo "6. 发布到 TestPyPI..."
+    uv run pytest -q
+    uv run --with twine python -m twine upload --repository testpypi "$WHEEL_PATH"
 fi
 
 echo ""
 echo "=== 构建完成 ==="
 echo "版本: ${PKG_VERSION}"
-echo "Wheel: dist/godot_rag-${PKG_VERSION}-py3-none-any.whl"
+echo "Wheel: ${WHEEL_PATH}"
 echo ""
 echo "发布: ./build.sh --publish"
+echo "TestPyPI: ./build.sh --test-pypi"
 echo "认证: TWINE_USERNAME=__token__ TWINE_PASSWORD=<token> ./build.sh --publish"
 echo "安装: uv pip install godot-rag"
 echo "测试: godot-rag search Timer --limit 3"
