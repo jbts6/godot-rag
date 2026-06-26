@@ -324,10 +324,11 @@ def _doc_comment_start(lines: List[str], index: int) -> int:
     return start
 
 
-def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tuple[str, List[str]]:
+def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tuple[str, List[str], List[str]]:
     lines = code.split("\n")
     selected: List[tuple[int, str]] = []
     primary_symbol = ""
+    aliases: List[str] = []
 
     for idx, line in enumerate(lines):
         if suffix == ".cs":
@@ -336,9 +337,11 @@ def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tup
                 continue
             symbol = match.group(1)
             primary_symbol = primary_symbol or symbol
+            aliases.append(symbol)
         elif suffix == ".gd":
+            class_name_match = _GDSCRIPT_CLASS_NAME_RE.match(line)
             match = (
-                _GDSCRIPT_CLASS_NAME_RE.match(line)
+                class_name_match
                 or _GDSCRIPT_FUNC_RE.match(line)
                 or _GDSCRIPT_SIGNAL_RE.match(line)
                 or _GDSCRIPT_ENUM_RE.match(line)
@@ -350,10 +353,14 @@ def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tup
             symbol = match.group(1)
             if symbol.startswith("_"):
                 continue
-            if _GDSCRIPT_CLASS_NAME_RE.match(line):
+            if class_name_match:
                 primary_symbol = symbol
             elif not primary_symbol:
                 primary_symbol = fallback_symbol
+            aliases.append(symbol)
+            owner = primary_symbol or fallback_symbol
+            if owner and symbol != owner:
+                aliases.append(f"{owner}.{symbol}")
         else:
             continue
 
@@ -370,12 +377,20 @@ def _extract_api_lines(code: str, suffix: str, fallback_symbol: str = "") -> tup
         seen.add(key)
         deduped.append(f"{line_no}: {text}")
 
-    return primary_symbol or fallback_symbol, deduped
+    deduped_aliases = []
+    seen_aliases = set()
+    for alias in aliases:
+        if not alias or alias in seen_aliases:
+            continue
+        seen_aliases.add(alias)
+        deduped_aliases.append(alias)
+
+    return primary_symbol or fallback_symbol, deduped_aliases, deduped
 
 
 def chunk_api_file(addon_name: str, display_name: str, rel_path: str, code: str) -> List[Chunk]:
     """Chunk public declarations from implementation code without indexing bodies."""
-    symbol, api_lines = _extract_api_lines(code, Path(rel_path).suffix, Path(rel_path).stem)
+    symbol, aliases, api_lines = _extract_api_lines(code, Path(rel_path).suffix, Path(rel_path).stem)
     if not api_lines:
         return []
 
@@ -393,6 +408,7 @@ def chunk_api_file(addon_name: str, display_name: str, rel_path: str, code: str)
         start_line=1,
         end_line=len(code.split("\n")),
         text=text,
+        symbols=aliases,
     )]
 
 

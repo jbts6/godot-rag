@@ -306,6 +306,10 @@ func _load_scene_resource(path: Variant) -> Resource:
         self.assertEqual(len(chunks), 1)
         self.assertEqual(chunks[0].chunk_type, "addon_api")
         self.assertEqual(chunks[0].symbol, "SceneManager")
+        self.assertIn("SceneManager.change_scene", chunks[0].symbols)
+        self.assertIn("SceneManager.scene_loaded", chunks[0].symbols)
+        self.assertIn("SceneManager.is_transitioning", chunks[0].symbols)
+        self.assertNotIn("_load_scene_resource", chunks[0].symbols)
         self.assertIn("signal scene_loaded", chunks[0].text)
         self.assertIn("func change_scene", chunks[0].text)
         self.assertNotIn("_load_scene_resource", chunks[0].text)
@@ -452,6 +456,20 @@ class TestAddonIntegration(unittest.TestCase):
 
             self.assertIn("addon_doc", chunk_types)
             self.assertIn("addon_api", chunk_types)
+
+    def test_nested_addon_api_alias_is_searchable(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(
+                db_path,
+                "SceneManager.change_scene",
+                limit=3,
+                addon="scene_manager",
+            )
+
+            self.assertGreater(len(results), 0)
+            self.assertEqual(results[0].chunk_type, "addon_api")
+            self.assertEqual(results[0].symbol, "SceneManager")
 
     def test_addon_example_symbol_points_to_own_chunk(self):
         with tempfile.TemporaryDirectory() as tmp:

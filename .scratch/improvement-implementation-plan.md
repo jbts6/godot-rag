@@ -156,6 +156,17 @@ Add Python compatibility CI matrix
 
 ## P1-1：支持 addon API 多符号索引
 
+状态：已完成。
+
+完成记录：
+
+- `Chunk` 增加兼容字段 `symbols`，展示仍使用主 `symbol`。
+- `extract_symbols()` 同时索引 `chunk.symbol` 和 `chunk.symbols`，并按 chunk 去重。
+- GDScript addon API 为 public `func`、`signal`、`const`、`var` 生成短名和 `Owner.member` 别名。
+- 私有 `_` 开头声明继续跳过。
+- 已验证 `SceneManager.change_scene`、`SceneManager.scene_loaded` 精确命中 `addon_api:SceneManager`，score 为 `100.0`。
+- 测试基线更新为 `58 passed`。
+
 ### 目标
 
 当前 `addon_api` 是“一个 API chunk 一个主 symbol”。这已经能让 `change_scene` 通过 FTS 命中，但还不能让 `SceneManager.change_scene` 精确符号命中。

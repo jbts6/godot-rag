@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -14,6 +15,7 @@ class Chunk:
     start_line: int
     end_line: int
     text: str
+    symbols: List[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

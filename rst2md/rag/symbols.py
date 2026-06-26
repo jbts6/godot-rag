@@ -26,19 +26,25 @@ def extract_symbols(chunks: List[Chunk]) -> List[Symbol]:
     """Extract symbols from chunks."""
     symbols = []
     for i, chunk in enumerate(chunks):
-        if not chunk.symbol:
-            continue
-
         kind = chunk.chunk_type
-        name = chunk.symbol
-        normalized = normalize_symbol(name)
+        names = []
+        if chunk.symbol:
+            names.append(chunk.symbol)
+        names.extend(chunk.symbols)
 
-        symbols.append(Symbol(
-            name=name,
-            normalized_name=normalized,
-            kind=kind,
-            chunk_id=i,
-            path=chunk.path,
-        ))
+        seen = set()
+        for name in names:
+            if not name or name in seen:
+                continue
+            seen.add(name)
+            normalized = normalize_symbol(name)
+
+            symbols.append(Symbol(
+                name=name,
+                normalized_name=normalized,
+                kind=kind,
+                chunk_id=i,
+                path=chunk.path,
+            ))
 
     return symbols
