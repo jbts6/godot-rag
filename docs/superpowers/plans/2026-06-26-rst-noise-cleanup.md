@@ -6,7 +6,7 @@ base-ref: 1e42e4dab6e2589058b3f89265a48858c8009cdd
 
 # RST Noise Cleanup Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 清理 Godot RST 转 Markdown 时遗留的 metadata、tabs/code-tab、verbose qualifier、空 API 标题和非代码转义噪音。
 
@@ -33,7 +33,7 @@ base-ref: 1e42e4dab6e2589058b3f89265a48858c8009cdd
 - Consumes: `rst2md_batch.clean_markdown`
 - Produces: 对 `rag.rst._preprocess_rst(rst_text: str) -> str` 的测试约束
 
-- [ ] **Step 1: 写入失败测试**
+- [x] **Step 1: 写入失败测试**
 
 在 `rst2md/tests/test_rst2md_batch.py` 顶部导入 `_preprocess_rst`：
 
@@ -111,7 +111,7 @@ class PreprocessRstTests(unittest.TestCase):
         )
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `pytest rst2md/tests/test_rst2md_batch.py -q`
 
@@ -126,7 +126,7 @@ Expected: FAIL，原因是 `rag.rst` 尚未导出 `_preprocess_rst` 或 tabs 转
 - Produces: `_preprocess_rst(rst_text: str) -> str`
 - Updates: `convert_rst_to_md(rst_text: str, *, allow_fallback: bool = False) -> str`
 
-- [ ] **Step 1: 添加缩进辅助函数和 tabs scanner**
+- [x] **Step 1: 添加缩进辅助函数和 tabs scanner**
 
 在 `FENCE_RE` 后添加：
 
@@ -199,7 +199,7 @@ def _convert_tabs_block(lines: list[str], start: int) -> tuple[list[str], int]:
     return converted, i
 ```
 
-- [ ] **Step 2: 添加 `_preprocess_rst()`**
+- [x] **Step 2: 添加 `_preprocess_rst()`**
 
 ```python
 def _preprocess_rst(rst_text: str) -> str:
@@ -230,7 +230,7 @@ def _preprocess_rst(rst_text: str) -> str:
     return text
 ```
 
-- [ ] **Step 3: 在 `convert_rst_to_md()` 开头调用预处理**
+- [x] **Step 3: 在 `convert_rst_to_md()` 开头调用预处理**
 
 ```python
 def convert_rst_to_md(rst_text: str, *, allow_fallback: bool = False) -> str:
@@ -240,7 +240,7 @@ def convert_rst_to_md(rst_text: str, *, allow_fallback: bool = False) -> str:
 
 Fallback 分支继续使用同一个预处理后的 `rst_text`。
 
-- [ ] **Step 4: 运行 Task 1 测试确认通过**
+- [x] **Step 4: 运行 Task 1 测试确认通过**
 
 Run: `pytest rst2md/tests/test_rst2md_batch.py -q`
 
@@ -255,7 +255,7 @@ Expected: PASS。
 - Consumes: `rst2md_batch.clean_markdown`
 - Produces: 对 `clean_markdown_segment()` 新清理规则的测试约束
 
-- [ ] **Step 1: 添加 qualifier、空标题、非代码转义测试**
+- [x] **Step 1: 添加 qualifier、空标题、非代码转义测试**
 
 在 `CleanMarkdownTests` 内新增：
 
@@ -307,7 +307,7 @@ Expected: PASS。
         )
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run: `pytest rst2md/tests/test_rst2md_batch.py -q`
 
@@ -321,7 +321,7 @@ Expected: FAIL，原因是新 Markdown 清理规则尚未实现。
 **Interfaces:**
 - Updates: `clean_markdown_segment(text: str) -> str`
 
-- [ ] **Step 1: 添加 concise qualifier 替换**
+- [x] **Step 1: 添加 concise qualifier 替换**
 
 在 cross-reference cleanup 后、directive cleanup 前加入：
 
@@ -338,7 +338,7 @@ Expected: FAIL，原因是新 Markdown 清理规则尚未实现。
     )
 ```
 
-- [ ] **Step 2: 扩展非代码文本转义清理**
+- [x] **Step 2: 扩展非代码文本转义清理**
 
 把现有 `text = text.replace(r"\<", "<")` 扩展为：
 
@@ -348,7 +348,7 @@ Expected: FAIL，原因是新 Markdown 清理规则尚未实现。
     text = text.replace(r"\*", "*")
 ```
 
-- [ ] **Step 3: 移除空 API heading**
+- [x] **Step 3: 移除空 API heading**
 
 在 `text = re.sub(r"\n{3,}", "\n\n", text)` 前加入：
 
@@ -361,7 +361,7 @@ Expected: FAIL，原因是新 Markdown 清理规则尚未实现。
     )
 ```
 
-- [ ] **Step 4: 运行 Markdown 清理测试确认通过**
+- [x] **Step 4: 运行 Markdown 清理测试确认通过**
 
 Run: `pytest rst2md/tests/test_rst2md_batch.py -q`
 
@@ -376,17 +376,17 @@ Expected: PASS。
 - Consumes: `rst2md/rag/rst.py` 的 converter implementation
 - Produces: 同步后的 `godot_rag/rag/rst.py`
 
-- [ ] **Step 1: 将主实现同步到镜像文件**
+- [x] **Step 1: 将主实现同步到镜像文件**
 
 将 `rst2md/rag/rst.py` 的内容复制到 `godot_rag/rag/rst.py`，保持两个文件一致。
 
-- [ ] **Step 2: 比较两个文件**
+- [x] **Step 2: 比较两个文件**
 
 Run: `cmp -s rst2md/rag/rst.py godot_rag/rag/rst.py`
 
 Expected: exit code 0。
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run: `pytest rst2md/tests/test_rst2md_batch.py -q`
 
@@ -401,13 +401,13 @@ Expected: PASS。
 - Consumes: `convert_rst_to_md()`、`clean_markdown()`
 - Produces: 验证证据
 
-- [ ] **Step 1: 运行完整 rst2md 测试目录**
+- [x] **Step 1: 运行完整 rst2md 测试目录**
 
 Run: `pytest rst2md/tests/ -q`
 
 Expected: PASS。
 
-- [ ] **Step 2: 运行代表性内联转换 spot check**
+- [x] **Step 2: 运行代表性内联转换 spot check**
 
 Run:
 
@@ -440,7 +440,7 @@ PY
 
 Expected: command exits 0。
 
-- [ ] **Step 3: 扫描测试转换输出中的残留模式**
+- [x] **Step 3: 扫描测试转换输出中的残留模式**
 
 如果有临时输出目录，扫描以下模式：
 
@@ -450,6 +450,6 @@ rg -n "github_url|const \\(This method has no side effects|vararg \\(This method
 
 Expected: 没有来自本 change 覆盖模式的残留命中；若扫描对象包含代码块，需人工确认代码内命中不属于清理目标。
 
-- [ ] **Step 4: 更新 OpenSpec tasks.md**
+- [x] **Step 4: 更新 OpenSpec tasks.md**
 
 把 `openspec/changes/cleanup-rst-extraction-noise/tasks.md` 中已完成项勾选为 `- [x]`，并在需要时记录验证命令。

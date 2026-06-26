@@ -3,8 +3,8 @@
 - [x] 1.1 Add preprocessing tests for `:github_url: hide` removal and `tabs` / `code-tab` conversion.
 - [x] 1.2 Add code-tab label tests covering `gdscript GDScript`, `csharp C#`, and 2D/3D display label variants.
 - [x] 1.3 Add indentation tests proving nested code body indentation survives conversion.
-- [ ] 1.4 Add Markdown cleanup tests for concise `const` / `vararg`, empty API headings, non-empty API headings, and escaped `#` / `*` boundaries.
-- [ ] 1.5 Add code protection tests proving fenced and indented code blocks are not altered by new cleanup rules.
+- [x] 1.4 Add Markdown cleanup tests for concise `const` / `vararg`, empty API headings, non-empty API headings, and escaped `#` / `*` boundaries.
+- [x] 1.5 Add code protection tests proving fenced and indented code blocks are not altered by new cleanup rules.
 
 ## 2. RST Preprocessing
 
