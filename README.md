@@ -1,5 +1,7 @@
 # Godot RAG
 
+[中文版](README_zh.md)
+
 Hybrid RAG search for Godot documentation and addons. Search by type for precise results.
 
 ## Installation
