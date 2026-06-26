@@ -106,7 +106,7 @@ A hybrid RAG system (FTS5 + symbol index) gives significantly better results tha
 
 ### Benchmark: Real Query Comparison
 
-Tested on a database of **30,581 chunks** (28,231 Godot docs + 2,350 addon chunks across 9 addons).
+Tested on a database of **30,627 chunks** (28,231 Godot docs + 2,396 addon chunks across 9 addons).
 
 | Metric | RAG (this tool) | grep (raw files) | Improvement |
 |---|---|---|---|
@@ -127,7 +127,7 @@ Tested on a database of **30,581 chunks** (28,231 Godot docs + 2,350 addon chunk
 | `BehaviorTree` | ✅ 3 hits (12ms) | ✅ 2 files (96ms) | RAG: includes doc context |
 | `DialogueManager` | ✅ 3 hits (13ms) | ✅ 26 files (98ms) | RAG: only relevant docs |
 | `state machine transitions` | ✅ 3 hits (13ms) | ❌ 0 files | **grep fails on multi-word** |
-| `scene transition animation` | ✅ 2 hits (12ms) | ❌ 0 files | **grep fails on multi-word** |
+| `scene transition animation` | ✅ 3 hits (12ms) | ❌ 0 files | **grep fails on multi-word** |
 | `input helper gamepad` | ✅ 2 hits (12ms) | ❌ 0 files | **grep fails on multi-word** |
 | `input action mapping` | ✅ 3 hits (11ms) | — | RAG finds cross-references |
 
@@ -155,10 +155,10 @@ $ godot-rag s-addon "state machine" --addon statecharts
 | input_helper | 32 | 3 | 6 | 41 |
 | limboai | 351 | 27 | — | 378 |
 | phantom-camera | 12 | 11 | 38 | 61 |
-| scene_manager | 1 | 2 | 5 | 8 |
+| scene_manager | 47 | 2 | 5 | 54 |
 | sound_manager | 13 | 2 | 7 | 22 |
 | statecharts | 80 | 21 | 98 | 199 |
-| **Total** | **1,693** | **193** | **464** | **2,350** |
+| **Total** | **1,739** | **193** | **464** | **2,396** |
 
 - **addon_doc**: Documentation markdown/RST, split by headings
 - **addon_example**: Example .gd/.cs code files

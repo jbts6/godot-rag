@@ -106,7 +106,7 @@ godot-rag s "physics interpolation"
 
 ### 基准测试：真实查询对比
 
-测试数据库：**30,581 个 chunk**（28,231 个 Godot 文档 + 2,350 个 addon chunk，覆盖 9 个 addon）。
+测试数据库：**30,627 个 chunk**（28,231 个 Godot 文档 + 2,396 个 addon chunk，覆盖 9 个 addon）。
 
 | 指标 | RAG（本工具） | grep（原始文件） | 提升 |
 |---|---|---|---|
@@ -127,7 +127,7 @@ godot-rag s "physics interpolation"
 | `BehaviorTree` | ✅ 3 命中 (12ms) | ✅ 2 文件 (96ms) | RAG：包含文档上下文 |
 | `DialogueManager` | ✅ 3 命中 (13ms) | ✅ 26 文件 (98ms) | RAG：仅相关文档 |
 | `state machine transitions` | ✅ 3 命中 (13ms) | ❌ 0 文件 | **grep 无法处理多词** |
-| `scene transition animation` | ✅ 2 命中 (12ms) | ❌ 0 文件 | **grep 无法处理多词** |
+| `scene transition animation` | ✅ 3 命中 (12ms) | ❌ 0 文件 | **grep 无法处理多词** |
 | `input helper gamepad` | ✅ 2 命中 (12ms) | ❌ 0 文件 | **grep 无法处理多词** |
 | `input action mapping` | ✅ 3 命中 (11ms) | — | RAG 发现交叉引用 |
 
@@ -155,10 +155,10 @@ $ godot-rag s-addon "state machine" --addon statecharts
 | input_helper | 32 | 3 | 6 | 41 |
 | limboai | 351 | 27 | — | 378 |
 | phantom-camera | 12 | 11 | 38 | 61 |
-| scene_manager | 1 | 2 | 5 | 8 |
+| scene_manager | 47 | 2 | 5 | 54 |
 | sound_manager | 13 | 2 | 7 | 22 |
 | statecharts | 80 | 21 | 98 | 199 |
-| **总计** | **1,693** | **193** | **464** | **2,350** |
+| **总计** | **1,739** | **193** | **464** | **2,396** |
 
 - **addon_doc**：文档 markdown/RST，按标题分段
 - **addon_example**：示例 .gd/.cs 代码文件
