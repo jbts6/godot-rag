@@ -35,6 +35,7 @@ def _print_results(results, as_json: bool):
                 "doc_type": r.doc_type,
                 "chunk_type": r.chunk_type,
                 "addon": r.addon,
+                "addon_name": r.addon_name,
                 "symbol": r.symbol,
                 "heading": r.heading,
                 "breadcrumb": r.breadcrumb,
@@ -51,7 +52,7 @@ def _print_results(results, as_json: bool):
             print(f"path: {r.path}:{r.start_line}-{r.end_line}")
             print(f"type: {r.chunk_type}")
             if r.addon:
-                print(f"addon: {r.addon}")
+                print(f"addon: {r.addon_name or r.addon}")
             print(f"symbol: {r.symbol}")
             print(f"heading: {r.heading}")
             print(f"breadcrumb: {r.breadcrumb}")

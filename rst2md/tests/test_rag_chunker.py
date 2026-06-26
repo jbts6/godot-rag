@@ -11,6 +11,7 @@ class ModelTests(unittest.TestCase):
             doc_type="class",
             chunk_type="method",
             addon="",
+            addon_name="",
             symbol="StringName.is_valid_filename",
             heading="Methods",
             breadcrumb="classes > StringName > is_valid_filename",

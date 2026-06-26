@@ -1,8 +1,9 @@
 """Discover and chunk addon documentation and examples."""
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from rag.models import Chunk
 
@@ -26,7 +27,8 @@ _CODE_EXTENSIONS = {".gd", ".cs"}
 @dataclass
 class AddonLayout:
     """Discovered layout of an addon's documentation and examples."""
-    name: str
+    name: str                    # Folder name (e.g. "statecharts")
+    display_name: str            # Real plugin name (e.g. "Godot State Charts")
     root: Path
     doc_dirs: List[Path] = field(default_factory=list)
     doc_files: List[Path] = field(default_factory=list)
@@ -47,9 +49,39 @@ def _is_excluded(rel_path: str) -> bool:
     return False
 
 
+def _read_plugin_name(addon_dir: Path) -> Optional[str]:
+    """Read the real plugin name from plugin.cfg.
+
+    Searches up to 3 levels deep. If multiple plugin.cfg files exist,
+    returns the first name that isn't a known test framework (e.g. "Gut").
+    """
+    _SKIP_NAMES = {"Gut"}
+    names = []
+    for cfg in addon_dir.rglob("plugin.cfg"):
+        if len(cfg.relative_to(addon_dir).parts) > 3:
+            continue
+        try:
+            text = cfg.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        match = re.search(r'^name="?([^"\n]+)"?', text, re.MULTILINE)
+        if match:
+            names.append(match.group(1).strip())
+    # Prefer names that aren't in the skip list
+    for n in names:
+        if n not in _SKIP_NAMES:
+            return n
+    return names[0] if names else None
+
+
 def discover_addon(addon_dir: Path) -> AddonLayout:
     """Discover documentation and example directories in an addon."""
-    layout = AddonLayout(name=addon_dir.name, root=addon_dir)
+    display_name = _read_plugin_name(addon_dir) or addon_dir.name
+    layout = AddonLayout(
+        name=addon_dir.name,
+        display_name=display_name,
+        root=addon_dir,
+    )
 
     # Doc directories
     for candidate in ["docs", "documentation", "doc/source"]:
@@ -101,7 +133,7 @@ def collect_example_files(layout: AddonLayout) -> List[Path]:
     return files
 
 
-def chunk_addon_markdown(addon_name: str, rel_path: str, markdown: str) -> List[Chunk]:
+def chunk_addon_markdown(addon_name: str, display_name: str, rel_path: str, markdown: str) -> List[Chunk]:
     """Chunk an addon markdown doc by headings. Returns addon_doc chunks."""
     from rag.chunker import _find_headings, HEADING_RE
 
@@ -109,7 +141,7 @@ def chunk_addon_markdown(addon_name: str, rel_path: str, markdown: str) -> List[
     headings = _find_headings(lines)
     chunks = []
 
-    breadcrumb_prefix = f"addons > {addon_name}"
+    breadcrumb_prefix = f"addons > {display_name}"
 
     if not headings:
         text = "\n".join(lines).strip()
@@ -120,6 +152,7 @@ def chunk_addon_markdown(addon_name: str, rel_path: str, markdown: str) -> List[
                 doc_type="addon",
                 chunk_type="addon_doc",
                 addon=addon_name,
+                addon_name=display_name,
                 symbol="",
                 heading=doc_name,
                 breadcrumb=f"{breadcrumb_prefix} > {doc_name}",
@@ -142,6 +175,7 @@ def chunk_addon_markdown(addon_name: str, rel_path: str, markdown: str) -> List[
             doc_type="addon",
             chunk_type="addon_doc",
             addon=addon_name,
+            addon_name=display_name,
             symbol="",
             heading=title,
             breadcrumb=f"{breadcrumb_prefix} > {doc_name} > {title}",
@@ -153,7 +187,7 @@ def chunk_addon_markdown(addon_name: str, rel_path: str, markdown: str) -> List[
     return chunks
 
 
-def chunk_code_file(addon_name: str, rel_path: str, code: str) -> List[Chunk]:
+def chunk_code_file(addon_name: str, display_name: str, rel_path: str, code: str) -> List[Chunk]:
     """Chunk a code file (.gd/.cs) as a single addon_example chunk."""
     lines = code.split("\n")
     if not code.strip():
@@ -165,9 +199,10 @@ def chunk_code_file(addon_name: str, rel_path: str, code: str) -> List[Chunk]:
         doc_type="addon",
         chunk_type="addon_example",
         addon=addon_name,
+        addon_name=display_name,
         symbol=rel_path,
         heading=filename,
-        breadcrumb=f"addons > {addon_name} > {rel_path}",
+        breadcrumb=f"addons > {display_name} > {rel_path}",
         start_line=1,
         end_line=len(lines),
         text=code,
@@ -178,6 +213,7 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
     """Discover and chunk all docs and examples for a single addon."""
     layout = discover_addon(addon_dir)
     addon_name = layout.name
+    display_name = layout.display_name
     chunks = []
 
     # Process documentation
@@ -187,7 +223,7 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
             markdown = md_file.read_text(encoding="utf-8")
         except (UnicodeDecodeError, OSError):
             continue
-        file_chunks = chunk_addon_markdown(addon_name, f"addons/{addon_name}/{rel_path}", markdown)
+        file_chunks = chunk_addon_markdown(addon_name, display_name, f"addons/{addon_name}/{rel_path}", markdown)
         chunks.extend(file_chunks)
 
     # Process examples
@@ -200,15 +236,16 @@ def chunk_addon(addon_dir: Path) -> List[Chunk]:
             continue
 
         if ex_file.suffix in _CODE_EXTENSIONS:
-            chunks.extend(chunk_code_file(addon_name, full_path, content))
+            chunks.extend(chunk_code_file(addon_name, display_name, full_path, content))
         else:
             # README in examples — split by heading, tag as addon_example
-            for c in chunk_addon_markdown(addon_name, full_path, content):
+            for c in chunk_addon_markdown(addon_name, display_name, full_path, content):
                 chunks.append(Chunk(
                     path=c.path,
                     doc_type="addon",
                     chunk_type="addon_example",
                     addon=c.addon,
+                    addon_name=c.addon_name,
                     symbol=c.symbol,
                     heading=f"README: {c.heading}" if c.heading else "README",
                     breadcrumb=c.breadcrumb,

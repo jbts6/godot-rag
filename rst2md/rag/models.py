@@ -7,6 +7,7 @@ class Chunk:
     doc_type: str
     chunk_type: str
     addon: str
+    addon_name: str
     symbol: str
     heading: str
     breadcrumb: str
@@ -24,6 +25,7 @@ class SearchResult:
     doc_type: str
     chunk_type: str
     addon: str
+    addon_name: str
     symbol: str
     heading: str
     breadcrumb: str

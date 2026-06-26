@@ -26,3 +26,6 @@
 [submodule "addons/doctor"]
 	path = addons/doctor
 	url = https://github.com/codevogel/godot_doctor
+[submodule "addons/scene_manager"]
+	path = addons/scene_manager
+	url = https://github.com/esdg/GodotSceneManager

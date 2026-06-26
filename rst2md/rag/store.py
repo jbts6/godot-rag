@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS chunks (
   doc_type TEXT NOT NULL,
   chunk_type TEXT NOT NULL,
   addon TEXT NOT NULL DEFAULT '',
+  addon_name TEXT NOT NULL DEFAULT '',
   symbol TEXT NOT NULL DEFAULT '',
   heading TEXT NOT NULL DEFAULT '',
   breadcrumb TEXT NOT NULL DEFAULT '',
@@ -138,8 +139,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
         for chunk in chunks:
             cleaned_text = clean_chunk_text(chunk.text)
             conn.execute(
-                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
             )
 
         # Extract and insert symbols
@@ -171,7 +172,7 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
             first = addon_chunks[0]
             cur = conn.execute(
                 "INSERT OR IGNORE INTO documents (path, doc_type, title) VALUES (?, ?, ?)",
-                (f"addons/{addon_name}", "addon", first.heading or addon_name),
+                (f"addons/{addon_name}", "addon", first.addon_name or addon_name),
             )
             doc_id = cur.lastrowid
             if doc_id == 0:
@@ -182,8 +183,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
             for chunk in addon_chunks:
                 cleaned_text = clean_chunk_text(chunk.text)
                 conn.execute(
-                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
                 )
 
             # Extract and insert symbols
@@ -246,22 +247,32 @@ def search_database(
         + type_filter + addon_filter,
         [normalized] + type_params + addon_params,
     ).fetchall()
+    def _make_result(row, score):
+        return {
+            "score": score,
+            "path": row["path"],
+            "start_line": row["start_line"],
+            "end_line": row["end_line"],
+            "doc_type": row["doc_type"],
+            "chunk_type": row["chunk_type"],
+            "addon": row["addon"],
+            "addon_name": row["addon_name"],
+            "symbol": row["symbol"],
+            "heading": row["heading"],
+            "breadcrumb": row["breadcrumb"],
+            "text": row["text"],
+        }
+
+    # 1. Exact symbol match (+100)
+    rows = conn.execute(
+        "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
+        + type_filter + addon_filter,
+        [normalized] + type_params + addon_params,
+    ).fetchall()
     for row in rows:
         cid = row["id"]
         if cid not in results or results[cid]["score"] < 100:
-            results[cid] = {
-                "score": 100.0,
-                "path": row["path"],
-                "start_line": row["start_line"],
-                "end_line": row["end_line"],
-                "doc_type": row["doc_type"],
-                "chunk_type": row["chunk_type"],
-                "addon": row["addon"],
-                "symbol": row["symbol"],
-                "heading": row["heading"],
-                "breadcrumb": row["breadcrumb"],
-                "text": row["text"],
-            }
+            results[cid] = _make_result(row, 100.0)
 
     # 2. Suffix symbol match (+80)
     rows = conn.execute(
@@ -272,19 +283,7 @@ def search_database(
     for row in rows:
         cid = row["id"]
         if cid not in results or results[cid]["score"] < 80:
-            results[cid] = {
-                "score": 80.0,
-                "path": row["path"],
-                "start_line": row["start_line"],
-                "end_line": row["end_line"],
-                "doc_type": row["doc_type"],
-                "chunk_type": row["chunk_type"],
-                "addon": row["addon"],
-                "symbol": row["symbol"],
-                "heading": row["heading"],
-                "breadcrumb": row["breadcrumb"],
-                "text": row["text"],
-            }
+            results[cid] = _make_result(row, 80.0)
 
     # 3. Prefix symbol match (+40)
     rows = conn.execute(
@@ -295,19 +294,7 @@ def search_database(
     for row in rows:
         cid = row["id"]
         if cid not in results or results[cid]["score"] < 40:
-            results[cid] = {
-                "score": 40.0,
-                "path": row["path"],
-                "start_line": row["start_line"],
-                "end_line": row["end_line"],
-                "doc_type": row["doc_type"],
-                "chunk_type": row["chunk_type"],
-                "addon": row["addon"],
-                "symbol": row["symbol"],
-                "heading": row["heading"],
-                "breadcrumb": row["breadcrumb"],
-                "text": row["text"],
-            }
+            results[cid] = _make_result(row, 40.0)
 
     # 4. FTS5 search (bm25 → 0-40 score)
     try:
@@ -336,19 +323,7 @@ def search_database(
             bm25 = abs(row["rank"])
             fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.1)))
             if cid not in results or results[cid]["score"] < fts_score:
-                results[cid] = {
-                    "score": fts_score,
-                    "path": row["path"],
-                    "start_line": row["start_line"],
-                    "end_line": row["end_line"],
-                    "doc_type": row["doc_type"],
-                    "chunk_type": row["chunk_type"],
-                    "addon": row["addon"],
-                    "symbol": row["symbol"],
-                    "heading": row["heading"],
-                    "breadcrumb": row["breadcrumb"],
-                    "text": row["text"],
-                }
+                results[cid] = _make_result(row, fts_score)
     except sqlite3.OperationalError:
         # FTS match syntax error, skip
         pass
@@ -366,6 +341,7 @@ def search_database(
             doc_type=r["doc_type"],
             chunk_type=r["chunk_type"],
             addon=r["addon"],
+            addon_name=r["addon_name"],
             symbol=r["symbol"],
             heading=r["heading"],
             breadcrumb=r["breadcrumb"],

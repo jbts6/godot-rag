@@ -78,6 +78,51 @@ class TestAddonDiscovery(unittest.TestCase):
             self.assertEqual(len(layout.doc_files), 0)
             self.assertEqual(len(layout.example_dirs), 0)
 
+    def test_display_name_from_plugin_cfg(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "statecharts"
+            root.mkdir()
+            addons = root / "addons" / "godot_state_charts"
+            addons.mkdir(parents=True)
+            (addons / "plugin.cfg").write_text(
+                '[plugin]\nname="Godot State Charts"\nauthor="test"\nversion="1.0"\n',
+                encoding="utf-8",
+            )
+
+            layout = discover_addon(root)
+            self.assertEqual(layout.name, "statecharts")
+            self.assertEqual(layout.display_name, "Godot State Charts")
+
+    def test_display_name_fallback_to_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "myaddon"
+            root.mkdir()
+
+            layout = discover_addon(root)
+            self.assertEqual(layout.display_name, "myaddon")
+
+    def test_display_name_skips_gut(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "statecharts"
+            root.mkdir()
+            # Gut plugin.cfg (test framework, should be skipped)
+            gut = root / "addons" / "gut"
+            gut.mkdir(parents=True)
+            (gut / "plugin.cfg").write_text(
+                '[plugin]\nname="Gut"\nauthor="test"\n',
+                encoding="utf-8",
+            )
+            # Real plugin.cfg
+            real = root / "addons" / "godot_state_charts"
+            real.mkdir(parents=True)
+            (real / "plugin.cfg").write_text(
+                '[plugin]\nname="Godot State Charts"\nauthor="test"\n',
+                encoding="utf-8",
+            )
+
+            layout = discover_addon(root)
+            self.assertEqual(layout.display_name, "Godot State Charts")
+
 
 class TestCollectFiles(unittest.TestCase):
     """collect_doc_files and collect_example_files should filter correctly."""
@@ -139,7 +184,7 @@ class TestAddonChunker(unittest.TestCase):
 
     def test_markdown_split_by_heading(self):
         md = "# Intro\n\nSome text.\n\n## Usage\n\nHow to use.\n\n## API\n\nDetails.\n"
-        chunks = chunk_addon_markdown("myaddon", "addons/myaddon/docs/guide.md", md)
+        chunks = chunk_addon_markdown("myaddon", "My Addon", "addons/myaddon/docs/guide.md", md)
         self.assertEqual(len(chunks), 3)
         self.assertEqual(chunks[0].heading, "Intro")
         self.assertEqual(chunks[1].heading, "Usage")
@@ -148,21 +193,23 @@ class TestAddonChunker(unittest.TestCase):
             self.assertEqual(c.doc_type, "addon")
             self.assertEqual(c.chunk_type, "addon_doc")
             self.assertEqual(c.addon, "myaddon")
+            self.assertEqual(c.addon_name, "My Addon")
 
     def test_markdown_no_heading(self):
         md = "Just some text without headings.\n"
-        chunks = chunk_addon_markdown("myaddon", "addons/myaddon/docs/plain.md", md)
+        chunks = chunk_addon_markdown("myaddon", "My Addon", "addons/myaddon/docs/plain.md", md)
         self.assertEqual(len(chunks), 1)
         self.assertEqual(chunks[0].heading, "plain")
 
     def test_gd_file_as_single_chunk(self):
         code = 'extends Node\n\n## This is a player script\nfunc _ready():\n\tpass\n'
-        chunks = chunk_code_file("statecharts", "addons/statecharts/examples/player.gd", code)
+        chunks = chunk_code_file("statecharts", "Godot State Charts", "addons/statecharts/examples/player.gd", code)
         self.assertEqual(len(chunks), 1)
         c = chunks[0]
         self.assertEqual(c.doc_type, "addon")
         self.assertEqual(c.chunk_type, "addon_example")
         self.assertEqual(c.addon, "statecharts")
+        self.assertEqual(c.addon_name, "Godot State Charts")
         self.assertEqual(c.symbol, "addons/statecharts/examples/player.gd")
         self.assertEqual(c.heading, "player.gd")
         self.assertIn("## This is a player script", c.text)
@@ -171,18 +218,18 @@ class TestAddonChunker(unittest.TestCase):
 
     def test_cs_file_as_single_chunk(self):
         code = 'using Godot;\n\n/// <summary>\n/// Player class\n/// </summary>\npublic partial class Player : Node {}\n'
-        chunks = chunk_code_file("myaddon", "addons/myaddon/examples/Player.cs", code)
+        chunks = chunk_code_file("myaddon", "My Addon", "addons/myaddon/examples/Player.cs", code)
         self.assertEqual(len(chunks), 1)
         self.assertEqual(chunks[0].chunk_type, "addon_example")
         self.assertIn("/// <summary>", chunks[0].text)
 
     def test_empty_gd_file_skipped(self):
-        chunks = chunk_code_file("myaddon", "addons/myaddon/examples/empty.gd", "")
+        chunks = chunk_code_file("myaddon", "My Addon", "addons/myaddon/examples/empty.gd", "")
         self.assertEqual(len(chunks), 0)
 
     def test_example_readme_tagged_as_example(self):
         md = "# Examples\n\nSome examples.\n\n## Basic\n\nBasic usage.\n"
-        chunks = chunk_addon_markdown("myaddon", "addons/myaddon/examples/README.md", md)
+        chunks = chunk_addon_markdown("myaddon", "My Addon", "addons/myaddon/examples/README.md", md)
         # Override chunk_type as chunk_addon does
         for c in chunks:
             self.assertEqual(c.chunk_type, "addon_doc")  # raw function returns addon_doc
@@ -210,6 +257,12 @@ class TestAddonIntegration(unittest.TestCase):
         # Addon 1: statecharts
         sc = addons / "statecharts"
         sc.mkdir()
+        sc_addons = sc / "addons" / "godot_state_charts"
+        sc_addons.mkdir(parents=True)
+        (sc_addons / "plugin.cfg").write_text(
+            '[plugin]\nname="Godot State Charts"\nauthor="test"\n',
+            encoding="utf-8",
+        )
         (sc / "README.md").write_text("# Statecharts\n\nState machine for Godot.\n", encoding="utf-8")
         docs_dir = sc / "docs"
         docs_dir.mkdir()
@@ -244,6 +297,7 @@ class TestAddonIntegration(unittest.TestCase):
             for r in results:
                 self.assertEqual(r.doc_type, "addon")
                 self.assertEqual(r.addon, "statecharts")
+                self.assertEqual(r.addon_name, "Godot State Charts")
 
     def test_search_specific_addon(self):
         with tempfile.TemporaryDirectory() as tmp:
