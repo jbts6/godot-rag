@@ -27,7 +27,7 @@ _SKIP_FILES = {
 # Code file extensions for examples
 _CODE_EXTENSIONS = {".gd", ".cs"}
 _DOC_EXTENSIONS = {".md", ".rst"}
-_DOC_DIR_CANDIDATES = ("docs", "Docs", "documentation", "Documentation", "doc/source", "docs_wiki")
+_DOC_DIR_CANDIDATES = ("docs", "Docs", "documentation", "Documentation", "doc/source")
 _EXAMPLE_DIR_CANDIDATES = ("examples", "demo", "dev_scenes")
 _API_SKIP_PARTS = {
     "docs", "documentation", "doc", "examples", "demo", "dev_scenes",
@@ -147,7 +147,14 @@ def _read_plugin_name(addon_dir: Path) -> Optional[str]:
 
 def discover_addon(addon_dir: Path) -> AddonLayout:
     """Discover documentation and example directories in an addon."""
-    display_name = _read_plugin_name(addon_dir) or addon_dir.name
+    from rag.addon_configs import get_config
+
+    config = get_config(addon_dir.name)
+    display_name = (
+        (config.display_name if config and config.display_name else None)
+        or _read_plugin_name(addon_dir)
+        or addon_dir.name
+    )
     layout = AddonLayout(
         name=addon_dir.name,
         display_name=display_name,
@@ -160,6 +167,11 @@ def discover_addon(addon_dir: Path) -> AddonLayout:
     for root in roots:
         for candidate in _DOC_DIR_CANDIDATES:
             _append_unique(layout.doc_dirs, root / candidate)
+
+    # Per-addon custom doc directories from config.
+    if config:
+        for custom_dir in config.custom_doc_dirs:
+            _append_unique(layout.doc_dirs, addon_dir / custom_dir)
 
     # Root README (fallback to .github/README.md)
     readme = addon_dir / "README.md"
@@ -182,6 +194,11 @@ def discover_addon(addon_dir: Path) -> AddonLayout:
             name = child.name.lower()
             if "example" in name or name.endswith("_demo"):
                 _append_unique(layout.example_dirs, child)
+
+    # Per-addon custom example directories from config.
+    if config:
+        for custom_dir in config.custom_example_dirs:
+            _append_unique(layout.example_dirs, addon_dir / custom_dir)
 
     # Public API summaries from nested plugin implementation roots. These are
     # declaration-only chunks, not full-source indexing.

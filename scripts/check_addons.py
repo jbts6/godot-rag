@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "rst2md"))
 
+from rag.addon_configs import all_smoke_queries  # noqa: E402
 from rag.addon_docs import (
     collect_api_files,
     collect_doc_files,
@@ -19,15 +20,6 @@ from rag.store import search_database  # noqa: E402
 
 ADDONS_DIR = ROOT / "addons"
 DB_PATH = ROOT / "godot_rag" / "rag" / "godot_docs.sqlite"
-
-# Smoke queries: (query, expected_addon)
-SMOKE_QUERIES = [
-    ("state machine", "statecharts"),
-    ("DialogueManager", "dialogue_manager"),
-    ("verify_node_path", "doctor"),
-    ("change_scene", "scene_manager"),
-    ("BehaviorTree", "limboai"),
-]
 
 
 def _count_files(addon_dir: Path) -> tuple[int, int, int]:
@@ -59,24 +51,27 @@ def main() -> int:
         return 1
 
     addons = sorted(p for p in ADDONS_DIR.iterdir() if p.is_dir())
+    smoke_queries = all_smoke_queries()
+    smoke_map = {name: [] for _, name in smoke_queries}
+    for query, addon_name in smoke_queries:
+        smoke_map[addon_name].append(query)
 
     # Header
     print("| Addon | Display Name | Docs | Examples | API | Smoke |")
     print("|---|---|---|---|---|---|")
-
-    smoke_map = {q: a for q, a in SMOKE_QUERIES}
 
     for addon_dir in addons:
         name = addon_dir.name
         display = _display_name(addon_dir)
         docs, examples, apis = _count_files(addon_dir)
 
-        # Find smoke query for this addon (if any)
+        # Find smoke queries for this addon
         smoke = ""
-        for query, expected in SMOKE_QUERIES:
-            if expected == name:
-                smoke = f"{_smoke_hit(query, name)} `{query}`"
-                break
+        if name in smoke_map:
+            hits = []
+            for query in smoke_map[name]:
+                hits.append(f"{_smoke_hit(query, name)} `{query}`")
+            smoke = " · ".join(hits)
 
         doc_s = str(docs) if docs else "—"
         ex_s = str(examples) if examples else "—"

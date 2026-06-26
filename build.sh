@@ -179,12 +179,21 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
 echo "3. 组装 RAG 包..."
 touch godot_rag/__init__.py
 cp rst2md/rag/*.py godot_rag/rag/
+# 复制 addon_configs 模块
+cp -r rst2md/rag/addon_configs godot_rag/rag/
 python3 -c "
 import glob, sys
 for f in glob.glob(sys.argv[1] + '/*.py'):
     t = open(f).read().replace('from rag.', 'from godot_rag.rag.')
     open(f, 'w').write(t)
+for f in glob.glob(sys.argv[1] + '/addon_configs/*.py'):
+    t = open(f).read().replace('from rag.', 'from godot_rag.rag.')
+    open(f, 'w').write(t)
 " godot_rag/rag
+
+# 合并中英文 README 用于 PyPI 展示
+echo "3a. 合并 README..."
+python3 scripts/merge_readme.py
 
 # 构建 wheel
 echo "4. 构建 wheel..."
