@@ -104,7 +104,7 @@ A hybrid RAG system (FTS5 + symbol index) gives significantly better results tha
 
 ### Benchmark: Real Query Comparison
 
-Tested on a database of **30,783 chunks** (28,231 Godot docs + 2,552 addon chunks across 9 addons).
+Tested on a database of **30,545 chunks** (28,231 Godot docs + 2,314 addon chunks across 9 addons).
 
 | Metric | RAG (this tool) | grep (raw files) | Improvement |
 |---|---|---|---|
@@ -119,14 +119,15 @@ Tested on a database of **30,783 chunks** (28,231 Godot docs + 2,552 addon chunk
 
 | Query | RAG Results | grep Results | Notes |
 |---|---|---|---|
-| `change_scene` | ✅ 3 hits (8ms) | ✅ 13 files (152ms) | RAG: ranked, deduped |
-| `SceneManager` | ✅ 3 hits (7ms) | ✅ 41 files (100ms) | grep: too many noise files |
-| `BehaviorTree` | ✅ 3 hits (7ms) | ✅ 2 files (96ms) | RAG: includes doc context |
-| `DialogueManager` | ✅ 3 hits (7ms) | ✅ 26 files (98ms) | RAG: only relevant docs |
-| `state machine transitions` | ✅ 3 hits (6ms) | ❌ 0 files | **grep fails on multi-word** |
-| `scene transition animation` | ✅ 3 hits (7ms) | ❌ 0 files | **grep fails on multi-word** |
-| `input helper gamepad` | ✅ 2 hits (7ms) | ❌ 0 files | **grep fails on multi-word** |
-| `input action mapping` | ✅ 3 hits (7ms) | — | RAG finds cross-references |
+| `change_scene` | ✅ 3 hits (12ms) | ✅ 13 files (152ms) | RAG: ranked, deduped |
+| `SceneManager` | ✅ 3 hits (12ms) | ✅ 41 files (100ms) | grep: too many noise files |
+| `SceneManager.change_scene` | ✅ 1 hit (12ms) | ❌ 0 files | **RAG: precise symbol hit** |
+| `BehaviorTree` | ✅ 3 hits (12ms) | ✅ 2 files (96ms) | RAG: includes doc context |
+| `DialogueManager` | ✅ 3 hits (13ms) | ✅ 26 files (98ms) | RAG: only relevant docs |
+| `state machine transitions` | ✅ 3 hits (13ms) | ❌ 0 files | **grep fails on multi-word** |
+| `scene transition animation` | ✅ 2 hits (12ms) | ❌ 0 files | **grep fails on multi-word** |
+| `input helper gamepad` | ✅ 2 hits (12ms) | ❌ 0 files | **grep fails on multi-word** |
+| `input action mapping` | ✅ 3 hits (11ms) | — | RAG finds cross-references |
 
 **Key insight**: grep can only find exact substring matches. RAG handles natural language queries like "state machine transitions" and returns ranked, contextual results.
 
@@ -147,15 +148,15 @@ $ godot-rag s-addon "state machine" --addon statecharts
 | Addon | Docs | Examples | API | Total |
 |---|---|---|---|---|
 | dialogue_manager | 140 | — | 55 | 195 |
-| doctor | — | 125 | 42 | 167 |
-| gdUnit4 | 1,030 | — | 215 | 1,245 |
+| doctor | — | 125 | 41 | 166 |
+| gdUnit4 | 1,030 | — | 214 | 1,244 |
 | input_helper | 32 | 3 | 6 | 41 |
 | limboai | 351 | 27 | — | 378 |
 | phantom-camera | 12 | 11 | 38 | 61 |
-| scene_manager | 209 | 5 | 31 | 245 |
+| scene_manager | 1 | 2 | 5 | 8 |
 | sound_manager | 13 | 2 | 7 | 22 |
-| statecharts | 80 | 21 | 97 | 198 |
-| **Total** | **1,867** | **194** | **491** | **2,552** |
+| statecharts | 80 | 21 | 98 | 199 |
+| **Total** | **1,659** | **191** | **464** | **2,314** |
 
 - **addon_doc**: Documentation markdown/RST, split by headings
 - **addon_example**: Example .gd/.cs code files
