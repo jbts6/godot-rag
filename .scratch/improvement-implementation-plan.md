@@ -97,6 +97,15 @@ Harden build and publish workflow
 
 ## P0-2：增加 Python 3.9 CI 矩阵
 
+状态：已完成。
+
+完成记录：
+
+- 新增 `.github/workflows/test.yml`。
+- CI 覆盖 Python 3.9、3.10、3.11、3.12。
+- 每个版本运行 `uv sync --dev`、`uv run pytest -q`、`bash -n build.sh`。
+- 已本地验证：`uv sync --dev --dry-run`、`uv run pytest -q`、`bash -n build.sh`。
+
 ### 目标
 
 既然项目声明 `requires-python = ">=3.9"`，CI 必须覆盖 Python 3.9，防止再次引入 3.11+ API。
