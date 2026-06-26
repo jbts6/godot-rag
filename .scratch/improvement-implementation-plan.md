@@ -261,6 +261,15 @@ Index addon API symbol aliases
 
 ## P1-2：重算 README benchmark 和 coverage
 
+状态：已完成。
+
+完成记录：
+
+- 新增 `scripts/benchmark_readme.py`，从数据库读取真实数字输出 markdown 表格。
+- README 更新：总 chunk 数 30,783 → 30,545，scene_manager 245 → 8。
+- 新增 `SceneManager.change_scene` 查询行（P1-1 完成后支持精确命中）。
+- coverage 表全部刷新为当前数据库实际数字。
+
 ### 目标
 
 README 当前 benchmark 数字来自旧数据形状。切换 GDScript Scene Manager 后，应重算：
@@ -323,6 +332,15 @@ Refresh README benchmark data
 ---
 
 ## P2-1：接入 Scene Manager Wiki 文档
+
+状态：已完成。
+
+完成记录：
+
+- `build.sh` 新增 `--with-wiki` 参数。
+- 克隆 wiki 到 `.cache/addon-wikis/scene_manager`，复制到 `addons/scene_manager/docs_wiki/`。
+- `addon_docs.py` 的 `_DOC_DIR_CANDIDATES` 新增 `docs_wiki`，discovery 自动发现。
+- `.gitignore` 新增 `.cache/`，避免 wiki 缓存进入版本控制。
 
 ### 目标
 
@@ -395,6 +413,12 @@ Add optional Scene Manager wiki docs source
 
 ## P2-2：整理 scratch 和开发噪音
 
+状态：已完成。
+
+完成记录：
+
+- `.gitignore` 新增 `.scratch/`。
+
 ### 目标
 
 避免 `.scratch/` 每次出现在 `git status`。
@@ -431,6 +455,15 @@ Ignore local scratch notes
 ---
 
 ## P2-3：addon 更新和 smoke test 工具
+
+状态：已完成。
+
+完成记录：
+
+- 新增 `scripts/check_addons.py`。
+- 输出 addon 名称、display name、doc/example/API 文件数。
+- 对 5 个 addon 运行 smoke query（statecharts、dialogue_manager、doctor、scene_manager、limboai）。
+- 使用 `addon_docs.py` 公开函数，不重复实现发现逻辑。
 
 ### 目标
 
