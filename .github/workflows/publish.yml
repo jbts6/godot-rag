@@ -1,22 +1,14 @@
-name: Test
+name: Publish
 
 on:
   push:
-  pull_request:
+    tags:
+      - "v*"
 
 jobs:
   test:
-    name: Python ${{ matrix.python-version }}
+    name: Test
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version:
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -27,7 +19,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.12"
 
       - name: Install dependencies
         run: uv sync --dev
@@ -38,9 +30,13 @@ jobs:
       - name: Check build script syntax
         run: bash -n build.sh
 
-  benchmark:
-    name: Benchmark staleness check
+  publish:
+    name: Build and publish to PyPI
+    needs: test
     runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Required for trusted publisher (OIDC)
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -58,11 +54,25 @@ jobs:
       - name: Install dependencies
         run: uv sync --dev
 
-      - name: Build database
+      - name: Build docs and database
         run: |
           PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
           mkdir -p godot_rag/rag
           PYTHONPATH=rst2md uv run python3 -m rag.cli build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite --addons addons
 
-      - name: Check README benchmark data
-        run: PYTHONPATH=rst2md uv run python3 scripts/benchmark_readme.py --check
+      - name: Assemble package
+        run: |
+          touch godot_rag/__init__.py
+          cp rst2md/rag/*.py godot_rag/rag/
+          python3 -c "
+          import glob, sys
+          for f in glob.glob(sys.argv[1] + '/*.py'):
+              t = open(f).read().replace('from rag.', 'from godot_rag.rag.')
+              open(f, 'w').write(t)
+          " godot_rag/rag
+
+      - name: Build wheel
+        run: uv build --wheel
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
