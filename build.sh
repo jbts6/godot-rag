@@ -175,6 +175,11 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
     --db godot_rag/rag/godot_docs.sqlite \
     --addons addons
 
+# 清理 wiki 缓存（已入库，不需要留在子模块内）
+if [ "$WITH_WIKI" -eq 1 ]; then
+    rm -rf addons/scene_manager/docs_wiki
+fi
+
 # 组装 RAG 包（源码复制 + import 改写）
 echo "3. 组装 RAG 包..."
 touch godot_rag/__init__.py
