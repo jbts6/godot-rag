@@ -24,6 +24,7 @@ Thumbs.db
 godot_rag/
 dist/
 *.sqlite
+README_PYPI.md
 
 # Local scratch notes
 .scratch/
