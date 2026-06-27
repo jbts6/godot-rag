@@ -62,7 +62,8 @@ CREATE TABLE IF NOT EXISTS chunks (
   breadcrumb TEXT NOT NULL DEFAULT '',
   start_line INTEGER NOT NULL,
   end_line INTEGER NOT NULL,
-  text TEXT NOT NULL
+  text TEXT NOT NULL,
+  parent_symbol TEXT NOT NULL DEFAULT ''
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
@@ -86,12 +87,77 @@ CREATE TABLE IF NOT EXISTS symbols (
 
 CREATE INDEX IF NOT EXISTS idx_symbols_normalized_name ON symbols(normalized_name);
 CREATE INDEX IF NOT EXISTS idx_symbols_name ON symbols(name);
+
+CREATE TABLE IF NOT EXISTS chunk_relations (
+  source_id INTEGER NOT NULL REFERENCES chunks(id),
+  target_id INTEGER NOT NULL REFERENCES chunks(id),
+  relation  TEXT NOT NULL,
+  weight    REAL DEFAULT 1.0,
+  PRIMARY KEY (source_id, target_id, relation)
+);
+CREATE INDEX IF NOT EXISTS idx_relations_source ON chunk_relations(source_id);
+CREATE INDEX IF NOT EXISTS idx_relations_target ON chunk_relations(target_id);
 """
 
 FTS_SYNC = """
 INSERT INTO chunks_fts(rowid, text, symbol, heading, breadcrumb)
 SELECT id, text, symbol, heading, breadcrumb FROM chunks;
 """
+
+INHERITS_RE = re.compile(r'\*\*Inherits:\*\*(.+)')
+
+
+def _extract_inherits(text: str) -> List[str]:
+    """Extract class names from an '**Inherits:**' line."""
+    match = INHERITS_RE.search(text)
+    if not match:
+        return []
+    return re.findall(r'`([A-Za-z_][A-Za-z0-9_]*)`', match.group(1))
+
+
+def _build_chunk_relations(conn) -> None:
+    """Build parent, inherits, and references relations between chunks."""
+    rows = conn.execute("SELECT id, path, doc_type, chunk_type, symbol, parent_symbol, text FROM chunks").fetchall()
+
+    # Index: normalized_symbol -> chunk_id
+    sym_to_id = {}
+    for row in rows:
+        if row[4]:  # symbol
+            sym_to_id[normalize_symbol(row[4])] = row[0]
+
+    for row in rows:
+        chunk_id, path, doc_type, chunk_type, symbol, parent_symbol, text = row
+
+        # 1. Parent relation: member -> class_summary
+        if parent_symbol:
+            parent_norm = normalize_symbol(parent_symbol)
+            if parent_norm in sym_to_id:
+                conn.execute(
+                    "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'parent', 1.0)",
+                    (chunk_id, sym_to_id[parent_norm])
+                )
+
+        # 2. Inherits relation: class_summary -> parent class_summary
+        if chunk_type == "class_summary":
+            parents = _extract_inherits(text)
+            for parent_name in parents:
+                parent_norm = normalize_symbol(parent_name)
+                if parent_norm in sym_to_id:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'inherits', 0.8)",
+                        (chunk_id, sym_to_id[parent_norm])
+                    )
+
+        # 3. References relation: text mentions of other symbols
+        tokens = set(re.findall(r'[A-Za-z_][A-Za-z0-9_.]+', text))
+        for token in tokens:
+            token_norm = normalize_symbol(token)
+            if token_norm and token_norm in sym_to_id and token_norm != normalize_symbol(symbol):
+                target_id = sym_to_id[token_norm]
+                conn.execute(
+                    "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'references', 0.5)",
+                    (chunk_id, target_id)
+                )
 
 
 def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = None) -> None:
@@ -139,8 +205,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
         for chunk in chunks:
             cleaned_text = clean_chunk_text(chunk.text)
             conn.execute(
-                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
             )
 
         # Extract and insert symbols
@@ -185,8 +251,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
             for chunk in addon_chunks:
                 cleaned_text = clean_chunk_text(chunk.text)
                 conn.execute(
-                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
                 )
 
             # Extract and insert symbols
@@ -203,6 +269,9 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
                     "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
                     (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
                 )
+
+    # Build chunk relations (graph)
+    _build_chunk_relations(conn)
 
     # Sync FTS index
     conn.executescript(FTS_SYNC)

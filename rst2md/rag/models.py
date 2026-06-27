@@ -16,6 +16,7 @@ class Chunk:
     end_line: int
     text: str
     symbols: List[str] = field(default_factory=list)
+    parent_symbol: str = ""
 
 
 @dataclass(frozen=True)

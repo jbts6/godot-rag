@@ -174,6 +174,63 @@ class DocTypeFilterTests(unittest.TestCase):
             self.assertEqual(len(all_results), len(filtered))
 
 
+class ChunkRelationTests(unittest.TestCase):
+    """chunk_relations table should be created and populated."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n"
+            "## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n"
+            "`void` **remove_child**(`Node` node)\n\nRemoves a child.\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nBase of all classes.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_relation_table_exists(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            tables = [r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()]
+            conn.close()
+            self.assertIn("chunk_relations", tables)
+
+    def test_parent_relations_exist(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            count = conn.execute(
+                "SELECT COUNT(*) FROM chunk_relations WHERE relation='parent'"
+            ).fetchone()[0]
+            conn.close()
+            self.assertGreater(count, 0, "Should have parent relations")
+
+    def test_inherits_relations_exist(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            count = conn.execute(
+                "SELECT COUNT(*) FROM chunk_relations WHERE relation='inherits'"
+            ).fetchone()[0]
+            conn.close()
+            self.assertGreater(count, 0, "Should have inherits relations")
+
+
 class CliTests(unittest.TestCase):
     def test_cli_help_runs(self):
         result = subprocess.run(

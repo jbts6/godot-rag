@@ -113,6 +113,7 @@ def _chunk_class_document(path: str, lines: List[str]) -> List[Chunk]:
                     start_line=member_start + 1,
                     end_line=end_line,
                     text=member_text,
+                    parent_symbol=class_name,
                 ))
         member_start = None
         member_symbol = None
