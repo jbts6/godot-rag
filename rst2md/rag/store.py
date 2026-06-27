@@ -14,6 +14,13 @@ def get_connection(db_path):
     """Context manager for SQLite connections."""
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
+    # Enable extension loading for sqlite-vec
+    conn.enable_load_extension(True)
+    try:
+        import sqlite_vec
+        sqlite_vec.load(conn)
+    except Exception:
+        pass  # sqlite-vec not available, skip
     try:
         yield conn
     finally:
@@ -339,6 +346,28 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
 
         # Build chunk relations (graph)
         _build_chunk_relations(conn)
+
+        # Generate and store embeddings (requires sqlite-vec extension)
+        try:
+            conn.execute("SELECT COUNT(*) FROM vec_chunks LIMIT 1")
+        except sqlite3.OperationalError:
+            # vec_chunks table not available, skip embedding generation
+            pass
+        else:
+            from rag.embeddings import generate_embeddings
+
+            chunk_rows = conn.execute("SELECT id, text FROM chunks ORDER BY id").fetchall()
+            chunk_ids = [row[0] for row in chunk_rows]
+            chunk_texts = [row[1] for row in chunk_rows]
+
+            print(f"Generating embeddings for {len(chunk_texts)} chunks...")
+            embeddings = generate_embeddings(chunk_texts)
+
+            for chunk_id, embedding in zip(chunk_ids, embeddings):
+                conn.execute(
+                    "INSERT INTO vec_chunks (chunk_id, embedding) VALUES (?, ?)",
+                    (chunk_id, str(embedding))
+                )
 
         # Sync FTS index
         conn.executescript(FTS_SYNC)
