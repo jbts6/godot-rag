@@ -449,6 +449,52 @@ class CliTests(unittest.TestCase):
             # Should contain progress output
             self.assertIn("Building database", output)
 
+
+class ConnectionManagerTests(unittest.TestCase):
+    """Test SQLite connection context manager."""
+
+    def test_get_connection_context_manager(self):
+        """get_connection should provide a working connection."""
+        from rag.store import get_connection
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.sqlite"
+
+            # Create a simple database
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            conn.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
+            conn.execute("INSERT INTO test VALUES (1, 'hello')")
+            conn.commit()
+            conn.close()
+
+            # Use context manager
+            with get_connection(db_path) as conn:
+                result = conn.execute("SELECT name FROM test WHERE id = 1").fetchone()
+                self.assertEqual(result[0], "hello")
+
+    def test_get_connection_sets_row_factory(self):
+        """get_connection should set row_factory to sqlite3.Row."""
+        from rag.store import get_connection
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.sqlite"
+
+            # Create a simple database
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            conn.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
+            conn.execute("INSERT INTO test VALUES (1, 'hello')")
+            conn.commit()
+            conn.close()
+
+            # Use context manager
+            with get_connection(db_path) as conn:
+                result = conn.execute("SELECT name FROM test WHERE id = 1").fetchone()
+                # Should be sqlite3.Row object
+                self.assertIsInstance(result, sqlite3.Row)
+                self.assertEqual(result["name"], "hello")
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],

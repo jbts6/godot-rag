@@ -1,11 +1,23 @@
 import re
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from typing import List, Optional
 
 from rag.chunker import chunk_markdown
 from rag.models import SearchResult
 from rag.symbols import extract_symbols, normalize_symbol
+
+
+@contextmanager
+def get_connection(db_path):
+    """Context manager for SQLite connections."""
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 # Patterns for cleaning text
 CLASSREF_LINE_RE = re.compile(r"^\s*classref-\S+\s*$", re.MULTILINE)
