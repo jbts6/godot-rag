@@ -495,6 +495,58 @@ class ConnectionManagerTests(unittest.TestCase):
                 self.assertIsInstance(result, sqlite3.Row)
                 self.assertEqual(result["name"], "hello")
 
+
+class StatsCommandTests(unittest.TestCase):
+    """Test godot-rag stats command."""
+
+    def _build_db(self, tmp):
+        """Build a test database."""
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_get_stats_returns_expected_keys(self):
+        """get_stats should return a dict with expected keys."""
+        from rag.store import get_stats
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            stats = get_stats(db_path)
+
+            self.assertIn("chunks", stats)
+            self.assertIn("symbols", stats)
+            self.assertIn("relations", stats)
+            self.assertIn("addons", stats)
+
+    def test_get_stats_returns_correct_chunk_count(self):
+        """get_stats should return correct chunk count."""
+        from rag.store import get_stats
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            stats = get_stats(db_path)
+
+            self.assertEqual(stats["chunks"]["total"], 2)  # class_summary + method
+
+    def test_cli_stats_command_works(self):
+        """godot-rag stats should work."""
+        result = subprocess.run(
+            [sys.executable, "-m", "rag.cli", "stats", "--help"],
+            text=True,
+            capture_output=True,
+            env=TEST_ENV,
+        )
+        self.assertEqual(result.returncode, 0)
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],
