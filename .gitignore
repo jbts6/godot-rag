@@ -22,8 +22,10 @@ Thumbs.db
 
 # Generated files (build.sh)
 godot_rag/
+godot-docs-md/
 dist/
 *.sqlite
+*.db
 README_PYPI.md
 
 # Local scratch notes
