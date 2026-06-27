@@ -1,0 +1,13 @@
+{
+  "change": "polish-and-fixes",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "af06994bcae427d6dd052c5cce72c748d2995e0b6d6a10fa27d83af28aa37ba7",
+  "files": [
+    { "path": "openspec/changes/polish-and-fixes/proposal.md", "sha256": "d56fa656f20d6f6f0738fd135edca066caa27c6388fe690ac04f9bfc5e03328c" },
+    { "path": "openspec/changes/polish-and-fixes/design.md", "sha256": "88e8db32d34d67e8fc9d9417b7bf72e9f4339d4567787525c437db9a1a99e5c0" },
+    { "path": "openspec/changes/polish-and-fixes/tasks.md", "sha256": "fc9bc165c36927d8821997d8d6683c91c7ccf01d1dc9da1e384435caceab20db" }
+  ]
+}

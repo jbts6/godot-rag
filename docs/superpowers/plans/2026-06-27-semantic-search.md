@@ -2,6 +2,7 @@
 change: semantic-search
 design-doc: docs/superpowers/specs/2026-06-27-semantic-search-design.md
 base-ref: a2b5f75fa6b1c4cdc5de07b80ff684d66363c482
+archived-with: 2026-06-27-semantic-search
 ---
 
 # 语义搜索实施计划
@@ -21,6 +22,7 @@ base-ref: a2b5f75fa6b1c4cdc5de07b80ff684d66363c482
 - 源码目录：`rst2md/rag/`
 - 测试目录：`rst2md/tests/`
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 1: 添加依赖
@@ -58,6 +60,7 @@ git add pyproject.toml
 git commit -m "feat: add sqlite-vec and model2vec dependencies"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 2: 新增 vec_chunks 虚拟表
@@ -91,6 +94,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: add vec_chunks virtual table schema"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 3: 实现 see_also 关系提取
@@ -140,6 +144,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: extract see_also relations from See also references"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 4: 实现向量生成函数
@@ -196,6 +201,7 @@ git add rst2md/rag/embeddings.py
 git commit -m "feat: add generate_embeddings function"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 5: 在 build_database 中集成向量生成
@@ -250,6 +256,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: integrate embedding generation into build_database"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 6: 实现向量搜索函数
@@ -297,6 +304,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: add vector_search function"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 7: 实现 RRF 融合函数
@@ -361,6 +369,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: add rrf_fusion function"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 8: 修改 search_database 集成向量搜索
@@ -433,6 +442,7 @@ git add rst2md/rag/store.py
 git commit -m "feat: integrate vector search and RRF fusion into search_database"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 9: 编写单元测试
@@ -514,6 +524,7 @@ git add rst2md/tests/test_semantic_search.py
 git commit -m "test: add semantic search unit tests"
 ```
 
+archived-with: 2026-06-27-semantic-search
 ---
 
 ### Task 10: 端到端验证
