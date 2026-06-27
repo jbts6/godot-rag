@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 9
+**current_task:** Task 10
 **current_stage:** implementing
 
 ## Tasks
@@ -67,9 +67,12 @@
 - **completed_at:** 2026-06-27
 
 ### Task 9: 编写单元测试
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 9: 编写单元测试
 - **openspec_text:** 5.1 编写 see_also 关系构建的单元测试, 5.2 编写向量搜索和 RRF 融合的单元测试
+- **commit:** 02f08da
+- **tests_passed:** 5
+- **completed_at:** 2026-06-27
 
 ### Task 10: 端到端验证
 - **status:** pending

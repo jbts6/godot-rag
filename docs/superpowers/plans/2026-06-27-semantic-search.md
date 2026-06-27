@@ -443,7 +443,7 @@ git commit -m "feat: integrate vector search and RRF fusion into search_database
 **Interfaces:**
 - Tests: see_also 关系构建、向量搜索、RRF 融合
 
-- [ ] **Step 1: 创建测试文件**
+- [x] **Step 1: 创建测试文件**
 
 ```python
 """Tests for semantic search features."""
@@ -502,12 +502,12 @@ def test_rrf_fusion():
     assert 'rrf_score' in fused[0]
 ```
 
-- [ ] **Step 2: 运行测试**
+- [x] **Step 2: 运行测试**
 
 Run: `uv run pytest rst2md/tests/test_semantic_search.py -v`
 Expected: ALL PASSED
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/tests/test_semantic_search.py
