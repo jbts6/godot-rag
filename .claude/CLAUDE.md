@@ -16,6 +16,8 @@
 ./build.sh --publish    # 构建并发布到 PyPI
 ```
 
+**不要手动 commit 版本号** — `build.sh` 会自动递增版本并构建。手动提前 commit 会导致版本跳号（如 post9 → post10）。正确流程：只提交代码改动，然后运行 `./build.sh --publish`。
+
 ## 测试
 
 ```bash
