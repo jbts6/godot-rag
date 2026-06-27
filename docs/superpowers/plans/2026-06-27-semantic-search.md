@@ -308,7 +308,7 @@ git commit -m "feat: add vector_search function"
 - Consumes: fts_results, vec_results, k
 - Produces: List[dict] with 'rrf_score' key
 
-- [ ] **Step 1: 在 store.py 中添加 rrf_fusion 函数**
+- [x] **Step 1: 在 store.py 中添加 rrf_fusion 函数**
 
 在 `vector_search` 函数之后添加：
 
@@ -349,12 +349,12 @@ def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) ->
     return results
 ```
 
-- [ ] **Step 2: 验证函数可调用**
+- [x] **Step 2: 验证函数可调用**
 
 Run: `uv run python -c "from rag.store import rrf_fusion; print('OK')"`
 Expected: `OK`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/rag/store.py
