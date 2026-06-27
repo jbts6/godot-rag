@@ -372,7 +372,7 @@ git commit -m "feat: add rrf_fusion function"
 - Consumes: vector_search, rrf_fusion, generate_embeddings
 - Produces: 融合后的搜索结果
 
-- [ ] **Step 1: 修改 search_database 函数**
+- [x] **Step 1: 修改 search_database 函数**
 
 在 `search_database` 函数中，在 `# 1. Exact symbol match` 之前添加向量搜索逻辑：
 
@@ -415,7 +415,7 @@ git commit -m "feat: add rrf_fusion function"
             pass
 ```
 
-- [ ] **Step 2: 验证搜索功能**
+- [x] **Step 2: 验证搜索功能**
 
 Run: `uv run python -c "
 from pathlib import Path
@@ -426,7 +426,7 @@ for r in results:
 "`
 Expected: 返回语义相关结果
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/rag/store.py

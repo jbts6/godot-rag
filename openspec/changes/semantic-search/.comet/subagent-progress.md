@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 8
+**current_task:** Task 9
 **current_stage:** implementing
 
 ## Tasks
@@ -60,9 +60,11 @@
 - **completed_at:** 2026-06-27
 
 ### Task 8: 修改 search_database 集成向量搜索
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 8: 修改 search_database 集成向量搜索
 - **openspec_text:** 4.3 修改 search_database 函数
+- **commit:** 2990287
+- **completed_at:** 2026-06-27
 
 ### Task 9: 编写单元测试
 - **status:** pending

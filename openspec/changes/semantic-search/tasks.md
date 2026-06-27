@@ -18,7 +18,7 @@
 
 - [x] 4.1 实现 vector_search 函数：使用 sqlite-vec 进行向量相似度搜索
 - [x] 4.2 实现 rrf_fusion 函数：RRF 融合 FTS5 和向量搜索结果
-- [ ] 4.3 修改 search_database 函数：集成向量搜索和 RRF 融合
+- [x] 4.3 修改 search_database 函数：集成向量搜索和 RRF 融合
 - [ ] 4.4 验证搜索 "how to make a button" 能返回语义相关结果
 
 ## 5. 测试
