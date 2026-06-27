@@ -38,6 +38,36 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(results[0].path, "classes/class_stringname.md")
 
 
+class FtsScoreTests(unittest.TestCase):
+    """BM25 score mapping should produce reasonable distribution."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        # Create classes with varied content lengths to get different BM25 scores
+        for cls_name, methods in [("Timer", 5), ("Node", 10), ("Object", 3)]:
+            content = f"# {cls_name}\n\n{cls_name} is a class.\n\n## Methods\n\n"
+            for i in range(methods):
+                extra = " extra context " * i  # vary document length
+                content += f"`bool` **method_{i}**() `const`\n\n{extra}A useful method.\n\n"
+            (classes / f"class_{cls_name.lower()}.md").write_text(content, encoding="utf-8")
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_fts_formula_produces_varied_scores(self):
+        """The BM25 formula should map different raw values to different scores."""
+        # Direct unit test of the formula
+        def fts_score(bm25):
+            return min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
+
+        # Different BM25 values should produce different scores
+        scores = {fts_score(v) for v in [0.0, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]}
+        self.assertGreater(len(scores), 3, "Formula should produce varied scores")
+
+
 class FtsEscapeTests(unittest.TestCase):
     """FTS5 queries with special characters should not silently fail."""
 

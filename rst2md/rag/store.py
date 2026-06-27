@@ -334,7 +334,7 @@ def search_database(
         for row in fts_rows:
             cid = row["id"]
             bm25 = abs(row["rank"])
-            fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.1)))
+            fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
             if cid not in results or results[cid]["score"] < fts_score:
                 results[cid] = _make_result(row, fts_score)
     except sqlite3.OperationalError:
