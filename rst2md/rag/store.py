@@ -135,7 +135,10 @@ CREATE TABLE IF NOT EXISTS chunk_relations (
 );
 CREATE INDEX IF NOT EXISTS idx_relations_source ON chunk_relations(source_id);
 CREATE INDEX IF NOT EXISTS idx_relations_target ON chunk_relations(target_id);
+"""
 
+# SQL to create vec_chunks virtual table (requires sqlite-vec extension)
+VEC_CHUNKS_SCHEMA = """
 CREATE VIRTUAL TABLE IF NOT EXISTS vec_chunks USING vec0(
     chunk_id INTEGER PRIMARY KEY,
     embedding float[256]
@@ -218,6 +221,13 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
 
     with get_connection(db_path) as conn:
         conn.executescript(SCHEMA)
+
+        # Create vec_chunks table if sqlite-vec extension is available
+        try:
+            conn.executescript(VEC_CHUNKS_SCHEMA)
+        except sqlite3.OperationalError:
+            # sqlite-vec not available, skip vector table creation
+            pass
 
         md_files = sorted(docs_dir.rglob("*.md"))
         total_files = len(md_files)
