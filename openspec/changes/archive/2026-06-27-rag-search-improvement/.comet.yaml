@@ -1,0 +1,23 @@
+workflow: full
+phase: archive
+design_doc: docs/superpowers/specs/2026-06-27-rag-search-improvement-design.md
+plan: docs/superpowers/plans/2026-06-27-rag-search-improvement.md
+base_ref: 5f32fd9bd5dc7e1b1ec191139c3c1d57a3638167
+build_mode: direct
+build_pause: null
+subagent_dispatch: null
+tdd_mode: tdd
+review_mode: standard
+isolation: branch
+verify_mode: null
+verify_result: pass
+verification_report: docs/superpowers/specs/2026-06-27-rag-search-improvement-verify.md
+branch_status: handled
+created_at: "2026-06-27"
+verified_at: 2026-06-27
+archived: true
+handoff_context: openspec/changes/rag-search-improvement/.comet/handoff/design-context.json
+handoff_hash: fdc2d062aa2f8cbcfaf0b6af94dad40e4c4f72cd090cc0d043a98059a566615e
+direct_override: true
+build_command: PYTHONPATH=rst2md uv run pytest rst2md/tests/ -q
+verify_command: PYTHONPATH=rst2md uv run pytest rst2md/tests/ -q
