@@ -212,14 +212,46 @@ fi
 echo "5. 检查 wheel..."
 uv run --with twine python -m twine check "$WHEEL_PATH"
 
+# 检查版本是否已存在于 PyPI
+check_pypi_version() {
+    local pkg="$1" ver="$2" repo="$3"
+    local url
+    if [ "$repo" = "testpypi" ]; then
+        url="https://test.pypi.org/pypi/${pkg}/${ver}/json"
+    else
+        url="https://pypi.org/pypi/${pkg}/${ver}/json"
+    fi
+    local code
+    code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
+    if [ "$code" = "200" ]; then
+        return 0  # 已存在
+    fi
+    return 1  # 不存在
+}
+
 if [ "$PUBLISH_TARGET" = "pypi" ]; then
-    echo "6. 发布到 PyPI..."
+    echo "6. 检查 PyPI 版本..."
+    if check_pypi_version "godot-rag" "$PKG_VERSION" "pypi"; then
+        echo "错误: 版本 $PKG_VERSION 已存在于 PyPI，请先 bump 版本"
+        exit 1
+    fi
+    echo "7. 发布到 PyPI..."
     uv run pytest -q
     uv run --with twine python -m twine upload "$WHEEL_PATH"
+    echo ""
+    echo "✅ 已发布 $PKG_VERSION 到 PyPI"
+    echo "   请提交版本变更: git add pyproject.toml && git commit -m 'bump to $PKG_VERSION'"
 elif [ "$PUBLISH_TARGET" = "testpypi" ]; then
-    echo "6. 发布到 TestPyPI..."
+    echo "6. 检查 TestPyPI 版本..."
+    if check_pypi_version "godot-rag" "$PKG_VERSION" "testpypi"; then
+        echo "错误: 版本 $PKG_VERSION 已存在于 TestPyPI，请先 bump 版本"
+        exit 1
+    fi
+    echo "7. 发布到 TestPyPI..."
     uv run pytest -q
     uv run --with twine python -m twine upload --repository testpypi "$WHEEL_PATH"
+    echo ""
+    echo "✅ 已发布 $PKG_VERSION 到 TestPyPI"
 fi
 
 echo ""

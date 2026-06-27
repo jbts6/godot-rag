@@ -29,7 +29,7 @@ wheels = [
 
 [[package]]
 name = "godot-rag"
-version = "4.7.0.post5"
+version = "4.7.0.post6"
 source = { editable = "." }
 
 [package.dev-dependencies]
