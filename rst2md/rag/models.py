@@ -33,3 +33,5 @@ class SearchResult:
     heading: str
     breadcrumb: str
     text: str
+    relation_type: str = ''
+    distance: int = 0

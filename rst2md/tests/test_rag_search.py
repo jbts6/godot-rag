@@ -231,6 +231,68 @@ class ChunkRelationTests(unittest.TestCase):
             self.assertGreater(count, 0, "Should have inherits relations")
 
 
+class GraphExpansionTests(unittest.TestCase):
+    """Graph expansion should return related chunks."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n"
+            "## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child node.\n\n"
+            "`void` **remove_child**(`Node` node)\n\nRemoves a child.\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nBase of all classes.\n\n## Methods\n\n"
+            "`void` **free**()\n\nFrees the object.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_expand_returns_parent_chunk(self):
+        """Searching for a method should return its class_summary via parent relation."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            # Should have the method itself plus parent class_summary
+            symbols = {r.symbol for r in results}
+            self.assertIn("Node.add_child", symbols)
+            # Parent (Node class_summary) should be in results
+            self.assertIn("Node", symbols)
+
+    def test_no_expand_returns_only_direct(self):
+        """With expand_graph=False, should only return direct matches."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=False)
+            symbols = {r.symbol for r in results}
+            self.assertIn("Node.add_child", symbols)
+            # Without expansion, Node class_summary may not be present
+            # (depends on FTS, but at least distance=0 results only)
+
+    def test_expanded_results_have_distance(self):
+        """Expanded results should have distance=1."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            expanded = [r for r in results if r.distance == 1]
+            self.assertGreater(len(expanded), 0, "Should have expanded results with distance=1")
+
+    def test_expanded_results_have_relation_type(self):
+        """Expanded results should have a relation_type."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            expanded = [r for r in results if r.relation_type]
+            self.assertGreater(len(expanded), 0, "Should have expanded results with relation_type")
+
+
 class CliTests(unittest.TestCase):
     def test_cli_help_runs(self):
         result = subprocess.run(

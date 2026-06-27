@@ -297,6 +297,7 @@ def list_addons(db_path: Path) -> List[dict]:
 def search_database(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
+    expand_graph: bool = True,
 ) -> List[SearchResult]:
     """Search the RAG database.
 
@@ -304,6 +305,9 @@ def search_database(
         db_path: Path to the SQLite database.
         query: Search query string.
         limit: Maximum number of results to return.
+        doc_types: If provided, only search chunks whose doc_type is in this list.
+        addon: If provided, only search chunks belonging to this addon.
+        expand_graph: If True, expand top results via chunk_relations graph.
         doc_types: If provided, only search chunks whose doc_type is in this list.
                    Common values: "class", "tutorial", "getting_started", "engine_detail", "addon".
         addon: If provided, only search chunks belonging to this addon (e.g. "statecharts").
@@ -331,6 +335,7 @@ def search_database(
 
     def _make_result(row, score):
         return {
+            "id": row["id"],
             "score": score,
             "path": row["path"],
             "start_line": row["start_line"],
@@ -343,6 +348,8 @@ def search_database(
             "heading": row["heading"],
             "breadcrumb": row["breadcrumb"],
             "text": row["text"],
+            "relation_type": "",
+            "distance": 0,
         }
 
     # 1. Exact symbol match (+100)
@@ -410,10 +417,54 @@ def search_database(
         # FTS match syntax error, skip
         pass
 
-    conn.close()
-
     # Sort by score descending
     sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+
+    # Graph expansion: expand top-K results via chunk_relations
+    if expand_graph:
+        top_k = min(3, len(sorted_results))
+        expanded_ids = {r["id"] for r in sorted_results[:top_k]}
+
+        for result in sorted_results[:top_k]:
+            graph_query = (
+                "SELECT c.*, r.relation, r.weight FROM chunk_relations r "
+                "JOIN chunks c ON c.id = r.target_id "
+                "WHERE r.source_id = ?"
+                + type_filter + addon_filter
+                + " ORDER BY r.weight DESC LIMIT 5"
+            )
+            related_rows = conn.execute(
+                graph_query,
+                [result["id"]] + type_params + addon_params
+            ).fetchall()
+            for rel_row in related_rows:
+                rel_id = rel_row["id"]
+                if rel_id not in results and rel_id not in expanded_ids:
+                    expanded_ids.add(rel_id)
+                    rel_score = result["score"] * rel_row["weight"] * 0.5
+                    results[rel_id] = {
+                        "id": rel_id,
+                        "score": rel_score,
+                        "path": rel_row["path"],
+                        "start_line": rel_row["start_line"],
+                        "end_line": rel_row["end_line"],
+                        "doc_type": rel_row["doc_type"],
+                        "chunk_type": rel_row["chunk_type"],
+                        "addon": rel_row["addon"],
+                        "addon_name": rel_row["addon_name"],
+                        "symbol": rel_row["symbol"],
+                        "heading": rel_row["heading"],
+                        "breadcrumb": rel_row["breadcrumb"],
+                        "text": rel_row["text"],
+                        "relation_type": rel_row["relation"],
+                        "distance": 1,
+                    }
+
+        # Re-sort after expansion
+        sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+
+    conn.close()
+
     return [
         SearchResult(
             score=r["score"],
@@ -428,6 +479,8 @@ def search_database(
             heading=r["heading"],
             breadcrumb=r["breadcrumb"],
             text=r["text"],
+            relation_type=r.get("relation_type", ""),
+            distance=r.get("distance", 0),
         )
         for r in sorted_results[:limit]
     ]
