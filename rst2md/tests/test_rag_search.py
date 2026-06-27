@@ -316,6 +316,89 @@ class GraphExpansionTests(unittest.TestCase):
             self.assertGreater(len(expanded), 0, "Should have expanded results with relation_type")
 
 
+class AddonSearchTests(unittest.TestCase):
+    """Addon search should support --no-expand flag."""
+
+    def _build_db(self, tmp):
+        """Build a database with addon content that has graph relations."""
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        # Create a class document that will be referenced
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n",
+            encoding="utf-8",
+        )
+
+        # Create addon content with API source that references Node
+        addons = Path(tmp) / "addons"
+        addons.mkdir()
+        sm = addons / "scene_manager"
+        sm.mkdir()
+        sm_plugin = sm / "addons" / "scene_manager"
+        sm_plugin.mkdir(parents=True)
+        (sm_plugin / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
+        sm_docs = sm_plugin / "Docs"
+        sm_docs.mkdir()
+        (sm_docs / "quick-start.md").write_text(
+            "# Quick Start\n\nUse `SceneManager.change_scene` to switch scenes.\n\n"
+            "This addon extends `Node` to provide scene management.\n",
+            encoding="utf-8",
+        )
+        (sm_plugin / "SceneManager.gd").write_text(
+            "extends Node\n\nsignal scene_loaded\n\nfunc change_scene(path):\n\tpass\n",
+            encoding="utf-8",
+        )
+
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path, addons_dir=addons)
+        return db_path
+
+    def test_addon_search_respects_no_expand(self):
+        """search_database with expand_graph=False should not expand results."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            # Search with expansion (without addon filter to get graph expansion)
+            results_expand = search_database(db_path, "SceneManager", limit=5, expand_graph=True)
+            # Search without expansion
+            results_no_expand = search_database(db_path, "SceneManager", limit=5, expand_graph=False)
+            # Without expansion, should have fewer or equal results
+            self.assertLessEqual(len(results_no_expand), len(results_expand))
+            # Without expansion, all results should have distance=0
+            for r in results_no_expand:
+                self.assertEqual(r.distance, 0, "No-expand results should have distance=0")
+
+    def test_cli_addon_search_no_expand_flag(self):
+        """cmd_search_addon should pass expand_graph=False when --no-expand is set."""
+        from rag.cli import cmd_search_addon
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+
+            # Mock args with no_expand=True
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "SceneManager"
+            args.limit = 5
+            args.json = True
+            args.no_expand = True
+            args.addon = None
+
+            # Patch search_database to capture the call
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                cmd_search_addon(args)
+
+                # Verify search_database was called with expand_graph=False
+                mock_search.assert_called_once()
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("expand_graph", True), False,
+                                 "search_database should be called with expand_graph=False when --no-expand is set")
+
+
 class CliTests(unittest.TestCase):
     def test_cli_help_runs(self):
         result = subprocess.run(
@@ -328,6 +411,259 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn("build", result.stdout)
         self.assertIn("s", result.stdout)
+
+    def test_cli_search_alias_works(self):
+        """Long alias 'search' should work as alias for 's'."""
+        result = subprocess.run(
+            [sys.executable, "-m", "rag.cli", "search", "--help"],
+            text=True,
+            capture_output=True,
+            env=TEST_ENV,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("query", result.stdout)
+
+    def test_build_shows_progress(self):
+        """build_database should print progress output."""
+        import io
+        from contextlib import redirect_stdout
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            classes = docs / "classes"
+            classes.mkdir()
+            # Create multiple files to trigger progress output
+            for i in range(105):
+                (classes / f"class_test{i}.md").write_text(
+                    f"# Test{i}\n\n## Methods\n\n`void` **method{i}**()\n\nA test method.\n",
+                    encoding="utf-8",
+                )
+            db_path = Path(tmp) / "test.sqlite"
+
+            f = io.StringIO()
+            with redirect_stdout(f):
+                build_database(docs, db_path)
+
+            output = f.getvalue()
+            # Should contain progress output
+            self.assertIn("Building database", output)
+
+
+class ConnectionManagerTests(unittest.TestCase):
+    """Test SQLite connection context manager."""
+
+    def test_get_connection_context_manager(self):
+        """get_connection should provide a working connection."""
+        from rag.store import get_connection
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.sqlite"
+
+            # Create a simple database
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            conn.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
+            conn.execute("INSERT INTO test VALUES (1, 'hello')")
+            conn.commit()
+            conn.close()
+
+            # Use context manager
+            with get_connection(db_path) as conn:
+                result = conn.execute("SELECT name FROM test WHERE id = 1").fetchone()
+                self.assertEqual(result[0], "hello")
+
+    def test_get_connection_sets_row_factory(self):
+        """get_connection should set row_factory to sqlite3.Row."""
+        from rag.store import get_connection
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.sqlite"
+
+            # Create a simple database
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            conn.execute("CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT)")
+            conn.execute("INSERT INTO test VALUES (1, 'hello')")
+            conn.commit()
+            conn.close()
+
+            # Use context manager
+            with get_connection(db_path) as conn:
+                result = conn.execute("SELECT name FROM test WHERE id = 1").fetchone()
+                # Should be sqlite3.Row object
+                self.assertIsInstance(result, sqlite3.Row)
+                self.assertEqual(result["name"], "hello")
+
+
+class StatsCommandTests(unittest.TestCase):
+    """Test godot-rag stats command."""
+
+    def _build_db(self, tmp):
+        """Build a test database."""
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_get_stats_returns_expected_keys(self):
+        """get_stats should return a dict with expected keys."""
+        from rag.store import get_stats
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            stats = get_stats(db_path)
+
+            self.assertIn("chunks", stats)
+            self.assertIn("symbols", stats)
+            self.assertIn("relations", stats)
+            self.assertIn("addons", stats)
+
+    def test_get_stats_returns_correct_chunk_count(self):
+        """get_stats should return correct chunk count."""
+        from rag.store import get_stats
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            stats = get_stats(db_path)
+
+            self.assertEqual(stats["chunks"]["total"], 2)  # class_summary + method
+
+    def test_cli_stats_command_works(self):
+        """godot-rag stats should work."""
+        result = subprocess.run(
+            [sys.executable, "-m", "rag.cli", "stats", "--help"],
+            text=True,
+            capture_output=True,
+            env=TEST_ENV,
+        )
+        self.assertEqual(result.returncode, 0)
+
+
+class SnippetTests(unittest.TestCase):
+    """Test snippet highlighting in search results."""
+
+    def _build_db(self, tmp):
+        """Build a test database with multi-line content."""
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        # Create a document with multiple lines
+        content = "# Node\n\nBase class for all scene nodes.\n\n"
+        content += "## Description\n\n"
+        content += "Nodes are the basic building blocks of scenes.\n"
+        content += "They can be added as children of other nodes.\n"
+        content += "The scene tree is made of nodes.\n\n"
+        content += "## Methods\n\n"
+        content += "`void` **add_child**(`Node` node)\n\n"
+        content += "Adds a child node to the scene tree.\n"
+        (classes / "class_node.md").write_text(content, encoding="utf-8")
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_search_result_has_snippet_field(self):
+        """SearchResult should have a snippet field."""
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            score=100.0,
+            path="test.md",
+            start_line=1,
+            end_line=10,
+            doc_type="class",
+            chunk_type="class_summary",
+            addon="",
+            addon_name="",
+            symbol="Node",
+            heading="Node",
+            breadcrumb="classes > Node",
+            text="Some text here",
+        )
+        self.assertEqual(result.snippet, "")
+
+    def test_search_database_returns_snippet(self):
+        """search_database should return results with snippet field."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5)
+
+            self.assertGreater(len(results), 0)
+            # Results should have snippet field
+            for r in results:
+                self.assertIsInstance(r.snippet, str)
+
+
+class RegressionTests(unittest.TestCase):
+    """Regression tests for bug fixes."""
+
+    def test_addon_search_no_expand_flag(self):
+        """Regression test: addon search should respect --no-expand flag."""
+        from rag.cli import cmd_search_addon
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            classes = docs / "classes"
+            classes.mkdir()
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class.\n\n## Methods\n\n"
+                "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n",
+                encoding="utf-8",
+            )
+
+            # Create addon content with API source that references Node
+            addons = Path(tmp) / "addons"
+            addons.mkdir()
+            sm = addons / "scene_manager"
+            sm.mkdir()
+            sm_plugin = sm / "addons" / "scene_manager"
+            sm_plugin.mkdir(parents=True)
+            (sm_plugin / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
+            sm_docs = sm_plugin / "Docs"
+            sm_docs.mkdir()
+            (sm_docs / "quick-start.md").write_text(
+                "# Quick Start\n\nUse `SceneManager.change_scene` to switch scenes.\n\n"
+                "This addon extends `Node` to provide scene management.\n",
+                encoding="utf-8",
+            )
+            (sm_plugin / "SceneManager.gd").write_text(
+                "extends Node\n\nsignal scene_loaded\n\nfunc change_scene(path):\n\tpass\n",
+                encoding="utf-8",
+            )
+
+            db_path = Path(tmp) / "test.sqlite"
+            build_database(docs, db_path, addons_dir=addons)
+
+            # Mock args with no_expand=True
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "SceneManager"
+            args.limit = 5
+            args.json = True
+            args.no_expand = True
+            args.addon = None
+
+            # Patch search_database to capture the call
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                cmd_search_addon(args)
+
+                # Verify search_database was called with expand_graph=False
+                mock_search.assert_called_once()
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("expand_graph", True), False,
+                                 "search_database should be called with expand_graph=False when --no-expand is set")
 
     def test_cli_search_class_help(self):
         result = subprocess.run(

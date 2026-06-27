@@ -1,11 +1,23 @@
 import re
 import sqlite3
+from contextlib import contextmanager
 from pathlib import Path
 from typing import List, Optional
 
 from rag.chunker import chunk_markdown
 from rag.models import SearchResult
 from rag.symbols import extract_symbols, normalize_symbol
+
+
+@contextmanager
+def get_connection(db_path):
+    """Context manager for SQLite connections."""
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 # Patterns for cleaning text
 CLASSREF_LINE_RE = re.compile(r"^\s*classref-\S+\s*$", re.MULTILINE)
@@ -199,82 +211,39 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
     if db_path.exists():
         db_path.unlink()
 
-    conn = sqlite3.connect(str(db_path))
-    conn.executescript(SCHEMA)
+    with get_connection(db_path) as conn:
+        conn.executescript(SCHEMA)
 
-    md_files = sorted(docs_dir.rglob("*.md"))
-    for md_file in md_files:
-        rel_path = str(md_file.relative_to(docs_dir))
-        markdown = md_file.read_text(encoding="utf-8")
-        chunks = chunk_markdown(rel_path, markdown)
+        md_files = sorted(docs_dir.rglob("*.md"))
+        total_files = len(md_files)
+        for i, md_file in enumerate(md_files):
+            if i % 100 == 0 or i == total_files - 1:
+                print(f"Building database... ({i+1}/{total_files} files)")
+            rel_path = str(md_file.relative_to(docs_dir))
+            markdown = md_file.read_text(encoding="utf-8")
+            chunks = chunk_markdown(rel_path, markdown)
 
-        if not chunks:
-            continue
-
-        # Detect doc_type from first chunk
-        doc_type = chunks[0].doc_type if chunks else "other"
-
-        # Extract title from first chunk or path
-        title = chunks[0].heading if chunks else Path(rel_path).stem
-
-        # Insert document
-        cur = conn.execute(
-            "INSERT OR IGNORE INTO documents (path, doc_type, title) VALUES (?, ?, ?)",
-            (rel_path, doc_type, title),
-        )
-        doc_id = cur.lastrowid
-        if doc_id == 0:
-            row = conn.execute("SELECT id FROM documents WHERE path = ?", (rel_path,)).fetchone()
-            doc_id = row[0]
-
-        # Insert chunks
-        for chunk in chunks:
-            cleaned_text = clean_chunk_text(chunk.text)
-            conn.execute(
-                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
-            )
-
-        # Extract and insert symbols
-        chunk_ids = [row[0] for row in conn.execute(
-            "SELECT id FROM chunks WHERE document_id = ? ORDER BY id",
-            (doc_id,),
-        ).fetchall()]
-
-        symbols = extract_symbols(chunks)
-        for sym in symbols:
-            if sym.chunk_id >= len(chunk_ids):
-                continue
-            conn.execute(
-                "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
-                (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
-            )
-
-    # Process addons
-    if addons_dir and addons_dir.is_dir():
-        from rag.addon_docs import chunk_addon
-
-        for addon_subdir in sorted(addons_dir.iterdir()):
-            if not addon_subdir.is_dir() or addon_subdir.name.startswith('.'):
-                continue
-            addon_name = addon_subdir.name
-            addon_chunks = chunk_addon(addon_subdir)
-            if not addon_chunks:
+            if not chunks:
                 continue
 
-            # Insert document (one per addon)
-            first = addon_chunks[0]
+            # Detect doc_type from first chunk
+            doc_type = chunks[0].doc_type if chunks else "other"
+
+            # Extract title from first chunk or path
+            title = chunks[0].heading if chunks else Path(rel_path).stem
+
+            # Insert document
             cur = conn.execute(
                 "INSERT OR IGNORE INTO documents (path, doc_type, title) VALUES (?, ?, ?)",
-                (f"addons/{addon_name}", "addon", first.addon_name or addon_name),
+                (rel_path, doc_type, title),
             )
             doc_id = cur.lastrowid
             if doc_id == 0:
-                row = conn.execute("SELECT id FROM documents WHERE path = ?", (f"addons/{addon_name}",)).fetchone()
+                row = conn.execute("SELECT id FROM documents WHERE path = ?", (rel_path,)).fetchone()
                 doc_id = row[0]
 
             # Insert chunks
-            for chunk in addon_chunks:
+            for chunk in chunks:
                 cleaned_text = clean_chunk_text(chunk.text)
                 conn.execute(
                     "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -287,7 +256,7 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
                 (doc_id,),
             ).fetchall()]
 
-            symbols = extract_symbols(addon_chunks)
+            symbols = extract_symbols(chunks)
             for sym in symbols:
                 if sym.chunk_id >= len(chunk_ids):
                     continue
@@ -296,13 +265,58 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
                     (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
                 )
 
-    # Build chunk relations (graph)
-    _build_chunk_relations(conn)
+        # Process addons
+        if addons_dir and addons_dir.is_dir():
+            from rag.addon_docs import chunk_addon
 
-    # Sync FTS index
-    conn.executescript(FTS_SYNC)
-    conn.commit()
-    conn.close()
+            for addon_subdir in sorted(addons_dir.iterdir()):
+                if not addon_subdir.is_dir() or addon_subdir.name.startswith('.'):
+                    continue
+                addon_name = addon_subdir.name
+                addon_chunks = chunk_addon(addon_subdir)
+                if not addon_chunks:
+                    continue
+
+                # Insert document (one per addon)
+                first = addon_chunks[0]
+                cur = conn.execute(
+                    "INSERT OR IGNORE INTO documents (path, doc_type, title) VALUES (?, ?, ?)",
+                    (f"addons/{addon_name}", "addon", first.addon_name or addon_name),
+                )
+                doc_id = cur.lastrowid
+                if doc_id == 0:
+                    row = conn.execute("SELECT id FROM documents WHERE path = ?", (f"addons/{addon_name}",)).fetchone()
+                    doc_id = row[0]
+
+                # Insert chunks
+                for chunk in addon_chunks:
+                    cleaned_text = clean_chunk_text(chunk.text)
+                    conn.execute(
+                        "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
+                    )
+
+                # Extract and insert symbols
+                chunk_ids = [row[0] for row in conn.execute(
+                    "SELECT id FROM chunks WHERE document_id = ? ORDER BY id",
+                    (doc_id,),
+                ).fetchall()]
+
+                symbols = extract_symbols(addon_chunks)
+                for sym in symbols:
+                    if sym.chunk_id >= len(chunk_ids):
+                        continue
+                    conn.execute(
+                        "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
+                        (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
+                    )
+
+        # Build chunk relations (graph)
+        _build_chunk_relations(conn)
+
+        # Sync FTS index
+        conn.executescript(FTS_SYNC)
+        conn.commit()
 
 
 def list_addons(db_path: Path) -> List[dict]:
@@ -310,14 +324,83 @@ def list_addons(db_path: Path) -> List[dict]:
 
     Returns a list of dicts with keys: addon, addon_name, chunk_count.
     """
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
-    rows = conn.execute(
-        "SELECT addon, addon_name, COUNT(*) as chunk_count "
-        "FROM chunks WHERE addon != '' GROUP BY addon ORDER BY addon"
-    ).fetchall()
-    conn.close()
-    return [{"addon": r["addon"], "addon_name": r["addon_name"], "chunk_count": r["chunk_count"]} for r in rows]
+    with get_connection(db_path) as conn:
+        rows = conn.execute(
+            "SELECT addon, addon_name, COUNT(*) as chunk_count "
+            "FROM chunks WHERE addon != '' GROUP BY addon ORDER BY addon"
+        ).fetchall()
+        return [{"addon": r["addon"], "addon_name": r["addon_name"], "chunk_count": r["chunk_count"]} for r in rows]
+
+
+def get_stats(db_path: Path) -> dict:
+    """Get database statistics.
+
+    Returns a dict with keys: chunks, symbols, relations, addons.
+    """
+    with get_connection(db_path) as conn:
+        # Chunk stats
+        chunk_total = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
+        chunk_by_type = {}
+        for row in conn.execute("SELECT doc_type, COUNT(*) as cnt FROM chunks GROUP BY doc_type"):
+            chunk_by_type[row["doc_type"]] = row["cnt"]
+
+        # Symbol stats
+        symbol_total = conn.execute("SELECT COUNT(*) FROM symbols").fetchone()[0]
+        symbol_by_kind = {}
+        for row in conn.execute("SELECT kind, COUNT(*) as cnt FROM symbols GROUP BY kind"):
+            symbol_by_kind[row["kind"]] = row["cnt"]
+
+        # Relation stats
+        relation_total = conn.execute("SELECT COUNT(*) FROM chunk_relations").fetchone()[0]
+        relation_by_type = {}
+        for row in conn.execute("SELECT relation, COUNT(*) as cnt FROM chunk_relations GROUP BY relation"):
+            relation_by_type[row["relation"]] = row["cnt"]
+
+        # Addon stats
+        addon_rows = conn.execute(
+            "SELECT addon, addon_name, COUNT(*) as chunk_count "
+            "FROM chunks WHERE addon != '' GROUP BY addon ORDER BY addon"
+        ).fetchall()
+        addons = [{"addon": r["addon"], "addon_name": r["addon_name"], "chunk_count": r["chunk_count"]} for r in addon_rows]
+
+        return {
+            "chunks": {"total": chunk_total, "by_type": chunk_by_type},
+            "symbols": {"total": symbol_total, "by_kind": symbol_by_kind},
+            "relations": {"total": relation_total, "by_type": relation_by_type},
+            "addons": addons,
+        }
+
+
+def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
+    """Extract a snippet from text around the first line containing query keywords."""
+    lines = text.split('\n')
+    query_lower = query.lower()
+    keywords = query_lower.split()
+
+    # Find first line containing any keyword
+    match_idx = None
+    for i, line in enumerate(lines):
+        line_lower = line.lower()
+        if any(kw in line_lower for kw in keywords):
+            match_idx = i
+            break
+
+    if match_idx is None:
+        # No match found, return first few lines
+        return '\n'.join(lines[:context_lines * 2 + 1])
+
+    # Extract context around match
+    start = max(0, match_idx - context_lines)
+    end = min(len(lines), match_idx + context_lines + 1)
+
+    snippet_lines = []
+    if start > 0:
+        snippet_lines.append('...')
+    snippet_lines.extend(lines[start:end])
+    if end < len(lines):
+        snippet_lines.append('...')
+
+    return '\n'.join(snippet_lines)
 
 
 def search_database(
@@ -338,175 +421,172 @@ def search_database(
                    Common values: "class", "tutorial", "getting_started", "engine_detail", "addon".
         addon: If provided, only search chunks belonging to this addon (e.g. "statecharts").
     """
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
+    with get_connection(db_path) as conn:
+        normalized = normalize_symbol(query)
+        results = {}
 
-    normalized = normalize_symbol(query)
-    results = {}
-
-    # Build optional doc_type filter
-    type_filter = ""
-    type_params: list = []
-    if doc_types:
-        placeholders = ",".join("?" for _ in doc_types)
-        type_filter = f" AND c.doc_type IN ({placeholders})"
-        type_params = list(doc_types)
-
-    # Build optional addon filter
-    addon_filter = ""
-    addon_params: list = []
-    if addon:
-        addon_filter = " AND c.addon = ?"
-        addon_params = [addon]
-
-    def _make_result(row, score):
-        return {
-            "id": row["id"],
-            "score": score,
-            "path": row["path"],
-            "start_line": row["start_line"],
-            "end_line": row["end_line"],
-            "doc_type": row["doc_type"],
-            "chunk_type": row["chunk_type"],
-            "addon": row["addon"],
-            "addon_name": row["addon_name"],
-            "symbol": row["symbol"],
-            "heading": row["heading"],
-            "breadcrumb": row["breadcrumb"],
-            "text": clean_chunk_text(row["text"]),
-            "relation_type": "",
-            "distance": 0,
-        }
-
-    # 1. Exact symbol match (+100)
-    rows = conn.execute(
-        "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
-        + type_filter + addon_filter,
-        [normalized] + type_params + addon_params,
-    ).fetchall()
-    for row in rows:
-        cid = row["id"]
-        if cid not in results or results[cid]["score"] < 100:
-            results[cid] = _make_result(row, 100.0)
-
-    # 2. Suffix symbol match (+80)
-    rows = conn.execute(
-        "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
-        + type_filter + addon_filter,
-        [f"%.{normalized}"] + type_params + addon_params,
-    ).fetchall()
-    for row in rows:
-        cid = row["id"]
-        if cid not in results or results[cid]["score"] < 80:
-            results[cid] = _make_result(row, 80.0)
-
-    # 3. Prefix symbol match (+40)
-    rows = conn.execute(
-        "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
-        + type_filter + addon_filter,
-        [f"{normalized}%"] + type_params + addon_params,
-    ).fetchall()
-    for row in rows:
-        cid = row["id"]
-        if cid not in results or results[cid]["score"] < 40:
-            results[cid] = _make_result(row, 40.0)
-
-    # 4. FTS5 search (bm25 → 0-40 score)
-    try:
-        escaped_query = _smart_tokenize(query)
-        fts_type_filter = ""
-        fts_type_params: list = []
+        # Build optional doc_type filter
+        type_filter = ""
+        type_params: list = []
         if doc_types:
             placeholders = ",".join("?" for _ in doc_types)
-            fts_type_filter = f" AND c.doc_type IN ({placeholders})"
-            fts_type_params = list(doc_types)
+            type_filter = f" AND c.doc_type IN ({placeholders})"
+            type_params = list(doc_types)
 
-        fts_addon_filter = ""
-        fts_addon_params: list = []
+        # Build optional addon filter
+        addon_filter = ""
+        addon_params: list = []
         if addon:
-            fts_addon_filter = " AND c.addon = ?"
-            fts_addon_params = [addon]
+            addon_filter = " AND c.addon = ?"
+            addon_params = [addon]
 
-        fts_rows = conn.execute(
-            "SELECT c.*, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
-            + fts_type_filter + fts_addon_filter
-            + " ORDER BY rank LIMIT ?",
-            [escaped_query] + fts_type_params + fts_addon_params + [limit * 3],
+        def _make_result(row, score):
+            return {
+                "id": row["id"],
+                "score": score,
+                "path": row["path"],
+                "start_line": row["start_line"],
+                "end_line": row["end_line"],
+                "doc_type": row["doc_type"],
+                "chunk_type": row["chunk_type"],
+                "addon": row["addon"],
+                "addon_name": row["addon_name"],
+                "symbol": row["symbol"],
+                "heading": row["heading"],
+                "breadcrumb": row["breadcrumb"],
+                "text": clean_chunk_text(row["text"]),
+                "relation_type": "",
+                "distance": 0,
+            }
+
+        # 1. Exact symbol match (+100)
+        rows = conn.execute(
+            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
+            + type_filter + addon_filter,
+            [normalized] + type_params + addon_params,
         ).fetchall()
-        for row in fts_rows:
+        for row in rows:
             cid = row["id"]
-            bm25 = abs(row["rank"])
-            fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
-            if cid not in results or results[cid]["score"] < fts_score:
-                results[cid] = _make_result(row, fts_score)
-    except sqlite3.OperationalError:
-        # FTS match syntax error, skip
-        pass
+            if cid not in results or results[cid]["score"] < 100:
+                results[cid] = _make_result(row, 100.0)
 
-    # Sort by score descending
-    sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+        # 2. Suffix symbol match (+80)
+        rows = conn.execute(
+            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
+            + type_filter + addon_filter,
+            [f"%.{normalized}"] + type_params + addon_params,
+        ).fetchall()
+        for row in rows:
+            cid = row["id"]
+            if cid not in results or results[cid]["score"] < 80:
+                results[cid] = _make_result(row, 80.0)
 
-    # Graph expansion: expand top-K results via chunk_relations
-    if expand_graph:
-        top_k = min(3, len(sorted_results))
-        expanded_ids = {r["id"] for r in sorted_results[:top_k]}
+        # 3. Prefix symbol match (+40)
+        rows = conn.execute(
+            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
+            + type_filter + addon_filter,
+            [f"{normalized}%"] + type_params + addon_params,
+        ).fetchall()
+        for row in rows:
+            cid = row["id"]
+            if cid not in results or results[cid]["score"] < 40:
+                results[cid] = _make_result(row, 40.0)
 
-        for result in sorted_results[:top_k]:
-            graph_query = (
-                "SELECT c.*, r.relation, r.weight FROM chunk_relations r "
-                "JOIN chunks c ON c.id = r.target_id "
-                "WHERE r.source_id = ?"
-                + type_filter + addon_filter
-                + " ORDER BY r.weight DESC LIMIT 5"
-            )
-            related_rows = conn.execute(
-                graph_query,
-                [result["id"]] + type_params + addon_params
+        # 4. FTS5 search (bm25 → 0-40 score)
+        try:
+            escaped_query = _smart_tokenize(query)
+            fts_type_filter = ""
+            fts_type_params: list = []
+            if doc_types:
+                placeholders = ",".join("?" for _ in doc_types)
+                fts_type_filter = f" AND c.doc_type IN ({placeholders})"
+                fts_type_params = list(doc_types)
+
+            fts_addon_filter = ""
+            fts_addon_params: list = []
+            if addon:
+                fts_addon_filter = " AND c.addon = ?"
+                fts_addon_params = [addon]
+
+            fts_rows = conn.execute(
+                "SELECT c.*, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
+                + fts_type_filter + fts_addon_filter
+                + " ORDER BY rank LIMIT ?",
+                [escaped_query] + fts_type_params + fts_addon_params + [limit * 3],
             ).fetchall()
-            for rel_row in related_rows:
-                rel_id = rel_row["id"]
-                if rel_id not in results and rel_id not in expanded_ids:
-                    expanded_ids.add(rel_id)
-                    rel_score = result["score"] * rel_row["weight"] * 0.5
-                    results[rel_id] = {
-                        "id": rel_id,
-                        "score": rel_score,
-                        "path": rel_row["path"],
-                        "start_line": rel_row["start_line"],
-                        "end_line": rel_row["end_line"],
-                        "doc_type": rel_row["doc_type"],
-                        "chunk_type": rel_row["chunk_type"],
-                        "addon": rel_row["addon"],
-                        "addon_name": rel_row["addon_name"],
-                        "symbol": rel_row["symbol"],
-                        "heading": rel_row["heading"],
-                        "breadcrumb": rel_row["breadcrumb"],
-                        "text": clean_chunk_text(rel_row["text"]),
-                        "relation_type": rel_row["relation"],
-                        "distance": 1,
-                    }
+            for row in fts_rows:
+                cid = row["id"]
+                bm25 = abs(row["rank"])
+                fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
+                if cid not in results or results[cid]["score"] < fts_score:
+                    results[cid] = _make_result(row, fts_score)
+        except sqlite3.OperationalError:
+            # FTS match syntax error, skip
+            pass
 
-        # Re-sort after expansion
+        # Sort by score descending
         sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
 
-    conn.close()
+        # Graph expansion: expand top-K results via chunk_relations
+        if expand_graph:
+            top_k = min(3, len(sorted_results))
+            expanded_ids = {r["id"] for r in sorted_results[:top_k]}
 
-    return [
-        SearchResult(
-            score=r["score"],
-            path=r["path"],
-            start_line=r["start_line"],
-            end_line=r["end_line"],
-            doc_type=r["doc_type"],
-            chunk_type=r["chunk_type"],
-            addon=r["addon"],
-            addon_name=r["addon_name"],
-            symbol=r["symbol"],
-            heading=r["heading"],
-            breadcrumb=r["breadcrumb"],
-            text=r["text"],
-            relation_type=r.get("relation_type", ""),
-            distance=r.get("distance", 0),
-        )
-        for r in sorted_results[:limit]
-    ]
+            for result in sorted_results[:top_k]:
+                graph_query = (
+                    "SELECT c.*, r.relation, r.weight FROM chunk_relations r "
+                    "JOIN chunks c ON c.id = r.target_id "
+                    "WHERE r.source_id = ?"
+                    + type_filter + addon_filter
+                    + " ORDER BY r.weight DESC LIMIT 5"
+                )
+                related_rows = conn.execute(
+                    graph_query,
+                    [result["id"]] + type_params + addon_params
+                ).fetchall()
+                for rel_row in related_rows:
+                    rel_id = rel_row["id"]
+                    if rel_id not in results and rel_id not in expanded_ids:
+                        expanded_ids.add(rel_id)
+                        rel_score = result["score"] * rel_row["weight"] * 0.5
+                        results[rel_id] = {
+                            "id": rel_id,
+                            "score": rel_score,
+                            "path": rel_row["path"],
+                            "start_line": rel_row["start_line"],
+                            "end_line": rel_row["end_line"],
+                            "doc_type": rel_row["doc_type"],
+                            "chunk_type": rel_row["chunk_type"],
+                            "addon": rel_row["addon"],
+                            "addon_name": rel_row["addon_name"],
+                            "symbol": rel_row["symbol"],
+                            "heading": rel_row["heading"],
+                            "breadcrumb": rel_row["breadcrumb"],
+                            "text": clean_chunk_text(rel_row["text"]),
+                            "relation_type": rel_row["relation"],
+                            "distance": 1,
+                        }
+
+            # Re-sort after expansion
+            sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+
+        return [
+            SearchResult(
+                score=r["score"],
+                path=r["path"],
+                start_line=r["start_line"],
+                end_line=r["end_line"],
+                doc_type=r["doc_type"],
+                chunk_type=r["chunk_type"],
+                addon=r["addon"],
+                addon_name=r["addon_name"],
+                symbol=r["symbol"],
+                heading=r["heading"],
+                breadcrumb=r["breadcrumb"],
+                text=r["text"],
+                relation_type=r.get("relation_type", ""),
+                distance=r.get("distance", 0),
+                snippet=_extract_snippet(r["text"], query),
+            )
+            for r in sorted_results[:limit]
+        ]

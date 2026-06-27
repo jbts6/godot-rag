@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from importlib import resources
 
-from rag.store import build_database, search_database, list_addons
+from rag.store import build_database, search_database, list_addons, get_stats
 
 
 def default_db_path() -> Path:
@@ -151,6 +151,38 @@ def cmd_addons(args):
         print(f"\n{len(addons)} addons, {total} chunks total")
 
 
+def cmd_stats(args):
+    """Show database statistics."""
+    db_path = _db_path_from_args(args)
+
+    if not db_path.exists():
+        print(f"Error: database not found: {db_path}", file=sys.stderr)
+        sys.exit(1)
+
+    stats = get_stats(db_path)
+
+    if args.json:
+        print(json.dumps(stats, ensure_ascii=False, indent=2))
+    else:
+        print("=== Database Statistics ===")
+        print(f"\nChunks: {stats['chunks']['total']}")
+        for doc_type, count in stats['chunks']['by_type'].items():
+            print(f"  {doc_type}: {count}")
+
+        print(f"\nSymbols: {stats['symbols']['total']}")
+        for kind, count in stats['symbols']['by_kind'].items():
+            print(f"  {kind}: {count}")
+
+        print(f"\nRelations: {stats['relations']['total']}")
+        for relation, count in stats['relations']['by_type'].items():
+            print(f"  {relation}: {count}")
+
+        if stats['addons']:
+            print(f"\nAddons: {len(stats['addons'])}")
+            for a in stats['addons']:
+                print(f"  {a['addon']}: {a['chunk_count']} chunks")
+
+
 def cmd_search_addon(args):
     """Search addon docs and examples."""
     db_path = _db_path_from_args(args)
@@ -159,9 +191,11 @@ def cmd_search_addon(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
+    expand = not getattr(args, 'no_expand', False)
     results = search_database(
         db_path, args.query, limit=args.limit,
         doc_types=["addon"], addon=getattr(args, 'addon', None),
+        expand_graph=expand,
     )
     _print_results(results, args.json)
 
@@ -187,22 +221,22 @@ def main():
     build_parser.set_defaults(func=cmd_build)
 
     # s command (all types)
-    search_parser = subparsers.add_parser("s", help="Search all docs")
+    search_parser = subparsers.add_parser("s", aliases=["search"], help="Search all docs")
     _add_search_args(search_parser)
     search_parser.set_defaults(func=cmd_search)
 
     # s-class command
-    class_parser = subparsers.add_parser("s-class", help="Search class reference docs")
+    class_parser = subparsers.add_parser("s-class", aliases=["search-class"], help="Search class reference docs")
     _add_search_args(class_parser)
     class_parser.set_defaults(func=cmd_search_class)
 
     # s-tutorial command
-    tutorial_parser = subparsers.add_parser("s-tutorial", help="Search tutorial and getting-started docs")
+    tutorial_parser = subparsers.add_parser("s-tutorial", aliases=["search-tutorial"], help="Search tutorial and getting-started docs")
     _add_search_args(tutorial_parser)
     tutorial_parser.set_defaults(func=cmd_search_tutorial)
 
     # s-engine command
-    engine_parser = subparsers.add_parser("s-engine", help="Search engine detail docs")
+    engine_parser = subparsers.add_parser("s-engine", aliases=["search-engine"], help="Search engine detail docs")
     _add_search_args(engine_parser)
     engine_parser.set_defaults(func=cmd_search_engine)
 
@@ -212,8 +246,14 @@ def main():
     addons_parser.add_argument("--json", action="store_true", help="Output as JSON")
     addons_parser.set_defaults(func=cmd_addons)
 
+    # stats command
+    stats_parser = subparsers.add_parser("stats", help="Show database statistics")
+    stats_parser.add_argument("--db", help="Path to SQLite database")
+    stats_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    stats_parser.set_defaults(func=cmd_stats)
+
     # s-addon command
-    addon_parser = subparsers.add_parser("s-addon", help="Search addon docs and examples")
+    addon_parser = subparsers.add_parser("s-addon", aliases=["search-addon"], help="Search addon docs and examples")
     _add_search_args(addon_parser)
     addon_parser.add_argument("--addon", help="Filter by addon name (e.g. statecharts)")
     addon_parser.set_defaults(func=cmd_search_addon)
