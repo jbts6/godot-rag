@@ -102,7 +102,7 @@ git commit -m "feat: add vec_chunks virtual table schema"
 - Consumes: sym_to_id 字典（normalized_symbol -> chunk_id）
 - Produces: chunk_relations 表中 see_also 类型关系
 
-- [ ] **Step 1: 在 _build_chunk_relations 函数末尾添加 see_also 提取逻辑**
+- [x] **Step 1: 在 _build_chunk_relations 函数末尾添加 see_also 提取逻辑**
 
 在 `_build_chunk_relations` 函数的 `# 3. References relation` 循环之后添加：
 
@@ -119,7 +119,7 @@ git commit -m "feat: add vec_chunks virtual table schema"
                 )
 ```
 
-- [ ] **Step 2: 构建数据库并验证 see_also 数量**
+- [x] **Step 2: 构建数据库并验证 see_also 数量**
 
 Run: `uv run python -c "
 from pathlib import Path
@@ -132,7 +132,7 @@ with get_connection(Path('test_see_also.db')) as conn:
 "`
 Expected: `see_also relations: >= 100`
 
-- [ ] **Step 3: 清理测试文件并 Commit**
+- [x] **Step 3: 清理测试文件并 Commit**
 
 ```bash
 rm -f test_see_also.db

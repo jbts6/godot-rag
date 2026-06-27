@@ -5,7 +5,7 @@
 
 ## 2. see_also 关系
 
-- [ ] 2.1 在 _build_chunk_relations 中新增 see_also 关系提取逻辑（正则 `See also \`([^`]+)\``）
+- [x] 2.1 在 _build_chunk_relations 中新增 see_also 关系提取逻辑（正则 `See also \`([^`]+)\``）
 - [ ] 2.2 验证构建后 chunk_relations 表中 see_also 数量 ≥ 100
 
 ## 3. 向量生成与存储

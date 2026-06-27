@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 3
+**current_task:** Task 4
 **current_stage:** implementing
 
 ## Tasks
@@ -23,9 +23,12 @@
 - **completed_at:** 2026-06-27
 
 ### Task 3: 实现 see_also 关系提取
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 3: 实现 see_also 关系提取
 - **openspec_text:** 2.1 在 _build_chunk_relations 中新增 see_also 关系提取逻辑
+- **commit:** de45217
+- **see_also_count:** 190
+- **completed_at:** 2026-06-27
 
 ### Task 4: 实现向量生成函数
 - **status:** pending
