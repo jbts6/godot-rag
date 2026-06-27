@@ -415,10 +415,12 @@ class TestAddonIntegration(unittest.TestCase):
             db_path = self._build_db(tmp)
             results = search_database(db_path, "state machine", limit=20, doc_types=["addon"])
             self.assertGreater(len(results), 0)
+            # All results should be addon type
             for r in results:
                 self.assertEqual(r.doc_type, "addon")
-                self.assertEqual(r.addon, "statecharts")
-                self.assertEqual(r.addon_name, "Godot State Charts")
+            # Statecharts should be among the results (primary match for "state machine")
+            addons_found = {r.addon for r in results}
+            self.assertIn("statecharts", addons_found)
 
     def test_search_specific_addon(self):
         with tempfile.TemporaryDirectory() as tmp:

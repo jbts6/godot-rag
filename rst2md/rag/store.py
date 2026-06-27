@@ -569,6 +569,56 @@ def search_database(
                 "distance": 0,
             }
 
+        # 0. Vector search + RRF fusion (respects doc_type and addon filters)
+        fused_ids = set()
+        try:
+            from rag.embeddings import generate_embeddings
+            query_embedding = generate_embeddings([query])[0]
+
+            # Vector search with doc_type/addon filtering via subquery
+            vec_query = (
+                "SELECT vc.chunk_id, vc.distance FROM vec_chunks vc "
+                "JOIN chunks c ON vc.chunk_id = c.id "
+                "WHERE vc.embedding MATCH ? AND k = ?"
+                + type_filter + addon_filter
+            )
+            vec_rows = conn.execute(
+                vec_query,
+                [str(query_embedding), limit * 3] + type_params + addon_params
+            ).fetchall()
+            vec_results_raw = [{'id': row[0], 'distance': row[1]} for row in vec_rows]
+
+            # FTS5 search for RRF fusion (with doc_type/addon filters)
+            fts_results_raw = []
+            try:
+                escaped_query = _smart_tokenize(query)
+                fts_rows = conn.execute(
+                    "SELECT c.id, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
+                    + type_filter + addon_filter
+                    + " ORDER BY rank LIMIT ?",
+                    [escaped_query] + type_params + addon_params + [limit * 3]
+                ).fetchall()
+                for row in fts_rows:
+                    fts_results_raw.append({'id': row['id'], 'rank': row['rank']})
+            except sqlite3.OperationalError:
+                pass
+
+            # RRF fusion
+            fused_results = rrf_fusion(fts_results_raw, vec_results_raw)
+            fused_ids = {r['id'] for r in fused_results[:limit * 3]}
+
+            # Add fused results to results dict with RRF scores
+            for rank, fused in enumerate(fused_results[:limit * 3]):
+                cid = fused['id']
+                rrf_score = fused['rrf_score'] * 40.0  # Scale RRF to 0-40 range
+                if cid not in results or results[cid]["score"] < rrf_score:
+                    row = conn.execute("SELECT * FROM chunks WHERE id = ?", (cid,)).fetchone()
+                    if row:
+                        results[cid] = _make_result(row, rrf_score)
+        except Exception:
+            # Vector search not available, skip
+            pass
+
         # 1. Exact symbol match (+100)
         rows = conn.execute(
             "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
@@ -602,7 +652,7 @@ def search_database(
             if cid not in results or results[cid]["score"] < 40:
                 results[cid] = _make_result(row, 40.0)
 
-        # 4. FTS5 search (bm25 → 0-40 score)
+        # 4. FTS5 search (bm25 → 0-40 score, skip chunks already in fused results)
         try:
             escaped_query = _smart_tokenize(query)
             fts_type_filter = ""
@@ -618,11 +668,19 @@ def search_database(
                 fts_addon_filter = " AND c.addon = ?"
                 fts_addon_params = [addon]
 
+            # Exclude chunks already in fused results
+            fused_exclude = ""
+            fused_exclude_params: list = []
+            if fused_ids:
+                placeholders = ",".join("?" for _ in fused_ids)
+                fused_exclude = f" AND c.id NOT IN ({placeholders})"
+                fused_exclude_params = list(fused_ids)
+
             fts_rows = conn.execute(
                 "SELECT c.*, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
-                + fts_type_filter + fts_addon_filter
+                + fts_type_filter + fts_addon_filter + fused_exclude
                 + " ORDER BY rank LIMIT ?",
-                [escaped_query] + fts_type_params + fts_addon_params + [limit * 3],
+                [escaped_query] + fts_type_params + fts_addon_params + fused_exclude_params + [limit * 3],
             ).fetchall()
             for row in fts_rows:
                 cid = row["id"]
@@ -656,26 +714,32 @@ def search_database(
                 ).fetchall()
                 for rel_row in related_rows:
                     rel_id = rel_row["id"]
-                    if rel_id not in results and rel_id not in expanded_ids:
+                    if rel_id not in expanded_ids:
                         expanded_ids.add(rel_id)
-                        rel_score = result["score"] * rel_row["weight"] * 0.5
-                        results[rel_id] = {
-                            "id": rel_id,
-                            "score": rel_score,
-                            "path": rel_row["path"],
-                            "start_line": rel_row["start_line"],
-                            "end_line": rel_row["end_line"],
-                            "doc_type": rel_row["doc_type"],
-                            "chunk_type": rel_row["chunk_type"],
-                            "addon": rel_row["addon"],
-                            "addon_name": rel_row["addon_name"],
-                            "symbol": rel_row["symbol"],
-                            "heading": rel_row["heading"],
-                            "breadcrumb": rel_row["breadcrumb"],
-                            "text": clean_chunk_text(rel_row["text"]),
-                            "relation_type": rel_row["relation"],
-                            "distance": 1,
-                        }
+                        if rel_id in results:
+                            # Chunk already found by vector/FTS search, update relation metadata
+                            results[rel_id]["relation_type"] = rel_row["relation"]
+                            results[rel_id]["distance"] = 1
+                        else:
+                            # New chunk from graph expansion
+                            rel_score = result["score"] * rel_row["weight"] * 0.5
+                            results[rel_id] = {
+                                "id": rel_id,
+                                "score": rel_score,
+                                "path": rel_row["path"],
+                                "start_line": rel_row["start_line"],
+                                "end_line": rel_row["end_line"],
+                                "doc_type": rel_row["doc_type"],
+                                "chunk_type": rel_row["chunk_type"],
+                                "addon": rel_row["addon"],
+                                "addon_name": rel_row["addon_name"],
+                                "symbol": rel_row["symbol"],
+                                "heading": rel_row["heading"],
+                                "breadcrumb": rel_row["breadcrumb"],
+                                "text": clean_chunk_text(rel_row["text"]),
+                                "relation_type": rel_row["relation"],
+                                "distance": 1,
+                            }
 
             # Re-sort after expansion
             sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
