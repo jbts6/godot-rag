@@ -3,8 +3,11 @@ name = "godot-rag"
 version = "4.7.0.post10"
 description = "Hybrid RAG search for Godot documentation"
 readme = "README_PYPI.md"
-requires-python = ">=3.9"
-dependencies = []
+requires-python = ">=3.10"
+dependencies = [
+    "sqlite-vec>=0.1.9",
+    "model2vec>=0.8.2",
+]
 
 [dependency-groups]
 dev = [
