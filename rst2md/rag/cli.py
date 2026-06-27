@@ -159,9 +159,11 @@ def cmd_search_addon(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
+    expand = not getattr(args, 'no_expand', False)
     results = search_database(
         db_path, args.query, limit=args.limit,
         doc_types=["addon"], addon=getattr(args, 'addon', None),
+        expand_graph=expand,
     )
     _print_results(results, args.json)
 
