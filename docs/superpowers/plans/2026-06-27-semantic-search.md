@@ -68,7 +68,7 @@ git commit -m "feat: add sqlite-vec and model2vec dependencies"
 **Interfaces:**
 - Produces: vec_chunks 虚拟表 schema
 
-- [ ] **Step 1: 在 SCHEMA 常量末尾添加 vec_chunks 表**
+- [x] **Step 1: 在 SCHEMA 常量末尾添加 vec_chunks 表**
 
 在 `store.py` 的 `SCHEMA` 常量末尾（`idx_relations_target` 之后）添加：
 
@@ -79,12 +79,12 @@ CREATE VIRTUAL TABLE IF NOT EXISTS vec_chunks USING vec0(
 );
 ```
 
-- [ ] **Step 2: 验证 schema 正确**
+- [x] **Step 2: 验证 schema 正确**
 
 Run: `uv run python -c "from rag.store import SCHEMA; print('vec_chunks' in SCHEMA)"`
 Expected: `True`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/rag/store.py

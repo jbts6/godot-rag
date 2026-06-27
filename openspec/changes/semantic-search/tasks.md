@@ -1,7 +1,7 @@
 ## 1. 依赖与 Schema
 
 - [x] 1.1 在 pyproject.toml 添加 sqlite-vec 和 model2vec 依赖
-- [ ] 1.2 在 store.py 的 SCHEMA 中新增 vec_chunks 虚拟表
+- [x] 1.2 在 store.py 的 SCHEMA 中新增 vec_chunks 虚拟表
 
 ## 2. see_also 关系
 

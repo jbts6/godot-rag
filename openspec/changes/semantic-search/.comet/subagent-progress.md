@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 2
+**current_task:** Task 3
 **current_stage:** implementing
 
 ## Tasks
@@ -15,9 +15,12 @@
 - **completed_at:** 2026-06-27
 
 ### Task 2: 新增 vec_chunks 虚拟表
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 2: 新增 vec_chunks 虚拟表
 - **openspec_text:** 1.2 在 store.py 的 SCHEMA 中新增 vec_chunks 虚拟表
+- **commit:** a4b5f75, 9b68a16
+- **note:** 分离 VEC_CHUNKS_SCHEMA，运行时条件创建
+- **completed_at:** 2026-06-27
 
 ### Task 3: 实现 see_also 关系提取
 - **status:** pending
