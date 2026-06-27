@@ -14,6 +14,29 @@ ANCHOR_RE = re.compile(r"`([^`<]+)<class_[^>]+>`")
 
 _FTS5_SPECIAL = set('"*+-:()^')
 
+def _smart_tokenize(query: str) -> str:
+    """Split dotted/snake_case symbols into separate tokens for FTS5.
+
+    "Node.add_child" → '"Node" AND "add" AND "child"'
+    Plain queries pass through unchanged.
+    """
+    # Only split if query contains . or _ (likely a symbol)
+    if '.' not in query and '_' not in query:
+        return _escape_fts5(query)
+
+    tokens = re.split(r'[._]', query)
+    fts_tokens = []
+    for t in tokens:
+        if not t:
+            continue
+        if any(c in _FTS5_SPECIAL for c in t):
+            escaped = t.replace('"', '""')
+            fts_tokens.append(f'"{escaped}"')
+        else:
+            fts_tokens.append(t)
+    return " AND ".join(fts_tokens) if fts_tokens else _escape_fts5(query)
+
+
 def _escape_fts5(query: str) -> str:
     """Escape FTS5 special characters so the query is treated as literal text.
 
@@ -387,7 +410,7 @@ def search_database(
 
     # 4. FTS5 search (bm25 → 0-40 score)
     try:
-        escaped_query = _escape_fts5(query)
+        escaped_query = _smart_tokenize(query)
         fts_type_filter = ""
         fts_type_params: list = []
         if doc_types:

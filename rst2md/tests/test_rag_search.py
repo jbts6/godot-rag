@@ -231,6 +231,29 @@ class ChunkRelationTests(unittest.TestCase):
             self.assertGreater(count, 0, "Should have inherits relations")
 
 
+class FtsTokenizeTests(unittest.TestCase):
+    """FTS query tokenizer should split dotted symbols."""
+
+    def test_dotted_symbol_splits_to_tokens(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("Node.add_child")
+        self.assertIn("Node", result)
+        self.assertIn("add", result)
+        self.assertIn("child", result)
+        self.assertIn("AND", result)
+
+    def test_plain_query_unchanged(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("scene transition")
+        self.assertEqual(result, "scene transition")
+
+    def test_special_chars_quoted(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("Node::add")
+        # Colons should be quoted
+        self.assertIn('"Node::add"', result)
+
+
 class GraphExpansionTests(unittest.TestCase):
     """Graph expansion should return related chunks."""
 
