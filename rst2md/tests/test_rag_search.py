@@ -602,6 +602,69 @@ class SnippetTests(unittest.TestCase):
             for r in results:
                 self.assertIsInstance(r.snippet, str)
 
+
+class RegressionTests(unittest.TestCase):
+    """Regression tests for bug fixes."""
+
+    def test_addon_search_no_expand_flag(self):
+        """Regression test: addon search should respect --no-expand flag."""
+        from rag.cli import cmd_search_addon
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            classes = docs / "classes"
+            classes.mkdir()
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class.\n\n## Methods\n\n"
+                "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n",
+                encoding="utf-8",
+            )
+
+            # Create addon content with API source that references Node
+            addons = Path(tmp) / "addons"
+            addons.mkdir()
+            sm = addons / "scene_manager"
+            sm.mkdir()
+            sm_plugin = sm / "addons" / "scene_manager"
+            sm_plugin.mkdir(parents=True)
+            (sm_plugin / "plugin.cfg").write_text('[plugin]\nname="SceneManager"\n', encoding="utf-8")
+            sm_docs = sm_plugin / "Docs"
+            sm_docs.mkdir()
+            (sm_docs / "quick-start.md").write_text(
+                "# Quick Start\n\nUse `SceneManager.change_scene` to switch scenes.\n\n"
+                "This addon extends `Node` to provide scene management.\n",
+                encoding="utf-8",
+            )
+            (sm_plugin / "SceneManager.gd").write_text(
+                "extends Node\n\nsignal scene_loaded\n\nfunc change_scene(path):\n\tpass\n",
+                encoding="utf-8",
+            )
+
+            db_path = Path(tmp) / "test.sqlite"
+            build_database(docs, db_path, addons_dir=addons)
+
+            # Mock args with no_expand=True
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "SceneManager"
+            args.limit = 5
+            args.json = True
+            args.no_expand = True
+            args.addon = None
+
+            # Patch search_database to capture the call
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                cmd_search_addon(args)
+
+                # Verify search_database was called with expand_graph=False
+                mock_search.assert_called_once()
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("expand_graph", True), False,
+                                 "search_database should be called with expand_graph=False when --no-expand is set")
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],
