@@ -243,6 +243,42 @@ def vector_search(conn, query_embedding: List[float], limit: int = 10) -> List[d
     return [{'id': row[0], 'distance': row[1]} for row in results]
 
 
+def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) -> List[dict]:
+    """Fuse FTS5 and vector search results using Reciprocal Rank Fusion.
+
+    Args:
+        fts_results: FTS5 results with 'id' key.
+        vec_results: Vector results with 'id' and 'distance' keys.
+        k: RRF parameter (default 60).
+
+    Returns:
+        Fused results sorted by RRF score, with 'rrf_score' key added.
+    """
+    scores = {}
+
+    for rank, result in enumerate(fts_results):
+        chunk_id = result['id']
+        scores[chunk_id] = scores.get(chunk_id, 0) + 1.0 / (k + rank)
+
+    for rank, result in enumerate(vec_results):
+        chunk_id = result['id']
+        scores[chunk_id] = scores.get(chunk_id, 0) + 1.0 / (k + rank)
+
+    sorted_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
+
+    results = []
+    for chunk_id in sorted_ids:
+        result = next((r for r in fts_results if r['id'] == chunk_id), None)
+        if result is None:
+            result = next((r for r in vec_results if r['id'] == chunk_id), None)
+        if result:
+            result = dict(result)
+            result['rrf_score'] = scores[chunk_id]
+            results.append(result)
+
+    return results
+
+
 def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = None) -> None:
     """Build the RAG database from markdown docs.
 
