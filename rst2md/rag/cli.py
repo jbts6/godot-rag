@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from importlib import resources
 
-from rag.store import build_database, search_database
+from rag.store import build_database, search_database, list_addons
 
 
 def default_db_path() -> Path:
@@ -121,6 +121,28 @@ def cmd_search_engine(args):
     _print_results(results, args.json)
 
 
+def cmd_addons(args):
+    """List all indexed addons."""
+    db_path = _db_path_from_args(args)
+
+    if not db_path.exists():
+        print(f"Error: database not found: {db_path}", file=sys.stderr)
+        sys.exit(1)
+
+    addons = list_addons(db_path)
+    if not addons:
+        print("No addons indexed in database.")
+        return
+
+    if args.json:
+        print(json.dumps(addons, ensure_ascii=False, indent=2))
+    else:
+        total = sum(a["chunk_count"] for a in addons)
+        for a in addons:
+            print(f"{a['addon']:<20} {a['addon_name']:<25} {a['chunk_count']} chunks")
+        print(f"\n{len(addons)} addons, {total} chunks total")
+
+
 def cmd_search_addon(args):
     """Search addon docs and examples."""
     db_path = _db_path_from_args(args)
@@ -174,6 +196,12 @@ def main():
     engine_parser = subparsers.add_parser("s-engine", help="Search engine detail docs")
     _add_search_args(engine_parser)
     engine_parser.set_defaults(func=cmd_search_engine)
+
+    # addons command
+    addons_parser = subparsers.add_parser("addons", help="List all indexed addons")
+    addons_parser.add_argument("--db", help="Path to SQLite database")
+    addons_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    addons_parser.set_defaults(func=cmd_addons)
 
     # s-addon command
     addon_parser = subparsers.add_parser("s-addon", help="Search addon docs and examples")

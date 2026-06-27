@@ -210,6 +210,21 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
     conn.close()
 
 
+def list_addons(db_path: Path) -> List[dict]:
+    """List all addons indexed in the database.
+
+    Returns a list of dicts with keys: addon, addon_name, chunk_count.
+    """
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    rows = conn.execute(
+        "SELECT addon, addon_name, COUNT(*) as chunk_count "
+        "FROM chunks WHERE addon != '' GROUP BY addon ORDER BY addon"
+    ).fetchall()
+    conn.close()
+    return [{"addon": r["addon"], "addon_name": r["addon_name"], "chunk_count": r["chunk_count"]} for r in rows]
+
+
 def search_database(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
