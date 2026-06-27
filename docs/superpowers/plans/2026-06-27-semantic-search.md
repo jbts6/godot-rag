@@ -207,7 +207,7 @@ git commit -m "feat: add generate_embeddings function"
 - Consumes: generate_embeddings 函数
 - Produces: vec_chunks 表填充
 
-- [ ] **Step 1: 在 build_database 函数末尾添加向量生成逻辑**
+- [x] **Step 1: 在 build_database 函数末尾添加向量生成逻辑**
 
 在 `conn.executescript(FTS_SYNC)` 之前添加：
 
@@ -229,7 +229,7 @@ git commit -m "feat: add generate_embeddings function"
             )
 ```
 
-- [ ] **Step 2: 构建数据库并验证 vec_chunks 记录数**
+- [x] **Step 2: 构建数据库并验证 vec_chunks 记录数**
 
 Run: `uv run python -c "
 from pathlib import Path
@@ -242,7 +242,7 @@ with get_connection(Path('test_vec.db')) as conn:
 "`
 Expected: `vec_chunks records: >= 28000`
 
-- [ ] **Step 3: 清理测试文件并 Commit**
+- [x] **Step 3: 清理测试文件并 Commit**
 
 ```bash
 rm -f test_vec.db

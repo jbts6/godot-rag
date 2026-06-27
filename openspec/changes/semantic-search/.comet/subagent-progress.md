@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 5
+**current_task:** Task 6
 **current_stage:** implementing
 
 ## Tasks
@@ -38,9 +38,12 @@
 - **completed_at:** 2026-06-27
 
 ### Task 5: 在 build_database 中集成向量生成
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 5: 在 build_database 中集成向量生成
 - **openspec_text:** 3.2 在 build_database 中调用 generate_embeddings 并写入 vec_chunks 表
+- **commit:** d6c53dc
+- **vec_chunks_count:** 28231
+- **completed_at:** 2026-06-27
 
 ### Task 6: 实现向量搜索函数
 - **status:** pending
