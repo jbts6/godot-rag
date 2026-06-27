@@ -261,7 +261,7 @@ git commit -m "feat: integrate embedding generation into build_database"
 - Consumes: conn, query_embedding, limit
 - Produces: List[dict] with 'id' and 'distance' keys
 
-- [ ] **Step 1: 在 store.py 中添加 vector_search 函数**
+- [x] **Step 1: 在 store.py 中添加 vector_search 函数**
 
 在 `_build_chunk_relations` 函数之后添加：
 
@@ -285,12 +285,12 @@ def vector_search(conn, query_embedding: List[float], limit: int = 10) -> List[d
     return [{'id': row[0], 'distance': row[1]} for row in results]
 ```
 
-- [ ] **Step 2: 验证函数可调用**
+- [x] **Step 2: 验证函数可调用**
 
 Run: `uv run python -c "from rag.store import vector_search; print('OK')"`
 Expected: `OK`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/rag/store.py

@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 6
+**current_task:** Task 7
 **current_stage:** implementing
 
 ## Tasks
@@ -46,9 +46,11 @@
 - **completed_at:** 2026-06-27
 
 ### Task 6: 实现向量搜索函数
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 6: 实现向量搜索函数
 - **openspec_text:** 4.1 实现 vector_search 函数
+- **commit:** c4233b2
+- **completed_at:** 2026-06-27
 
 ### Task 7: 实现 RRF 融合函数
 - **status:** pending
