@@ -40,6 +40,14 @@ godot-rag s-addon "dialogue" --limit 3
 
 # 搜索全部文档（无类型过滤）
 godot-rag s "Timer"
+
+# 模糊符号匹配（camelCase/snake_case/带点号 都能匹配）
+godot-rag s-class "addChild"          # 匹配 add_child, _add_child
+godot-rag s-class "Node.add_child"    # 匹配 Node._add_child
+godot-rag s-class "node_add_child"    # 匹配 Node.addChild
+
+# 禁用图谱扩展（仅返回直接匹配结果）
+godot-rag s-class "add_child" --no-expand
 ```
 
 ### 搜索 addon
@@ -81,6 +89,28 @@ godot-rag s-addon "change_scene" --addon scene_manager --json
 # 限制结果数量
 godot-rag s-tutorial "C# Variant" --limit 3
 ```
+
+JSON 输出包含图谱关系信息：
+
+```json
+{
+  "score": 100.0,
+  "symbol": "Node.add_child",
+  "relation_type": "",
+  "distance": 0,
+  ...
+},
+{
+  "score": 50.0,
+  "symbol": "Node",
+  "relation_type": "parent",
+  "distance": 1,
+  ...
+}
+```
+
+- `relation_type`：`""`（直接匹配）、`"parent"`、`"inherits"`、`"references"`、`"see_also"`
+- `distance`：`0`（直接）、`1`（图谱扩展）
 
 ## 示例
 
@@ -132,6 +162,25 @@ godot-rag s "physics interpolation"
 | `input action mapping` | ✅ 3 命中 (11ms) | — | RAG 发现交叉引用 |
 
 **核心洞察**：grep 只能做精确子串匹配。RAG 能处理自然语言查询（如 "state machine transitions"），并返回排序后的上下文结果。
+
+### 图谱扩展：上下文关联
+
+启用图谱扩展（默认开启）时，搜索结果会自动关联相关 chunk：
+
+- **parent**：搜索 `add_child` 会同时返回 `Node` 类摘要
+- **inherits**：搜索 `Node` 会同时返回 `Object`（其父类）
+- **references**：文本中提及匹配符号的 chunk
+
+```bash
+# 图谱扩展自动补充上下文
+$ godot-rag s-class "add_child"
+  score: 100.0  symbol: Node.add_child        # 直接匹配
+  score: 50.0   symbol: Node    relation: parent (distance=1)  # 自动扩展
+
+# 禁用以获得更快、更精简的结果
+$ godot-rag s-class "add_child" --no-expand
+  score: 100.0  symbol: Node.add_child        # 仅直接匹配
+```
 
 ### --addon 过滤器：精准搜索
 
