@@ -178,3 +178,58 @@ def test_rrf_fusion_single_source():
     fused = rrf_fusion(fts_results, [], k=60)
     assert len(fused) == 2
     assert fused[0]['id'] == 1  # rank 0 scores higher than rank 1
+
+
+def test_search_metadata_reports_vector_query_failure(tmp_path, monkeypatch):
+    from rag import embeddings
+    from rag import store
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAdds a child node.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    def fail_vector_search(*args, **kwargs):
+        raise RuntimeError("vector query failed")
+
+    monkeypatch.setattr(store, "_run_vector_query", fail_vector_search)
+    response = store.search_database_with_metadata(db_path, "child node", limit=3, expand_graph=False)
+
+    assert response.results
+    assert response.metadata.mode == "fts_only"
+    assert response.metadata.fallback_reason == "vector_query_failed"
+
+
+def test_diagnostics_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
+    from rag import embeddings
+    from rag.diagnostics import run_diagnostics
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAdds a child node.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+    with get_connection(db_path) as conn:
+        conn.execute("DELETE FROM vec_chunks WHERE chunk_id = (SELECT MIN(id) FROM chunks)")
+        conn.commit()
+
+    report = run_diagnostics(db_path, check_model=False)
+
+    assert report["ok"] is False
+    assert report["row_parity"] is False
+    assert "vector_row_count_mismatch" in report["errors"]

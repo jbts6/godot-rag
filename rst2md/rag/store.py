@@ -524,6 +524,20 @@ def _vector_availability(conn) -> tuple[bool, str]:
     return True, ""
 
 
+def _run_vector_query(conn, query_embedding, limit, type_filter, type_params, addon_filter, addon_params):
+    vec_query = (
+        "SELECT vc.chunk_id, vc.distance FROM vec_chunks vc "
+        "JOIN chunks c ON vc.chunk_id = c.id "
+        "WHERE vc.embedding MATCH ? AND k = ?"
+        + type_filter + addon_filter
+    )
+    vec_rows = conn.execute(
+        vec_query,
+        [str(query_embedding), limit * 3] + type_params + addon_params,
+    ).fetchall()
+    return [{'id': row[0], 'distance': row[1]} for row in vec_rows]
+
+
 def search_database_with_metadata(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
@@ -624,18 +638,10 @@ def _search_database_impl(
                 from rag.embeddings import generate_embeddings
                 query_embedding = generate_embeddings([query])[0]
 
-                # Vector search with doc_type/addon filtering via subquery
-                vec_query = (
-                    "SELECT vc.chunk_id, vc.distance FROM vec_chunks vc "
-                    "JOIN chunks c ON vc.chunk_id = c.id "
-                    "WHERE vc.embedding MATCH ? AND k = ?"
-                    + type_filter + addon_filter
+                vec_results_raw = _run_vector_query(
+                    conn, query_embedding, limit,
+                    type_filter, type_params, addon_filter, addon_params,
                 )
-                vec_rows = conn.execute(
-                    vec_query,
-                    [str(query_embedding), limit * 3] + type_params + addon_params
-                ).fetchall()
-                vec_results_raw = [{'id': row[0], 'distance': row[1]} for row in vec_rows]
 
                 # FTS5 search for RRF fusion (with doc_type/addon filters)
                 fts_results_raw = []

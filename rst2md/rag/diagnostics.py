@@ -28,7 +28,8 @@ def run_diagnostics(db_path: Path, check_model: bool = True) -> dict:
             sqlite_vec.load(conn)
             report["sqlite_vec_available"] = True
         except Exception:
-            report["errors"].append("sqlite_vec_unavailable")
+            report["sqlite_vec_available"] = False
+            report["errors"].append("missing_extension")
 
         try:
             report["chunks_count"] = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
@@ -38,8 +39,11 @@ def run_diagnostics(db_path: Path, check_model: bool = True) -> dict:
         try:
             report["vec_chunks_count"] = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
             report["vec_chunks_exists"] = True
-        except sqlite3.OperationalError:
-            report["errors"].append("missing_vec_chunks")
+        except sqlite3.OperationalError as exc:
+            if "no such module" in str(exc).lower():
+                report["errors"].append("missing_extension")
+            else:
+                report["errors"].append("missing_vec_chunks")
 
         if report["chunks_count"] is not None and report["vec_chunks_count"] is not None:
             report["row_parity"] = report["chunks_count"] == report["vec_chunks_count"]
