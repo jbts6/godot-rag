@@ -35,3 +35,4 @@ class SearchResult:
     text: str
     relation_type: str = ''
     distance: int = 0
+    snippet: str = ''

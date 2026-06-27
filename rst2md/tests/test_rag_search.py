@@ -547,6 +547,61 @@ class StatsCommandTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0)
 
+
+class SnippetTests(unittest.TestCase):
+    """Test snippet highlighting in search results."""
+
+    def _build_db(self, tmp):
+        """Build a test database with multi-line content."""
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        # Create a document with multiple lines
+        content = "# Node\n\nBase class for all scene nodes.\n\n"
+        content += "## Description\n\n"
+        content += "Nodes are the basic building blocks of scenes.\n"
+        content += "They can be added as children of other nodes.\n"
+        content += "The scene tree is made of nodes.\n\n"
+        content += "## Methods\n\n"
+        content += "`void` **add_child**(`Node` node)\n\n"
+        content += "Adds a child node to the scene tree.\n"
+        (classes / "class_node.md").write_text(content, encoding="utf-8")
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_search_result_has_snippet_field(self):
+        """SearchResult should have a snippet field."""
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            score=100.0,
+            path="test.md",
+            start_line=1,
+            end_line=10,
+            doc_type="class",
+            chunk_type="class_summary",
+            addon="",
+            addon_name="",
+            symbol="Node",
+            heading="Node",
+            breadcrumb="classes > Node",
+            text="Some text here",
+        )
+        self.assertEqual(result.snippet, "")
+
+    def test_search_database_returns_snippet(self):
+        """search_database should return results with snippet field."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5)
+
+            self.assertGreater(len(results), 0)
+            # Results should have snippet field
+            for r in results:
+                self.assertIsInstance(r.snippet, str)
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],
