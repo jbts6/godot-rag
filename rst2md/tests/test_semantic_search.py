@@ -6,6 +6,7 @@ from rag.store import (
     get_connection,
     build_database,
     rrf_fusion,
+    search_database,
 )
 
 
@@ -31,6 +32,48 @@ def test_vec_chunks_populated(test_db):
     with get_connection(test_db) as conn:
         count = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
         assert count >= 28000, f"Expected >= 28000 vec_chunks, got {count}"
+
+
+def test_search_skips_embeddings_when_vec_table_missing(tmp_path, monkeypatch):
+    """Search should not pay semantic-query cost when the DB has no vector table."""
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`bool` **is_stopped**() `const`\n\n"
+        "Returns true if the timer is stopped.\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        embeddings,
+        "generate_embeddings",
+        lambda texts: [[0.0] * 256 for _ in texts],
+    )
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    with get_connection(db_path) as conn:
+        conn.execute("DROP TABLE IF EXISTS vec_chunks")
+        conn.commit()
+
+    called = False
+
+    def fail_if_called(texts):
+        nonlocal called
+        called = True
+        return [[0.0] * 256 for _ in texts]
+
+    monkeypatch.setattr(embeddings, "generate_embeddings", fail_if_called)
+
+    results = search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+
+    assert results
+    assert not called
 
 
 def test_rrf_fusion():

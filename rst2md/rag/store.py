@@ -572,6 +572,8 @@ def search_database(
         # 0. Vector search + RRF fusion (respects doc_type and addon filters)
         fused_ids = set()
         try:
+            conn.execute("SELECT 1 FROM vec_chunks LIMIT 1").fetchone()
+
             from rag.embeddings import generate_embeddings
             query_embedding = generate_embeddings([query])[0]
 
