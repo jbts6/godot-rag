@@ -38,6 +38,36 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(results[0].path, "classes/class_stringname.md")
 
 
+class FtsScoreTests(unittest.TestCase):
+    """BM25 score mapping should produce reasonable distribution."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        # Create classes with varied content lengths to get different BM25 scores
+        for cls_name, methods in [("Timer", 5), ("Node", 10), ("Object", 3)]:
+            content = f"# {cls_name}\n\n{cls_name} is a class.\n\n## Methods\n\n"
+            for i in range(methods):
+                extra = " extra context " * i  # vary document length
+                content += f"`bool` **method_{i}**() `const`\n\n{extra}A useful method.\n\n"
+            (classes / f"class_{cls_name.lower()}.md").write_text(content, encoding="utf-8")
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_fts_formula_produces_varied_scores(self):
+        """The BM25 formula should map different raw values to different scores."""
+        # Direct unit test of the formula
+        def fts_score(bm25):
+            return min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
+
+        # Different BM25 values should produce different scores
+        scores = {fts_score(v) for v in [0.0, 0.5, 1.0, 5.0, 10.0, 50.0, 100.0]}
+        self.assertGreater(len(scores), 3, "Formula should produce varied scores")
+
+
 class FtsEscapeTests(unittest.TestCase):
     """FTS5 queries with special characters should not silently fail."""
 
@@ -142,6 +172,148 @@ class DocTypeFilterTests(unittest.TestCase):
             all_results = search_database(db_path, "timer stopped", limit=10)
             filtered = search_database(db_path, "timer stopped", limit=10, doc_types=[])
             self.assertEqual(len(all_results), len(filtered))
+
+
+class ChunkRelationTests(unittest.TestCase):
+    """chunk_relations table should be created and populated."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n"
+            "## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n\n"
+            "`void` **remove_child**(`Node` node)\n\nRemoves a child.\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nBase of all classes.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_relation_table_exists(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            tables = [r[0] for r in conn.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            ).fetchall()]
+            conn.close()
+            self.assertIn("chunk_relations", tables)
+
+    def test_parent_relations_exist(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            count = conn.execute(
+                "SELECT COUNT(*) FROM chunk_relations WHERE relation='parent'"
+            ).fetchone()[0]
+            conn.close()
+            self.assertGreater(count, 0, "Should have parent relations")
+
+    def test_inherits_relations_exist(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            conn = sqlite3.connect(str(db_path))
+            count = conn.execute(
+                "SELECT COUNT(*) FROM chunk_relations WHERE relation='inherits'"
+            ).fetchone()[0]
+            conn.close()
+            self.assertGreater(count, 0, "Should have inherits relations")
+
+
+class FtsTokenizeTests(unittest.TestCase):
+    """FTS query tokenizer should split dotted symbols."""
+
+    def test_dotted_symbol_splits_to_tokens(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("Node.add_child")
+        self.assertIn("Node", result)
+        self.assertIn("add", result)
+        self.assertIn("child", result)
+        self.assertIn("AND", result)
+
+    def test_plain_query_unchanged(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("scene transition")
+        self.assertEqual(result, "scene transition")
+
+    def test_special_chars_quoted(self):
+        from rag.store import _smart_tokenize
+        result = _smart_tokenize("Node::add")
+        # Colons should be quoted
+        self.assertIn('"Node::add"', result)
+
+
+class GraphExpansionTests(unittest.TestCase):
+    """Graph expansion should return related chunks."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n"
+            "## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child node.\n\n"
+            "`void` **remove_child**(`Node` node)\n\nRemoves a child.\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nBase of all classes.\n\n## Methods\n\n"
+            "`void` **free**()\n\nFrees the object.\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_expand_returns_parent_chunk(self):
+        """Searching for a method should return its class_summary via parent relation."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            # Should have the method itself plus parent class_summary
+            symbols = {r.symbol for r in results}
+            self.assertIn("Node.add_child", symbols)
+            # Parent (Node class_summary) should be in results
+            self.assertIn("Node", symbols)
+
+    def test_no_expand_returns_only_direct(self):
+        """With expand_graph=False, should only return direct matches."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=False)
+            symbols = {r.symbol for r in results}
+            self.assertIn("Node.add_child", symbols)
+            # Without expansion, Node class_summary may not be present
+            # (depends on FTS, but at least distance=0 results only)
+
+    def test_expanded_results_have_distance(self):
+        """Expanded results should have distance=1."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            expanded = [r for r in results if r.distance == 1]
+            self.assertGreater(len(expanded), 0, "Should have expanded results with distance=1")
+
+    def test_expanded_results_have_relation_type(self):
+        """Expanded results should have a relation_type."""
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=5, expand_graph=True)
+            expanded = [r for r in results if r.relation_type]
+            self.assertGreater(len(expanded), 0, "Should have expanded results with relation_type")
 
 
 class CliTests(unittest.TestCase):

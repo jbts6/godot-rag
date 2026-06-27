@@ -14,6 +14,29 @@ ANCHOR_RE = re.compile(r"`([^`<]+)<class_[^>]+>`")
 
 _FTS5_SPECIAL = set('"*+-:()^')
 
+def _smart_tokenize(query: str) -> str:
+    """Split dotted/snake_case symbols into separate tokens for FTS5.
+
+    "Node.add_child" → '"Node" AND "add" AND "child"'
+    Plain queries pass through unchanged.
+    """
+    # Only split if query contains . or _ (likely a symbol)
+    if '.' not in query and '_' not in query:
+        return _escape_fts5(query)
+
+    tokens = re.split(r'[._]', query)
+    fts_tokens = []
+    for t in tokens:
+        if not t:
+            continue
+        if any(c in _FTS5_SPECIAL for c in t):
+            escaped = t.replace('"', '""')
+            fts_tokens.append(f'"{escaped}"')
+        else:
+            fts_tokens.append(t)
+    return " AND ".join(fts_tokens) if fts_tokens else _escape_fts5(query)
+
+
 def _escape_fts5(query: str) -> str:
     """Escape FTS5 special characters so the query is treated as literal text.
 
@@ -62,7 +85,8 @@ CREATE TABLE IF NOT EXISTS chunks (
   breadcrumb TEXT NOT NULL DEFAULT '',
   start_line INTEGER NOT NULL,
   end_line INTEGER NOT NULL,
-  text TEXT NOT NULL
+  text TEXT NOT NULL,
+  parent_symbol TEXT NOT NULL DEFAULT ''
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
@@ -86,12 +110,77 @@ CREATE TABLE IF NOT EXISTS symbols (
 
 CREATE INDEX IF NOT EXISTS idx_symbols_normalized_name ON symbols(normalized_name);
 CREATE INDEX IF NOT EXISTS idx_symbols_name ON symbols(name);
+
+CREATE TABLE IF NOT EXISTS chunk_relations (
+  source_id INTEGER NOT NULL REFERENCES chunks(id),
+  target_id INTEGER NOT NULL REFERENCES chunks(id),
+  relation  TEXT NOT NULL,
+  weight    REAL DEFAULT 1.0,
+  PRIMARY KEY (source_id, target_id, relation)
+);
+CREATE INDEX IF NOT EXISTS idx_relations_source ON chunk_relations(source_id);
+CREATE INDEX IF NOT EXISTS idx_relations_target ON chunk_relations(target_id);
 """
 
 FTS_SYNC = """
 INSERT INTO chunks_fts(rowid, text, symbol, heading, breadcrumb)
 SELECT id, text, symbol, heading, breadcrumb FROM chunks;
 """
+
+INHERITS_RE = re.compile(r'\*\*Inherits:\*\*(.+)')
+
+
+def _extract_inherits(text: str) -> List[str]:
+    """Extract class names from an '**Inherits:**' line."""
+    match = INHERITS_RE.search(text)
+    if not match:
+        return []
+    return re.findall(r'`([A-Za-z_][A-Za-z0-9_]*)`', match.group(1))
+
+
+def _build_chunk_relations(conn) -> None:
+    """Build parent, inherits, and references relations between chunks."""
+    rows = conn.execute("SELECT id, path, doc_type, chunk_type, symbol, parent_symbol, text FROM chunks").fetchall()
+
+    # Index: normalized_symbol -> chunk_id
+    sym_to_id = {}
+    for row in rows:
+        if row[4]:  # symbol
+            sym_to_id[normalize_symbol(row[4])] = row[0]
+
+    for row in rows:
+        chunk_id, path, doc_type, chunk_type, symbol, parent_symbol, text = row
+
+        # 1. Parent relation: member -> class_summary
+        if parent_symbol:
+            parent_norm = normalize_symbol(parent_symbol)
+            if parent_norm in sym_to_id:
+                conn.execute(
+                    "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'parent', 1.0)",
+                    (chunk_id, sym_to_id[parent_norm])
+                )
+
+        # 2. Inherits relation: class_summary -> parent class_summary
+        if chunk_type == "class_summary":
+            parents = _extract_inherits(text)
+            for parent_name in parents:
+                parent_norm = normalize_symbol(parent_name)
+                if parent_norm in sym_to_id:
+                    conn.execute(
+                        "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'inherits', 0.8)",
+                        (chunk_id, sym_to_id[parent_norm])
+                    )
+
+        # 3. References relation: text mentions of other symbols
+        tokens = set(re.findall(r'[A-Za-z_][A-Za-z0-9_.]+', text))
+        for token in tokens:
+            token_norm = normalize_symbol(token)
+            if token_norm and token_norm in sym_to_id and token_norm != normalize_symbol(symbol):
+                target_id = sym_to_id[token_norm]
+                conn.execute(
+                    "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'references', 0.5)",
+                    (chunk_id, target_id)
+                )
 
 
 def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = None) -> None:
@@ -139,8 +228,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
         for chunk in chunks:
             cleaned_text = clean_chunk_text(chunk.text)
             conn.execute(
-                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
             )
 
         # Extract and insert symbols
@@ -185,8 +274,8 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
             for chunk in addon_chunks:
                 cleaned_text = clean_chunk_text(chunk.text)
                 conn.execute(
-                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text),
+                    "INSERT INTO chunks (document_id, path, doc_type, chunk_type, addon, addon_name, symbol, heading, breadcrumb, start_line, end_line, text, parent_symbol) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (doc_id, chunk.path, chunk.doc_type, chunk.chunk_type, chunk.addon, chunk.addon_name, chunk.symbol, chunk.heading, chunk.breadcrumb, chunk.start_line, chunk.end_line, cleaned_text, chunk.parent_symbol),
                 )
 
             # Extract and insert symbols
@@ -203,6 +292,9 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
                     "INSERT INTO symbols (name, normalized_name, kind, chunk_id, path) VALUES (?, ?, ?, ?, ?)",
                     (sym.name, sym.normalized_name, sym.kind, chunk_ids[sym.chunk_id], sym.path),
                 )
+
+    # Build chunk relations (graph)
+    _build_chunk_relations(conn)
 
     # Sync FTS index
     conn.executescript(FTS_SYNC)
@@ -228,6 +320,7 @@ def list_addons(db_path: Path) -> List[dict]:
 def search_database(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
+    expand_graph: bool = True,
 ) -> List[SearchResult]:
     """Search the RAG database.
 
@@ -235,6 +328,9 @@ def search_database(
         db_path: Path to the SQLite database.
         query: Search query string.
         limit: Maximum number of results to return.
+        doc_types: If provided, only search chunks whose doc_type is in this list.
+        addon: If provided, only search chunks belonging to this addon.
+        expand_graph: If True, expand top results via chunk_relations graph.
         doc_types: If provided, only search chunks whose doc_type is in this list.
                    Common values: "class", "tutorial", "getting_started", "engine_detail", "addon".
         addon: If provided, only search chunks belonging to this addon (e.g. "statecharts").
@@ -262,6 +358,7 @@ def search_database(
 
     def _make_result(row, score):
         return {
+            "id": row["id"],
             "score": score,
             "path": row["path"],
             "start_line": row["start_line"],
@@ -274,6 +371,8 @@ def search_database(
             "heading": row["heading"],
             "breadcrumb": row["breadcrumb"],
             "text": row["text"],
+            "relation_type": "",
+            "distance": 0,
         }
 
     # 1. Exact symbol match (+100)
@@ -311,7 +410,7 @@ def search_database(
 
     # 4. FTS5 search (bm25 → 0-40 score)
     try:
-        escaped_query = _escape_fts5(query)
+        escaped_query = _smart_tokenize(query)
         fts_type_filter = ""
         fts_type_params: list = []
         if doc_types:
@@ -334,17 +433,61 @@ def search_database(
         for row in fts_rows:
             cid = row["id"]
             bm25 = abs(row["rank"])
-            fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.1)))
+            fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
             if cid not in results or results[cid]["score"] < fts_score:
                 results[cid] = _make_result(row, fts_score)
     except sqlite3.OperationalError:
         # FTS match syntax error, skip
         pass
 
-    conn.close()
-
     # Sort by score descending
     sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+
+    # Graph expansion: expand top-K results via chunk_relations
+    if expand_graph:
+        top_k = min(3, len(sorted_results))
+        expanded_ids = {r["id"] for r in sorted_results[:top_k]}
+
+        for result in sorted_results[:top_k]:
+            graph_query = (
+                "SELECT c.*, r.relation, r.weight FROM chunk_relations r "
+                "JOIN chunks c ON c.id = r.target_id "
+                "WHERE r.source_id = ?"
+                + type_filter + addon_filter
+                + " ORDER BY r.weight DESC LIMIT 5"
+            )
+            related_rows = conn.execute(
+                graph_query,
+                [result["id"]] + type_params + addon_params
+            ).fetchall()
+            for rel_row in related_rows:
+                rel_id = rel_row["id"]
+                if rel_id not in results and rel_id not in expanded_ids:
+                    expanded_ids.add(rel_id)
+                    rel_score = result["score"] * rel_row["weight"] * 0.5
+                    results[rel_id] = {
+                        "id": rel_id,
+                        "score": rel_score,
+                        "path": rel_row["path"],
+                        "start_line": rel_row["start_line"],
+                        "end_line": rel_row["end_line"],
+                        "doc_type": rel_row["doc_type"],
+                        "chunk_type": rel_row["chunk_type"],
+                        "addon": rel_row["addon"],
+                        "addon_name": rel_row["addon_name"],
+                        "symbol": rel_row["symbol"],
+                        "heading": rel_row["heading"],
+                        "breadcrumb": rel_row["breadcrumb"],
+                        "text": rel_row["text"],
+                        "relation_type": rel_row["relation"],
+                        "distance": 1,
+                    }
+
+        # Re-sort after expansion
+        sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
+
+    conn.close()
+
     return [
         SearchResult(
             score=r["score"],
@@ -359,6 +502,8 @@ def search_database(
             heading=r["heading"],
             breadcrumb=r["breadcrumb"],
             text=r["text"],
+            relation_type=r.get("relation_type", ""),
+            distance=r.get("distance", 0),
         )
         for r in sorted_results[:limit]
     ]

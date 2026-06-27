@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from typing import List
 
@@ -13,13 +14,19 @@ class Symbol:
     path: str
 
 
+def _canonical_form(name: str) -> str:
+    """Unified symbol form: split camelCase, strip _ and ., lowercase."""
+    name = name.rstrip("()")
+    # Insert separator at camelCase boundaries
+    name = re.sub(r'([a-z])([A-Z])', r'\1_\2', name)
+    name = name.lower()
+    name = name.replace("_", "").replace(".", "")
+    return name
+
+
 def normalize_symbol(name: str) -> str:
     """Normalize a symbol name for matching."""
-    # Remove trailing ()
-    name = name.rstrip("()")
-    # Lowercase
-    name = name.lower()
-    return name
+    return _canonical_form(name)
 
 
 def extract_symbols(chunks: List[Chunk]) -> List[Symbol]:

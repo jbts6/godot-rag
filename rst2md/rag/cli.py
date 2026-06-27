@@ -50,6 +50,8 @@ def _print_results(results, as_json: bool):
                 "heading": r.heading,
                 "breadcrumb": r.breadcrumb,
                 "text": r.text,
+                "relation_type": r.relation_type,
+                "distance": r.distance,
             }
             for r in results
         ]
@@ -59,6 +61,8 @@ def _print_results(results, as_json: bool):
             if i > 0:
                 print("---")
             print(f"score: {r.score}")
+            if r.relation_type:
+                print(f"relation: {r.relation_type} (distance={r.distance})")
             print(f"path: {r.path}:{r.start_line}-{r.end_line}")
             print(f"type: {r.chunk_type}")
             if r.addon:
@@ -77,7 +81,8 @@ def cmd_search(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
-    results = search_database(db_path, args.query, limit=args.limit)
+    expand = not getattr(args, 'no_expand', False)
+    results = search_database(db_path, args.query, limit=args.limit, expand_graph=expand)
     _print_results(results, args.json)
 
 
@@ -89,7 +94,8 @@ def cmd_search_class(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
-    results = search_database(db_path, args.query, limit=args.limit, doc_types=["class"])
+    expand = not getattr(args, 'no_expand', False)
+    results = search_database(db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand)
     _print_results(results, args.json)
 
 
@@ -101,8 +107,9 @@ def cmd_search_tutorial(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
+    expand = not getattr(args, 'no_expand', False)
     results = search_database(
-        db_path, args.query, limit=args.limit, doc_types=["tutorial", "getting_started"]
+        db_path, args.query, limit=args.limit, doc_types=["tutorial", "getting_started"], expand_graph=expand
     )
     _print_results(results, args.json)
 
@@ -115,8 +122,9 @@ def cmd_search_engine(args):
         print(f"Error: database not found: {db_path}", file=sys.stderr)
         sys.exit(1)
 
+    expand = not getattr(args, 'no_expand', False)
     results = search_database(
-        db_path, args.query, limit=args.limit, doc_types=["engine_detail"]
+        db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
     )
     _print_results(results, args.json)
 
@@ -164,6 +172,7 @@ def _add_search_args(parser):
     parser.add_argument("--db", help="Path to SQLite database")
     parser.add_argument("--limit", type=int, default=8, help="Max results")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--no-expand", action="store_true", help="Disable graph expansion")
 
 
 def main():
