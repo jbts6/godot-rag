@@ -6,13 +6,13 @@
 ## 2. see_also 关系
 
 - [x] 2.1 在 _build_chunk_relations 中新增 see_also 关系提取逻辑（正则 `See also \`([^`]+)\``）
-- [ ] 2.2 验证构建后 chunk_relations 表中 see_also 数量 ≥ 100
+- [x] 2.2 验证构建后 chunk_relations 表中 see_also 数量 ≥ 100
 
 ## 3. 向量生成与存储
 
 - [x] 3.1 实现 generate_embeddings 函数：使用 model2vec 对 chunks 批量生成向量（分批处理，每批 1000 个）
 - [x] 3.2 在 build_database 中调用 generate_embeddings 并写入 vec_chunks 表
-- [ ] 3.3 验证构建后 vec_chunks 表有 28231 条记录
+- [x] 3.3 验证构建后 vec_chunks 表有 28231 条记录
 
 ## 4. 向量搜索与融合
 
