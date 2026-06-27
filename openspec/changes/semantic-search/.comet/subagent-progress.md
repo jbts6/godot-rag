@@ -2,7 +2,7 @@
 
 **review_mode:** standard
 **current_task:** null
-**current_stage:** final-review
+**current_stage:** done
 
 ## Tasks
 
