@@ -423,6 +423,32 @@ class CliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0)
         self.assertIn("query", result.stdout)
 
+    def test_build_shows_progress(self):
+        """build_database should print progress output."""
+        import io
+        from contextlib import redirect_stdout
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            docs.mkdir()
+            classes = docs / "classes"
+            classes.mkdir()
+            # Create multiple files to trigger progress output
+            for i in range(105):
+                (classes / f"class_test{i}.md").write_text(
+                    f"# Test{i}\n\n## Methods\n\n`void` **method{i}**()\n\nA test method.\n",
+                    encoding="utf-8",
+                )
+            db_path = Path(tmp) / "test.sqlite"
+
+            f = io.StringIO()
+            with redirect_stdout(f):
+                build_database(docs, db_path)
+
+            output = f.getvalue()
+            # Should contain progress output
+            self.assertIn("Building database", output)
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],

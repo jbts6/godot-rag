@@ -203,7 +203,10 @@ def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = N
     conn.executescript(SCHEMA)
 
     md_files = sorted(docs_dir.rglob("*.md"))
-    for md_file in md_files:
+    total_files = len(md_files)
+    for i, md_file in enumerate(md_files):
+        if i % 100 == 0 or i == total_files - 1:
+            print(f"Building database... ({i+1}/{total_files} files)")
         rel_path = str(md_file.relative_to(docs_dir))
         markdown = md_file.read_text(encoding="utf-8")
         chunks = chunk_markdown(rel_path, markdown)
