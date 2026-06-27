@@ -135,6 +135,11 @@ CREATE TABLE IF NOT EXISTS chunk_relations (
 );
 CREATE INDEX IF NOT EXISTS idx_relations_source ON chunk_relations(source_id);
 CREATE INDEX IF NOT EXISTS idx_relations_target ON chunk_relations(target_id);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS vec_chunks USING vec0(
+    chunk_id INTEGER PRIMARY KEY,
+    embedding float[256]
+);
 """
 
 FTS_SYNC = """
