@@ -10,7 +10,7 @@
 
 ## 3. 向量生成与存储
 
-- [ ] 3.1 实现 generate_embeddings 函数：使用 model2vec 对 chunks 批量生成向量（分批处理，每批 1000 个）
+- [x] 3.1 实现 generate_embeddings 函数：使用 model2vec 对 chunks 批量生成向量（分批处理，每批 1000 个）
 - [ ] 3.2 在 build_database 中调用 generate_embeddings 并写入 vec_chunks 表
 - [ ] 3.3 验证构建后 vec_chunks 表有 28231 条记录
 

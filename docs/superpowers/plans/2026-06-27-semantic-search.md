@@ -150,7 +150,7 @@ git commit -m "feat: extract see_also relations from See also references"
 **Interfaces:**
 - Produces: generate_embeddings(chunks, batch_size) -> List[List[float]]
 
-- [ ] **Step 1: 创建 embeddings.py 文件**
+- [x] **Step 1: 创建 embeddings.py 文件**
 
 ```python
 """Vector embedding generation using model2vec."""
@@ -184,12 +184,12 @@ def generate_embeddings(texts: List[str], batch_size: int = 1000) -> List[List[f
     return embeddings
 ```
 
-- [ ] **Step 2: 验证函数可调用**
+- [x] **Step 2: 验证函数可调用**
 
 Run: `uv run python -c "from rag.embeddings import generate_embeddings; print('OK')"`
 Expected: `OK`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add rst2md/rag/embeddings.py

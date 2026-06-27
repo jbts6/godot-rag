@@ -1,7 +1,7 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 4
+**current_task:** Task 5
 **current_stage:** implementing
 
 ## Tasks
@@ -31,9 +31,11 @@
 - **completed_at:** 2026-06-27
 
 ### Task 4: 实现向量生成函数
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 4: 实现向量生成函数
 - **openspec_text:** 3.1 实现 generate_embeddings 函数
+- **commit:** 9f9d447
+- **completed_at:** 2026-06-27
 
 ### Task 5: 在 build_database 中集成向量生成
 - **status:** pending
