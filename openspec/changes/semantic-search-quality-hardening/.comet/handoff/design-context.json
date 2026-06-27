@@ -1,0 +1,14 @@
+{
+  "change": "semantic-search-quality-hardening",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "3f2cc89063b9348049b4f65741d83f04eaa8c3e4bdf3783e55efe04d5a644527",
+  "files": [
+    { "path": "openspec/changes/semantic-search-quality-hardening/proposal.md", "sha256": "6fe2bc847c5788630b84e7f32282266b08f5754f392e3d916808a16be618e8e9" },
+    { "path": "openspec/changes/semantic-search-quality-hardening/design.md", "sha256": "a08328593690a0902d86c50fc74777f11e5690351518f8791942fd50eaa70bd4" },
+    { "path": "openspec/changes/semantic-search-quality-hardening/tasks.md", "sha256": "bc3cce52fd70d929d1f91f02c4727cc2f36dfcfb8921eb0cd07063b644ae82f0" },
+    { "path": "openspec/changes/semantic-search-quality-hardening/specs/semantic-search-quality/spec.md", "sha256": "768d894fb7e3d01ff6d2c901f4165e68770a95964d221c6e4d7a48c3146c9e43" }
+  ]
+}
