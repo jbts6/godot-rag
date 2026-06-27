@@ -1,8 +1,8 @@
 # Subagent Progress - semantic-search
 
 **review_mode:** standard
-**current_task:** Task 10
-**current_stage:** implementing
+**current_task:** null
+**current_stage:** final-review
 
 ## Tasks
 
@@ -75,6 +75,8 @@
 - **completed_at:** 2026-06-27
 
 ### Task 10: 端到端验证
-- **status:** pending
+- **status:** done
 - **plan_text:** Task 10: 端到端验证
 - **openspec_text:** 4.4 验证搜索 "how to make a button" 能返回语义相关结果
+- **commit:** 248f729
+- **completed_at:** 2026-06-27

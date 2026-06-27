@@ -524,7 +524,7 @@ git commit -m "test: add semantic search unit tests"
 **Interfaces:**
 - Consumes: search_database 函数
 
-- [ ] **Step 1: 验证语义搜索效果**
+- [x] **Step 1: 验证语义搜索效果**
 
 Run: `uv run python -c "
 from pathlib import Path
@@ -545,7 +545,7 @@ for query in queries:
 "`
 Expected: 返回语义相关结果
 
-- [ ] **Step 2: 验证 see_also 关系数量**
+- [x] **Step 2: 验证 see_also 关系数量**
 
 Run: `uv run python -c "
 from pathlib import Path
@@ -558,7 +558,7 @@ with get_connection(Path('godot_rag.db')) as conn:
 "`
 Expected: `see_also relations: >= 100`
 
-- [ ] **Step 3: Commit 验证结果**
+- [x] **Step 3: Commit 验证结果**
 
 ```bash
 git add -A
