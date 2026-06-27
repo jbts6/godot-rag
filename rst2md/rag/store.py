@@ -224,6 +224,25 @@ def _build_chunk_relations(conn) -> None:
                 )
 
 
+def vector_search(conn, query_embedding: List[float], limit: int = 10) -> List[dict]:
+    """Search for similar chunks using vector embeddings.
+
+    Args:
+        conn: SQLite connection.
+        query_embedding: Query vector (256 dimensions).
+        limit: Maximum number of results.
+
+    Returns:
+        List of dicts with 'id' and 'distance' keys.
+    """
+    results = conn.execute(
+        "SELECT chunk_id, distance FROM vec_chunks WHERE embedding MATCH ? AND k = ?",
+        (str(query_embedding), limit)
+    ).fetchall()
+
+    return [{'id': row[0], 'distance': row[1]} for row in results]
+
+
 def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = None) -> None:
     """Build the RAG database from markdown docs.
 
