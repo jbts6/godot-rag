@@ -60,6 +60,9 @@ def clean_chunk_text(text: str) -> str:
     text = CLASSREF_LINE_RE.sub("", text)
     # Remove <class_*> anchors, keep display text
     text = ANCHOR_RE.sub(r"`\1`", text)
+    # Remove image references (Markdown and HTML) — invisible to LLM
+    text = re.sub(r'!\[[^\]]*\]\([^)]*\)', '', text)
+    text = re.sub(r'<img\b[^>]*/?\s*>', '', text)
     # Collapse multiple blank lines
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
@@ -370,7 +373,7 @@ def search_database(
             "symbol": row["symbol"],
             "heading": row["heading"],
             "breadcrumb": row["breadcrumb"],
-            "text": row["text"],
+            "text": clean_chunk_text(row["text"]),
             "relation_type": "",
             "distance": 0,
         }
@@ -478,7 +481,7 @@ def search_database(
                         "symbol": rel_row["symbol"],
                         "heading": rel_row["heading"],
                         "breadcrumb": rel_row["breadcrumb"],
-                        "text": rel_row["text"],
+                        "text": clean_chunk_text(rel_row["text"]),
                         "relation_type": rel_row["relation"],
                         "distance": 1,
                     }
