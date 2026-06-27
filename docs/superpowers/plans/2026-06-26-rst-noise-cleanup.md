@@ -2,6 +2,7 @@
 change: cleanup-rst-extraction-noise
 design-doc: docs/superpowers/specs/2026-06-26-rst-noise-cleanup-design.md
 base-ref: 1e42e4dab6e2589058b3f89265a48858c8009cdd
+archived-with: 2026-06-27-cleanup-rst-extraction-noise
 ---
 
 # RST Noise Cleanup Implementation Plan
@@ -22,6 +23,7 @@ base-ref: 1e42e4dab6e2589058b3f89265a48858c8009cdd
 - Markdown 后处理必须继续保护 fenced code block 和 indented code block。
 - `rst2md/rag/rst.py` 与 `godot_rag/rag/rst.py` 的 converter 实现必须保持同步。
 
+archived-with: 2026-06-27-cleanup-rst-extraction-noise
 ---
 
 ### Task 1: 添加 RST 预处理失败测试

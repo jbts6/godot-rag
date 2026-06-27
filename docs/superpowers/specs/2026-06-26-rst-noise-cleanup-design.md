@@ -2,6 +2,8 @@
 comet_change: cleanup-rst-extraction-noise
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-27-cleanup-rst-extraction-noise
+status: final
 ---
 
 # RST Extraction Noise Cleanup
