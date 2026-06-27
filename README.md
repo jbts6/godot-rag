@@ -25,21 +25,29 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 godot-rag s-class "Node.add_child"
 godot-rag s-class "Signal.emit" --limit 3
 
-# Search tutorials (tutorials + getting started guides)
+# Tutorials + getting started guides
 godot-rag s-tutorial "how to use signals"
 godot-rag s-tutorial "2D pathfinding" --limit 5
 
-# Search engine details (architecture, file formats, GDExtension, etc.)
+# Engine details (architecture, file formats, GDExtension, etc.)
 godot-rag s-engine "GDExtension"
 godot-rag s-engine "IDE debugging" --limit 3
 
-# Search addon docs and examples
+# Addon docs and examples
 godot-rag s-addon "state machine"
 godot-rag s-addon "state machine" --addon statecharts
 godot-rag s-addon "dialogue" --limit 3
 
 # Search all docs (no type filter)
 godot-rag s "Timer"
+
+# Fuzzy symbol matching (camelCase/snake_case/dotted all work)
+godot-rag s-class "addChild"          # matches add_child, _add_child
+godot-rag s-class "Node.add_child"    # matches Node._add_child
+godot-rag s-class "node_add_child"    # matches Node.addChild
+
+# Disable graph expansion (only return direct matches)
+godot-rag s-class "add_child" --no-expand
 ```
 
 ### Search addons
@@ -81,6 +89,28 @@ godot-rag s-addon "change_scene" --addon scene_manager --json
 # Limit results
 godot-rag s-tutorial "C# Variant" --limit 3
 ```
+
+JSON output includes graph relation info:
+
+```json
+{
+  "score": 100.0,
+  "symbol": "Node.add_child",
+  "relation_type": "",
+  "distance": 0,
+  ...
+},
+{
+  "score": 50.0,
+  "symbol": "Node",
+  "relation_type": "parent",
+  "distance": 1,
+  ...
+}
+```
+
+- `relation_type`: `""` (direct match), `"parent"`, `"inherits"`, `"references"`, `"see_also"`
+- `distance`: `0` (direct), `1` (graph-expanded)
 
 ## Examples
 
@@ -132,6 +162,25 @@ Tested on a database of **30,529 chunks** (28,231 Godot docs + 2,298 addon chunk
 | `input action mapping` | ✅ 3 hits (11ms) | — | RAG finds cross-references |
 
 **Key insight**: grep can only find exact substring matches. RAG handles natural language queries like "state machine transitions" and returns ranked, contextual results.
+
+### Graph Expansion: Contextual Results
+
+When graph expansion is enabled (default), search results are enriched with related chunks:
+
+- **parent**: Searching `add_child` also returns the `Node` class summary
+- **inherits**: Searching `Node` also returns `Object` (its parent class)
+- **references**: Chunks that mention matched symbols in their text
+
+```bash
+# Graph expansion adds context
+$ godot-rag s-class "add_child"
+  score: 100.0  symbol: Node.add_child        # direct match
+  score: 50.0   symbol: Node    relation: parent (distance=1)  # auto-expanded
+
+# Disable for faster, minimal results
+$ godot-rag s-class "add_child" --no-expand
+  score: 100.0  symbol: Node.add_child        # direct match only
+```
 
 ### --addon Filter: Precision Search
 
