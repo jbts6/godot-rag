@@ -8,8 +8,23 @@ class SymbolTests(unittest.TestCase):
     def test_normalizes_method_symbols(self):
         self.assertEqual(
             normalize_symbol("StringName.is_valid_filename()"),
-            "stringname.is_valid_filename",
+            "stringnameisvalidfilename",
         )
+
+    def test_canonical_camelcase(self):
+        self.assertEqual(normalize_symbol("addChild"), "addchild")
+
+    def test_canonical_snake_case(self):
+        self.assertEqual(normalize_symbol("add_child"), "addchild")
+
+    def test_canonical_leading_underscore(self):
+        self.assertEqual(normalize_symbol("_add_child"), "addchild")
+
+    def test_canonical_dotted(self):
+        self.assertEqual(normalize_symbol("Node.add_child"), "nodeaddchild")
+
+    def test_canonical_mixed(self):
+        self.assertEqual(normalize_symbol("GDExtension"), "gdextension")
 
     def test_extracts_class_and_method_symbols(self):
         markdown = """# StringName
