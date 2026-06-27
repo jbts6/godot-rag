@@ -205,6 +205,17 @@ def _build_chunk_relations(conn) -> None:
                     (chunk_id, target_id)
                 )
 
+        # 4. See also relation: See also `xxx` references
+        see_also_matches = re.findall(r'See also `([^`]+)`', text)
+        for match in see_also_matches:
+            target_norm = normalize_symbol(match)
+            if target_norm and target_norm in sym_to_id and target_norm != normalize_symbol(symbol):
+                target_id = sym_to_id[target_norm]
+                conn.execute(
+                    "INSERT OR IGNORE INTO chunk_relations (source_id, target_id, relation, weight) VALUES (?, ?, 'see_also', 0.6)",
+                    (chunk_id, target_id)
+                )
+
 
 def build_database(docs_dir: Path, db_path: Path, addons_dir: Optional[Path] = None) -> None:
     """Build the RAG database from markdown docs.
