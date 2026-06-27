@@ -412,6 +412,17 @@ class CliTests(unittest.TestCase):
         self.assertIn("build", result.stdout)
         self.assertIn("s", result.stdout)
 
+    def test_cli_search_alias_works(self):
+        """Long alias 'search' should work as alias for 's'."""
+        result = subprocess.run(
+            [sys.executable, "-m", "rag.cli", "search", "--help"],
+            text=True,
+            capture_output=True,
+            env=TEST_ENV,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("query", result.stdout)
+
     def test_cli_search_class_help(self):
         result = subprocess.run(
             [sys.executable, "-m", "rag.cli", "s-class", "--help"],

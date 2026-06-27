@@ -189,22 +189,22 @@ def main():
     build_parser.set_defaults(func=cmd_build)
 
     # s command (all types)
-    search_parser = subparsers.add_parser("s", help="Search all docs")
+    search_parser = subparsers.add_parser("s", aliases=["search"], help="Search all docs")
     _add_search_args(search_parser)
     search_parser.set_defaults(func=cmd_search)
 
     # s-class command
-    class_parser = subparsers.add_parser("s-class", help="Search class reference docs")
+    class_parser = subparsers.add_parser("s-class", aliases=["search-class"], help="Search class reference docs")
     _add_search_args(class_parser)
     class_parser.set_defaults(func=cmd_search_class)
 
     # s-tutorial command
-    tutorial_parser = subparsers.add_parser("s-tutorial", help="Search tutorial and getting-started docs")
+    tutorial_parser = subparsers.add_parser("s-tutorial", aliases=["search-tutorial"], help="Search tutorial and getting-started docs")
     _add_search_args(tutorial_parser)
     tutorial_parser.set_defaults(func=cmd_search_tutorial)
 
     # s-engine command
-    engine_parser = subparsers.add_parser("s-engine", help="Search engine detail docs")
+    engine_parser = subparsers.add_parser("s-engine", aliases=["search-engine"], help="Search engine detail docs")
     _add_search_args(engine_parser)
     engine_parser.set_defaults(func=cmd_search_engine)
 
@@ -215,7 +215,7 @@ def main():
     addons_parser.set_defaults(func=cmd_addons)
 
     # s-addon command
-    addon_parser = subparsers.add_parser("s-addon", help="Search addon docs and examples")
+    addon_parser = subparsers.add_parser("s-addon", aliases=["search-addon"], help="Search addon docs and examples")
     _add_search_args(addon_parser)
     addon_parser.add_argument("--addon", help="Filter by addon name (e.g. statecharts)")
     addon_parser.set_defaults(func=cmd_search_addon)
