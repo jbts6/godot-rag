@@ -15,7 +15,7 @@ The system SHALL provide a Python-based release build tool exposed as the projec
 - **THEN** `build.sh` delegates to the Python release build tool instead of containing the primary build implementation
 
 ### Requirement: Conservative stage cache reuse
-The build tool SHALL reuse stage outputs only when that stage's recorded input fingerprint exactly matches the current input fingerprint.
+The build tool SHALL reuse stage outputs only when that stage's recorded input fingerprint exactly matches the current input fingerprint, including stage-relevant source inputs, documentation inputs, addon/wiki inputs, and tool/environment versions.
 
 #### Scenario: Unchanged inputs skip reusable stages
 - **WHEN** a developer runs the same build command twice without changing tracked build inputs
@@ -28,6 +28,10 @@ The build tool SHALL reuse stage outputs only when that stage's recorded input f
 #### Scenario: Missing manifest reruns stages
 - **WHEN** `.cache/build-release/manifest.json` is absent
 - **THEN** the build tool treats cache state as unavailable and runs required stages
+
+#### Scenario: Stage-specific source inputs affect fingerprints
+- **WHEN** a developer changes `rst2md/` source, README inputs, addon documentation/configuration, wiki input state, or a tracked tool/environment version
+- **THEN** affected reusable stages produce a different fingerprint and cannot reuse the stale manifest entry
 
 ### Requirement: Stage timing and run reports
 The build tool SHALL report every stage's status, elapsed time, and run or skip reason in a human-readable terminal summary and SHALL write `.cache/build-release/last-run.json`.
@@ -76,3 +80,4 @@ The build tool SHALL provide a `clean-cache` command that removes local release 
 #### Scenario: Build after clean cache reruns required stages
 - **WHEN** a developer runs a build after cleaning the cache
 - **THEN** required build stages run instead of reporting cache hits
+
