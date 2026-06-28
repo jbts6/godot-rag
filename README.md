@@ -20,6 +20,8 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 ### Search by type
 
+All search commands have long aliases: `search`, `search-class`, `search-tutorial`, `search-engine`, `search-addon`.
+
 ```bash
 # Search class reference (API docs only)
 godot-rag s-class "Node.add_child"
@@ -88,6 +90,10 @@ godot-rag s-addon "change_scene" --addon scene_manager --json
 
 # Limit results
 godot-rag s-tutorial "C# Variant" --limit 3
+
+# Debug search metadata (shows search mode, vector availability, fallback reason)
+godot-rag s-class "Node.add_child" --debug-search
+godot-rag s-class "Node.add_child" --debug-search --json
 ```
 
 JSON output includes graph relation info:
@@ -112,6 +118,29 @@ JSON output includes graph relation info:
 - `relation_type`: `""` (direct match), `"parent"`, `"inherits"`, `"references"`, `"see_also"`
 - `distance`: `0` (direct), `1` (graph-expanded)
 
+### Database statistics
+
+```bash
+# Show database statistics (chunk counts, symbols, relations)
+godot-rag stats
+
+# JSON output
+godot-rag stats --json
+```
+
+### Diagnostics
+
+```bash
+# Validate semantic search readiness (vector embeddings, model availability)
+godot-rag diagnostics
+
+# JSON output
+godot-rag diagnostics --json
+
+# Skip model availability check
+godot-rag diagnostics --no-model
+```
+
 ## Examples
 
 ```bash
@@ -132,7 +161,7 @@ godot-rag s "physics interpolation"
 
 ## RAG vs Non-RAG: Why It Matters
 
-A hybrid RAG system (FTS5 + symbol index) gives significantly better results than raw text search for AI-assisted documentation lookup.
+A hybrid RAG system (FTS5 + symbol index + vector semantic search) gives significantly better results than raw text search for AI-assisted documentation lookup. The system uses RRF (Reciprocal Rank Fusion) to combine lexical (FTS5) and semantic (vector) search results.
 
 ### Benchmark: Real Query Comparison
 

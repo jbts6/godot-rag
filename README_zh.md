@@ -20,6 +20,8 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 ### 按类型搜索
 
+所有搜索命令都有长别名：`search`、`search-class`、`search-tutorial`、`search-engine`、`search-addon`。
+
 ```bash
 # 搜索类参考（仅 API 文档）
 godot-rag s-class "Node.add_child"
@@ -88,6 +90,10 @@ godot-rag s-addon "change_scene" --addon scene_manager --json
 
 # 限制结果数量
 godot-rag s-tutorial "C# Variant" --limit 3
+
+# 调试搜索元数据（显示搜索模式、向量可用性、回退原因）
+godot-rag s-class "Node.add_child" --debug-search
+godot-rag s-class "Node.add_child" --debug-search --json
 ```
 
 JSON 输出包含图谱关系信息：
@@ -112,6 +118,29 @@ JSON 输出包含图谱关系信息：
 - `relation_type`：`""`（直接匹配）、`"parent"`、`"inherits"`、`"references"`、`"see_also"`
 - `distance`：`0`（直接）、`1`（图谱扩展）
 
+### 数据库统计
+
+```bash
+# 显示数据库统计信息（chunk 数量、符号、关系）
+godot-rag stats
+
+# JSON 输出
+godot-rag stats --json
+```
+
+### 诊断
+
+```bash
+# 验证语义搜索就绪状态（向量嵌入、模型可用性）
+godot-rag diagnostics
+
+# JSON 输出
+godot-rag diagnostics --json
+
+# 跳过模型可用性检查
+godot-rag diagnostics --no-model
+```
+
 ## 示例
 
 ```bash
@@ -132,7 +161,7 @@ godot-rag s "physics interpolation"
 
 ## RAG vs 非 RAG：为什么重要
 
-混合 RAG 系统（FTS5 + 符号索引）在 AI 辅助文档查询中，比原始文本搜索有显著优势。
+混合 RAG 系统（FTS5 + 符号索引 + 向量语义搜索）在 AI 辅助文档查询中，比原始文本搜索有显著优势。系统使用 RRF（互惠排名融合）来组合词法（FTS5）和语义（向量）搜索结果。
 
 ### 基准测试：真实查询对比
 
