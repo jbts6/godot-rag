@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import List
 
-from rag.db import get_connection
+from rag.db import clean_chunk_text, get_connection
 from rag.indexer import build_database
 from rag.searcher import (  # noqa: F401 — re-export for backward compat
     _FTS5_SPECIAL,

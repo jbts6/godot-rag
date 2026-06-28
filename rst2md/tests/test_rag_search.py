@@ -478,6 +478,12 @@ class CliTests(unittest.TestCase):
 class ConnectionManagerTests(unittest.TestCase):
     """Test SQLite connection context manager."""
 
+    def test_clean_chunk_text_importable_from_store_facade(self):
+        """clean_chunk_text should remain importable from rag.store."""
+        from rag.store import clean_chunk_text
+
+        self.assertEqual(clean_chunk_text("classref-test\n`Node<class_Node>`"), "`Node`")
+
     def test_get_connection_context_manager(self):
         """get_connection should provide a working connection."""
         from rag.store import get_connection

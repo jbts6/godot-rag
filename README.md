@@ -81,6 +81,16 @@ godot-rag s-addon "state machine" --addon statecharts --json
 godot-rag s-addon "change_scene" --json
 ```
 
+### List addons
+
+```bash
+# List all indexed addons with chunk counts
+godot-rag addons
+
+# JSON output
+godot-rag addons --json
+```
+
 ### Output format
 
 ```bash
@@ -255,6 +265,18 @@ uv run godot-rag-build build
 
 # Include Scene Manager wiki docs
 uv run godot-rag-build build --with-wiki
+
+# Build and publish to PyPI
+uv run godot-rag-build publish --target pypi
+
+# Build and publish to TestPyPI
+uv run godot-rag-build publish --target testpypi
+
+# Release database diagnostics
+uv run godot-rag-build diagnostics
+
+# Clean build cache
+uv run godot-rag-build clean-cache
 
 # Legacy wrapper still works:
 ./build.sh

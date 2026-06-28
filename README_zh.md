@@ -81,6 +81,16 @@ godot-rag s-addon "state machine" --addon statecharts --json
 godot-rag s-addon "change_scene" --json
 ```
 
+### 列出 addon
+
+```bash
+# 列出所有已索引的 addon 及 chunk 数量
+godot-rag addons
+
+# JSON 输出
+godot-rag addons --json
+```
+
 ### 输出格式
 
 ```bash
@@ -255,6 +265,18 @@ uv run godot-rag-build build
 
 # 纳入 Scene Manager wiki 文档
 uv run godot-rag-build build --with-wiki
+
+# 构建并发布到 PyPI
+uv run godot-rag-build publish --target pypi
+
+# 构建并发布到 TestPyPI
+uv run godot-rag-build publish --target testpypi
+
+# 发布数据库诊断
+uv run godot-rag-build diagnostics
+
+# 清理构建缓存
+uv run godot-rag-build clean-cache
 
 # 兼容入口仍可使用：
 ./build.sh
