@@ -222,12 +222,13 @@ When Godot releases a new version:
 cd godot-docs && git pull origin stable
 
 # Rebuild docs and RAG
-./build.sh
+uv run godot-rag-build build
 
-# Or manually:
-PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
-PYTHONPATH=rst2md uv run python3 -m rag.cli build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite --addons addons
-uv build --wheel
+# Include Scene Manager wiki docs
+uv run godot-rag-build build --with-wiki
+
+# Legacy wrapper still works:
+./build.sh
 ```
 
 ## Development
