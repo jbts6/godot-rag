@@ -861,5 +861,14 @@ class RegressionTests(unittest.TestCase):
                 self.assertNotIn("vector_available:", output)
 
 
+class IndexerModuleTests(unittest.TestCase):
+    """Task 4: build_database should be importable from rag.indexer."""
+
+    def test_build_database_importable_from_indexer(self):
+        from rag.indexer import build_database as indexer_fn
+        from rag.store import build_database as store_fn
+        self.assertIs(indexer_fn, store_fn)
+
+
 if __name__ == "__main__":
     unittest.main()
