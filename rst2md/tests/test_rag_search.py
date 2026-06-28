@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 import tempfile
@@ -701,6 +702,58 @@ class RegressionTests(unittest.TestCase):
 
         with patch("rag.cli.default_db_path", return_value=Path("/tmp/godot_docs.sqlite")):
             self.assertEqual(_db_path_from_args(Args()), Path("/tmp/godot_docs.sqlite"))
+
+    def test_cli_diagnostics_help(self):
+        result = subprocess.run(
+            [sys.executable, "-m", "rag.cli", "diagnostics", "--help"],
+            capture_output=True,
+            text=True,
+            env=TEST_ENV,
+        )
+
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("--db", result.stdout)
+        self.assertIn("--json", result.stdout)
+
+    def test_cli_search_debug_json_includes_metadata(self):
+        from rag import embeddings
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n"
+                "## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\n"
+                "Returns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            with patch.object(embeddings, "generate_embeddings", return_value=[[0.0] * 256]):
+                db_path = Path(tmp) / "test.db"
+                build_database(docs, db_path)
+
+                args = MagicMock()
+                args.db = str(db_path)
+                args.query = "timer stopped"
+                args.limit = 3
+                args.json = True
+                args.no_expand = True
+                args.debug_search = True
+
+                import io
+                from contextlib import redirect_stdout
+
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    cmd_search(args)
+                output = json.loads(f.getvalue())
+
+                self.assertIn("metadata", output)
+                self.assertIn("mode", output["metadata"])
+                self.assertIn("results", output)
 
 
 if __name__ == "__main__":
