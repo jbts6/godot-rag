@@ -387,6 +387,7 @@ class AddonSearchTests(unittest.TestCase):
             args.json = True
             args.no_expand = True
             args.addon = None
+            args.debug_search = False
 
             # Patch search_database to capture the call
             with patch("rag.cli.search_database") as mock_search:
@@ -654,6 +655,7 @@ class RegressionTests(unittest.TestCase):
             args.json = True
             args.no_expand = True
             args.addon = None
+            args.debug_search = False
 
             # Patch search_database to capture the call
             with patch("rag.cli.search_database") as mock_search:
