@@ -2,7 +2,7 @@
 
 - [x] 1.1 Decide the Python module location for the release build tool and add the `godot-rag-build` project script entrypoint.
 - [x] 1.2 Implement subcommand parsing for `build`, `publish`, `diagnostics`, and `clean-cache`.
-- [ ] 1.3 Replace `build.sh` with a thin wrapper that delegates supported invocations to the Python tool.
+- [x] 1.3 Replace `build.sh` with a thin wrapper that delegates supported invocations to the Python tool.
 
 ## 2. Stage Orchestration, Cache, and Reports
 
@@ -22,16 +22,16 @@
 
 ## 4. Tests and Compatibility
 
-- [ ] 4.1 Add tests for CLI parsing and subcommand help.
-- [ ] 4.2 Add tests for cache hit, cache miss, missing manifest, and changed-input behavior.
-- [ ] 4.3 Add tests for JSON report and manifest writing.
-- [ ] 4.4 Add tests for publish gate ordering and version-exists failure before upload.
-- [ ] 4.5 Add tests or checks for `build.sh` wrapper compatibility.
+- [x] 4.1 Add tests for CLI parsing and subcommand help.
+- [x] 4.2 Add tests for cache hit, cache miss, missing manifest, and changed-input behavior.
+- [x] 4.3 Add tests for JSON report and manifest writing.
+- [x] 4.4 Add tests for publish gate ordering and version-exists failure before upload.
+- [x] 4.5 Add tests or checks for `build.sh` wrapper compatibility.
 - [ ] 4.6 Run focused build-tool tests and the full test suite.
 
 ## 5. Documentation and Verification
 
-- [ ] 5.1 Update local build usage text to document `uv run godot-rag-build`.
+- [x] 5.1 Update local build usage text to document `uv run godot-rag-build`.
 - [ ] 5.2 Verify repeated local builds skip reusable stages when inputs are unchanged.
 - [ ] 5.3 Verify cache cleanup forces required stages to run on the next build.
 - [ ] 5.4 Verify existing CI checks are not broken or apply minimal compatibility updates.
