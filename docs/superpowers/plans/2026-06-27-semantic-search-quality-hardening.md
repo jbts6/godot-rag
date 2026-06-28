@@ -887,7 +887,7 @@ rtk git commit -m "build: validate semantic search release database"
 
 ## Final Verification
 
-- [ ] Run OpenSpec validation:
+- [x] Run OpenSpec validation:
 
 ```bash
 rtk openspec validate semantic-search-quality-hardening --strict
@@ -895,7 +895,7 @@ rtk openspec validate semantic-search-quality-hardening --strict
 
 Expected: PASS.
 
-- [ ] Run focused semantic-search tests:
+- [x] Run focused semantic-search tests:
 
 ```bash
 rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py -q
@@ -903,7 +903,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py -q
 
 Expected: PASS.
 
-- [ ] Run full test suite:
+- [x] Run full test suite:
 
 ```bash
 rtk env PYTHONPATH=rst2md uv run pytest -q
@@ -911,7 +911,7 @@ rtk env PYTHONPATH=rst2md uv run pytest -q
 
 Expected: PASS.
 
-- [ ] Check generated artifacts are not staged:
+- [x] Check generated artifacts are not staged:
 
 ```bash
 rtk git status --short
