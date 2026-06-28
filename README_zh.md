@@ -222,12 +222,13 @@ $ godot-rag s-addon "state machine" --addon statecharts
 cd godot-docs && git pull origin stable
 
 # 重建文档和 RAG
-./build.sh
+uv run godot-rag-build build
 
-# 或手动执行：
-PYTHONPATH=rst2md uv run python3 rst2md/rst2md_batch.py -i godot-docs -o godot_rag/docs-md
-PYTHONPATH=rst2md uv run python3 -m rag.cli build --docs godot_rag/docs-md --db godot_rag/rag/godot_docs.sqlite --addons addons
-uv build --wheel
+# 纳入 Scene Manager wiki 文档
+uv run godot-rag-build build --with-wiki
+
+# 兼容入口仍可使用：
+./build.sh
 ```
 
 ## 开发
