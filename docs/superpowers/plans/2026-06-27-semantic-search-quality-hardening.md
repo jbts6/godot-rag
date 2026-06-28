@@ -62,7 +62,7 @@ base-ref: 4faaf40b2e5d72840e11be8e67687814f63e514d
 - Produces: `run_diagnostics(db_path: Path, check_model: bool = True) -> dict`
 - Consumes: existing `SearchResult`, `get_connection`, `search_database`
 
-- [ ] **Step 1: Write failing metadata tests**
+- [x] **Step 1: Write failing metadata tests**
 
 Add these tests to `rst2md/tests/test_semantic_search.py`:
 
@@ -125,7 +125,7 @@ def test_search_metadata_reports_fts_only_when_vec_table_missing(tmp_path, monke
     assert response.metadata.fallback_reason == "missing_vec_chunks"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -135,7 +135,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py::te
 
 Expected: FAIL because `search_database_with_metadata` and metadata dataclasses do not exist.
 
-- [ ] **Step 3: Add model dataclasses**
+- [x] **Step 3: Add model dataclasses**
 
 In `rst2md/rag/models.py`, add below `SearchResult`:
 
@@ -153,7 +153,7 @@ class SearchResponse:
     metadata: SearchMetadata
 ```
 
-- [ ] **Step 4: Implement metadata search wrapper**
+- [x] **Step 4: Implement metadata search wrapper**
 
 In `rst2md/rag/store.py`, import the new models:
 
@@ -221,7 +221,7 @@ if vector_available:
 
 At the final return, return `(results_list, metadata)` instead of only `results_list`.
 
-- [ ] **Step 5: Add diagnostics module**
+- [x] **Step 5: Add diagnostics module**
 
 Create `rst2md/rag/diagnostics.py`:
 
@@ -294,7 +294,7 @@ def run_diagnostics(db_path: Path, check_model: bool = True) -> dict:
         conn.close()
 ```
 
-- [ ] **Step 6: Add CLI diagnostics/debug surface**
+- [x] **Step 6: Add CLI diagnostics/debug surface**
 
 In `rst2md/rag/cli.py`, import `run_diagnostics` and `search_database_with_metadata`.
 
@@ -367,7 +367,7 @@ diagnostics_parser.add_argument("--no-model", action="store_true", help="Skip em
 diagnostics_parser.set_defaults(func=cmd_diagnostics)
 ```
 
-- [ ] **Step 7: Run focused tests**
+- [x] **Step 7: Run focused tests**
 
 Run:
 
@@ -377,7 +377,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py -q
 
 Expected: PASS for metadata tests and existing semantic tests.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add rst2md/rag/models.py rst2md/rag/store.py rst2md/rag/diagnostics.py rst2md/rag/cli.py rst2md/tests/test_semantic_search.py
@@ -396,7 +396,7 @@ rtk git commit -m "feat: expose semantic search diagnostics metadata"
 - Consumes: `run_diagnostics(...)`
 - Produces fallback reasons: `missing_vec_chunks`, `missing_extension`, `vector_query_failed`
 
-- [ ] **Step 1: Write failing fallback tests**
+- [x] **Step 1: Write failing fallback tests**
 
 Add tests to `rst2md/tests/test_semantic_search.py`:
 
@@ -459,7 +459,7 @@ def test_diagnostics_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
     assert "vector_row_count_mismatch" in report["errors"]
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -469,7 +469,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py::te
 
 Expected: FAIL until `_run_vector_query` exists and diagnostics row mismatch is implemented.
 
-- [ ] **Step 3: Extract vector query helper**
+- [x] **Step 3: Extract vector query helper**
 
 In `rst2md/rag/store.py`, add:
 
@@ -494,11 +494,11 @@ Call this helper from the vector block. Catch exceptions from the helper and set
 metadata = SearchMetadata(mode="fts_only", vector_available=False, fallback_reason="vector_query_failed")
 ```
 
-- [ ] **Step 4: Distinguish missing extension in diagnostics**
+- [x] **Step 4: Distinguish missing extension in diagnostics**
 
 In `rst2md/rag/diagnostics.py`, when `sqlite_vec.load(conn)` fails, append `missing_extension`. If a `vec_chunks` query fails with `"no such module"` in the message, append `missing_extension` instead of only `missing_vec_chunks`.
 
-- [ ] **Step 5: Run fallback tests**
+- [x] **Step 5: Run fallback tests**
 
 Run:
 
@@ -508,7 +508,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py -q
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add rst2md/rag/store.py rst2md/rag/diagnostics.py rst2md/tests/test_semantic_search.py
@@ -526,7 +526,7 @@ rtk git commit -m "test: cover semantic vector fallback paths"
 - Produces: `reset_embedding_model_cache()`
 - Consumes: `generate_embeddings(texts: List[str], batch_size: int = 1000) -> List[List[float]]`
 
-- [ ] **Step 1: Write failing model reuse test**
+- [x] **Step 1: Write failing model reuse test**
 
 Add to `rst2md/tests/test_semantic_search.py`:
 
@@ -592,7 +592,7 @@ def test_warm_query_latency_under_one_second(tmp_path, monkeypatch):
     assert elapsed < 1.0
 ```
 
-- [ ] **Step 2: Run tests to verify model cache fails**
+- [x] **Step 2: Run tests to verify model cache fails**
 
 Run:
 
@@ -602,7 +602,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py::te
 
 Expected: FAIL because `reset_embedding_model_cache` and cacheable `StaticModel` binding do not exist.
 
-- [ ] **Step 3: Implement model cache**
+- [x] **Step 3: Implement model cache**
 
 Replace `rst2md/rag/embeddings.py` with this structure:
 
@@ -642,7 +642,7 @@ def generate_embeddings(texts: List[str], batch_size: int = 1000) -> List[List[f
     return embeddings
 ```
 
-- [ ] **Step 4: Run cache and latency tests**
+- [x] **Step 4: Run cache and latency tests**
 
 Run:
 
@@ -652,7 +652,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py::te
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add rst2md/rag/embeddings.py rst2md/tests/test_semantic_search.py
@@ -669,7 +669,7 @@ rtk git commit -m "perf: reuse semantic embedding model"
 - Consumes: `search_database(...)`
 - Produces deterministic top-K family assertions.
 
-- [ ] **Step 1: Add fixture builder and failing golden tests**
+- [x] **Step 1: Add fixture builder and failing golden tests**
 
 Add helper to `rst2md/tests/test_semantic_search.py`:
 
@@ -727,7 +727,7 @@ def test_golden_queries_return_expected_path_family(tmp_path, monkeypatch, query
     assert paths & expected_paths
 ```
 
-- [ ] **Step 2: Run golden tests**
+- [x] **Step 2: Run golden tests**
 
 Run:
 
@@ -737,7 +737,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_semantic_search.py::te
 
 Expected: PASS or an actionable FAIL that shows ranking/FTS regressions. If it fails because fixture copy lacks enough matching text, adjust only fixture text, not production ranking.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 rtk git add rst2md/tests/test_semantic_search.py
@@ -757,7 +757,7 @@ rtk git commit -m "test: add semantic search golden queries"
 - Produces CLI command: `godot-rag diagnostics --db <path> [--json] [--no-model]`
 - Produces build validation: generated DB has `vec_chunks` row parity and ignored artifact status.
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 Add to `rst2md/tests/test_rag_search.py` near existing CLI regression tests:
 
@@ -810,7 +810,7 @@ def test_cli_search_debug_json_includes_metadata(tmp_path, monkeypatch, capsys):
     assert "results" in output
 ```
 
-- [ ] **Step 2: Run CLI tests to verify failure**
+- [x] **Step 2: Run CLI tests to verify failure**
 
 Run:
 
@@ -820,7 +820,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_rag_search.py::Regress
 
 Expected: FAIL until CLI command and debug JSON are wired.
 
-- [ ] **Step 3: Wire release validation in `build.sh`**
+- [x] **Step 3: Wire release validation in `build.sh`**
 
 After the `python3 -m rag.cli build` command, add:
 
@@ -835,7 +835,7 @@ if ! git check-ignore -q godot_rag/rag/godot_docs.sqlite; then
 fi
 ```
 
-- [ ] **Step 4: Run focused tests**
+- [x] **Step 4: Run focused tests**
 
 Run:
 
@@ -845,7 +845,7 @@ rtk env PYTHONPATH=rst2md uv run pytest rst2md/tests/test_rag_search.py rst2md/t
 
 Expected: PASS.
 
-- [ ] **Step 5: Run full tests**
+- [x] **Step 5: Run full tests**
 
 Run:
 
@@ -855,7 +855,7 @@ rtk env PYTHONPATH=rst2md uv run pytest -q
 
 Expected: PASS.
 
-- [ ] **Step 6: Run release DB validation flow**
+- [x] **Step 6: Run release DB validation flow**
 
 If `godot_rag/rag/godot_docs.sqlite` already exists, run:
 
@@ -874,11 +874,11 @@ rtk ./build.sh --no-bump
 
 Expected: build reaches "=== 构建完成 ===" and diagnostics step passes.
 
-- [ ] **Step 7: Update OpenSpec tasks**
+- [x] **Step 7: Update OpenSpec tasks**
 
 In `openspec/changes/semantic-search-quality-hardening/tasks.md`, check off all completed tasks from sections 1 through 5 after the evidence above passes.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add build.sh rst2md/rag/cli.py rst2md/tests/test_rag_search.py rst2md/tests/test_semantic_search.py openspec/changes/semantic-search-quality-hardening/tasks.md
