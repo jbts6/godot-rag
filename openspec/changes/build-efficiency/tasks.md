@@ -27,11 +27,11 @@
 - [x] 4.3 Add tests for JSON report and manifest writing.
 - [x] 4.4 Add tests for publish gate ordering and version-exists failure before upload.
 - [x] 4.5 Add tests or checks for `build.sh` wrapper compatibility.
-- [ ] 4.6 Run focused build-tool tests and the full test suite.
+- [x] 4.6 Run focused build-tool tests and the full test suite.
 
 ## 5. Documentation and Verification
 
 - [x] 5.1 Update local build usage text to document `uv run godot-rag-build`.
-- [ ] 5.2 Verify repeated local builds skip reusable stages when inputs are unchanged.
-- [ ] 5.3 Verify cache cleanup forces required stages to run on the next build.
-- [ ] 5.4 Verify existing CI checks are not broken or apply minimal compatibility updates.
+- [x] 5.2 Verify repeated local builds skip reusable stages when inputs are unchanged.
+- [x] 5.3 Verify cache cleanup forces required stages to run on the next build.
+- [x] 5.4 Verify existing CI checks are not broken or apply minimal compatibility updates.
