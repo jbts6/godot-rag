@@ -92,7 +92,7 @@ def run_stages(
             if cache and spec.cacheable and digest:
                 cache.record_success(spec.name, digest, outputs)
             completed.add(spec.name)
-        except StageError as exc:
+        except (StageError, RuntimeError, OSError) as exc:
             results.append(
                 StageResult(
                     name=spec.name,
