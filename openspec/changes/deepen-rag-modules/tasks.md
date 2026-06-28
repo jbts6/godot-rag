@@ -13,9 +13,9 @@
 
 ## 3. Deepen Addon Discovery
 
-- [ ] 3.1 Extract `AddonLayout`, addon path filtering, plugin discovery, and file collection helpers from `addon_docs.py` into `addon_discovery.py`.
-- [ ] 3.2 Update `addon_docs.py` to use the discovery module while keeping `chunk_addon` and chunk output semantics unchanged.
-- [ ] 3.3 Run focused addon chunking tests after the addon discovery split.
+- [x] 3.1 Extract `AddonLayout`, addon path filtering, plugin discovery, and file collection helpers from `addon_docs.py` into `addon_discovery.py`.
+- [x] 3.2 Update `addon_docs.py` to use the discovery module while keeping `chunk_addon` and chunk output semantics unchanged.
+- [x] 3.3 Run focused addon chunking tests after the addon discovery split.
 
 ## 4. Consolidate CLI Search Orchestration
 

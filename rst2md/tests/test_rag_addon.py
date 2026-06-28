@@ -8,11 +8,13 @@ import os
 from pathlib import Path
 
 from rag.addon_docs import (
-    AddonLayout,
     chunk_api_file,
     chunk_addon,
     chunk_addon_markdown,
     chunk_code_file,
+)
+from rag.addon_discovery import (
+    AddonLayout,
     collect_api_files,
     collect_doc_files,
     collect_example_files,
