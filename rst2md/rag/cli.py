@@ -7,7 +7,14 @@ import sys
 from pathlib import Path
 from importlib import resources
 
-from rag.store import build_database, search_database, list_addons, get_stats
+from rag.diagnostics import run_diagnostics
+from rag.store import (
+    build_database,
+    get_stats,
+    list_addons,
+    search_database,
+    search_database_with_metadata,
+)
 
 
 def default_db_path() -> Path:
@@ -33,28 +40,38 @@ def cmd_build(args):
     print(f"Database built at {db_path}")
 
 
-def _print_results(results, as_json: bool):
+def _result_to_dict(r):
+    return {
+        "score": r.score,
+        "path": r.path,
+        "start_line": r.start_line,
+        "end_line": r.end_line,
+        "doc_type": r.doc_type,
+        "chunk_type": r.chunk_type,
+        "addon": r.addon,
+        "addon_name": r.addon_name,
+        "symbol": r.symbol,
+        "heading": r.heading,
+        "breadcrumb": r.breadcrumb,
+        "text": r.text,
+        "relation_type": r.relation_type,
+        "distance": r.distance,
+    }
+
+
+def _print_results(results, as_json: bool, metadata=None, debug_search: bool = False):
     """Print search results in text or JSON format."""
     if as_json:
-        output = [
-            {
-                "score": r.score,
-                "path": r.path,
-                "start_line": r.start_line,
-                "end_line": r.end_line,
-                "doc_type": r.doc_type,
-                "chunk_type": r.chunk_type,
-                "addon": r.addon,
-                "addon_name": r.addon_name,
-                "symbol": r.symbol,
-                "heading": r.heading,
-                "breadcrumb": r.breadcrumb,
-                "text": r.text,
-                "relation_type": r.relation_type,
-                "distance": r.distance,
+        output = [_result_to_dict(r) for r in results]
+        if debug_search and metadata is not None:
+            output = {
+                "metadata": {
+                    "mode": metadata.mode,
+                    "vector_available": metadata.vector_available,
+                    "fallback_reason": metadata.fallback_reason,
+                },
+                "results": output,
             }
-            for r in results
-        ]
         print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
         for i, r in enumerate(results):
@@ -82,8 +99,14 @@ def cmd_search(args):
         sys.exit(1)
 
     expand = not getattr(args, 'no_expand', False)
-    results = search_database(db_path, args.query, limit=args.limit, expand_graph=expand)
-    _print_results(results, args.json)
+    if args.debug_search:
+        response = search_database_with_metadata(
+            db_path, args.query, limit=args.limit, expand_graph=expand
+        )
+        _print_results(response.results, args.json, response.metadata, debug_search=True)
+    else:
+        results = search_database(db_path, args.query, limit=args.limit, expand_graph=expand)
+        _print_results(results, args.json)
 
 
 def cmd_search_class(args):
@@ -95,8 +118,14 @@ def cmd_search_class(args):
         sys.exit(1)
 
     expand = not getattr(args, 'no_expand', False)
-    results = search_database(db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand)
-    _print_results(results, args.json)
+    if args.debug_search:
+        response = search_database_with_metadata(
+            db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand
+        )
+        _print_results(response.results, args.json, response.metadata, debug_search=True)
+    else:
+        results = search_database(db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand)
+        _print_results(results, args.json)
 
 
 def cmd_search_tutorial(args):
@@ -108,10 +137,20 @@ def cmd_search_tutorial(args):
         sys.exit(1)
 
     expand = not getattr(args, 'no_expand', False)
-    results = search_database(
-        db_path, args.query, limit=args.limit, doc_types=["tutorial", "getting_started"], expand_graph=expand
-    )
-    _print_results(results, args.json)
+    if args.debug_search:
+        response = search_database_with_metadata(
+            db_path,
+            args.query,
+            limit=args.limit,
+            doc_types=["tutorial", "getting_started"],
+            expand_graph=expand,
+        )
+        _print_results(response.results, args.json, response.metadata, debug_search=True)
+    else:
+        results = search_database(
+            db_path, args.query, limit=args.limit, doc_types=["tutorial", "getting_started"], expand_graph=expand
+        )
+        _print_results(results, args.json)
 
 
 def cmd_search_engine(args):
@@ -123,10 +162,16 @@ def cmd_search_engine(args):
         sys.exit(1)
 
     expand = not getattr(args, 'no_expand', False)
-    results = search_database(
-        db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
-    )
-    _print_results(results, args.json)
+    if args.debug_search:
+        response = search_database_with_metadata(
+            db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
+        )
+        _print_results(response.results, args.json, response.metadata, debug_search=True)
+    else:
+        results = search_database(
+            db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
+        )
+        _print_results(results, args.json)
 
 
 def cmd_addons(args):
@@ -192,12 +237,42 @@ def cmd_search_addon(args):
         sys.exit(1)
 
     expand = not getattr(args, 'no_expand', False)
-    results = search_database(
-        db_path, args.query, limit=args.limit,
-        doc_types=["addon"], addon=getattr(args, 'addon', None),
-        expand_graph=expand,
-    )
-    _print_results(results, args.json)
+    if args.debug_search:
+        response = search_database_with_metadata(
+            db_path,
+            args.query,
+            limit=args.limit,
+            doc_types=["addon"],
+            addon=getattr(args, 'addon', None),
+            expand_graph=expand,
+        )
+        _print_results(response.results, args.json, response.metadata, debug_search=True)
+    else:
+        results = search_database(
+            db_path, args.query, limit=args.limit,
+            doc_types=["addon"], addon=getattr(args, 'addon', None),
+            expand_graph=expand,
+        )
+        _print_results(results, args.json)
+
+
+def cmd_diagnostics(args):
+    db_path = _db_path_from_args(args)
+    report = run_diagnostics(db_path, check_model=not args.no_model)
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        print(f"database: {report['db_path']}")
+        print(f"ok: {report['ok']}")
+        print(f"sqlite_vec_available: {report['sqlite_vec_available']}")
+        print(f"vec_chunks: {report['vec_chunks_count']}")
+        print(f"chunks: {report['chunks_count']}")
+        print(f"row_parity: {report['row_parity']}")
+        print(f"model_available: {report['model_available']}")
+        if report["errors"]:
+            print("errors: " + ", ".join(report["errors"]))
+    if not report["ok"]:
+        sys.exit(1)
 
 
 def _add_search_args(parser):
@@ -206,6 +281,7 @@ def _add_search_args(parser):
     parser.add_argument("--db", help="Path to SQLite database")
     parser.add_argument("--limit", type=int, default=8, help="Max results")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--debug-search", action="store_true", help="Include search-path metadata")
     parser.add_argument("--no-expand", action="store_true", help="Disable graph expansion")
 
 
@@ -257,6 +333,12 @@ def main():
     _add_search_args(addon_parser)
     addon_parser.add_argument("--addon", help="Filter by addon name (e.g. statecharts)")
     addon_parser.set_defaults(func=cmd_search_addon)
+
+    diagnostics_parser = subparsers.add_parser("diagnostics", help="Validate semantic search readiness")
+    diagnostics_parser.add_argument("--db", help="Path to SQLite database")
+    diagnostics_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    diagnostics_parser.add_argument("--no-model", action="store_true", help="Skip embedding model availability check")
+    diagnostics_parser.set_defaults(func=cmd_diagnostics)
 
     args = parser.parse_args()
     args.func(args)

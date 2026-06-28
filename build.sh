@@ -175,6 +175,15 @@ PYTHONPATH=rst2md uv run python3 -m rag.cli build \
     --db godot_rag/rag/godot_docs.sqlite \
     --addons addons
 
+echo "2b. 校验 RAG 数据库..."
+PYTHONPATH=rst2md uv run python3 -m rag.cli diagnostics \
+    --db godot_rag/rag/godot_docs.sqlite
+
+if ! git check-ignore -q godot_rag/rag/godot_docs.sqlite; then
+    echo "错误: godot_rag/rag/godot_docs.sqlite 必须被 git ignore"
+    exit 1
+fi
+
 # 清理 wiki 缓存（已入库，不需要留在子模块内）
 if [ "$WITH_WIKI" -eq 1 ]; then
     rm -rf addons/scene_manager/docs_wiki

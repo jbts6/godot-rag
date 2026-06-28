@@ -36,3 +36,16 @@ class SearchResult:
     relation_type: str = ''
     distance: int = 0
     snippet: str = ''
+
+
+@dataclass(frozen=True)
+class SearchMetadata:
+    mode: str
+    vector_available: bool
+    fallback_reason: str = ""
+
+
+@dataclass(frozen=True)
+class SearchResponse:
+    results: List[SearchResult]
+    metadata: SearchMetadata

@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from rag.chunker import chunk_markdown
-from rag.models import SearchResult
+from rag.models import SearchMetadata, SearchResponse, SearchResult
 from rag.symbols import extract_symbols, normalize_symbol
 
 
@@ -513,11 +513,67 @@ def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
     return '\n'.join(snippet_lines)
 
 
+def _vector_availability(conn) -> tuple[bool, str]:
+    try:
+        conn.execute("SELECT 1 FROM vec_chunks LIMIT 1").fetchone()
+    except sqlite3.OperationalError as exc:
+        message = str(exc).lower()
+        if "no such table" in message or "no such module" in message:
+            return False, "missing_vec_chunks"
+        return False, "vector_unavailable"
+    return True, ""
+
+
+def _run_vector_query(conn, query_embedding, limit, type_filter, type_params, addon_filter, addon_params):
+    vec_query = (
+        "SELECT vc.chunk_id, vc.distance FROM vec_chunks vc "
+        "JOIN chunks c ON vc.chunk_id = c.id "
+        "WHERE vc.embedding MATCH ? AND k = ?"
+        + type_filter + addon_filter
+    )
+    vec_rows = conn.execute(
+        vec_query,
+        [str(query_embedding), limit * 3] + type_params + addon_params,
+    ).fetchall()
+    return [{'id': row[0], 'distance': row[1]} for row in vec_rows]
+
+
+def search_database_with_metadata(
+    db_path: Path, query: str, limit: int = 8,
+    doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
+    expand_graph: bool = True,
+) -> SearchResponse:
+    results, metadata = _search_database_impl(
+        db_path=db_path,
+        query=query,
+        limit=limit,
+        doc_types=doc_types,
+        addon=addon,
+        expand_graph=expand_graph,
+    )
+    return SearchResponse(results=results, metadata=metadata)
+
+
 def search_database(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
     expand_graph: bool = True,
 ) -> List[SearchResult]:
+    return search_database_with_metadata(
+        db_path,
+        query,
+        limit=limit,
+        doc_types=doc_types,
+        addon=addon,
+        expand_graph=expand_graph,
+    ).results
+
+
+def _search_database_impl(
+    db_path: Path, query: str, limit: int = 8,
+    doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
+    expand_graph: bool = True,
+) -> tuple[List[SearchResult], SearchMetadata]:
     """Search the RAG database.
 
     Args:
@@ -534,6 +590,12 @@ def search_database(
     with get_connection(db_path) as conn:
         normalized = normalize_symbol(query)
         results = {}
+        vector_available, fallback_reason = _vector_availability(conn)
+        metadata = SearchMetadata(
+            mode="fts_only",
+            vector_available=False,
+            fallback_reason=fallback_reason,
+        )
 
         # Build optional doc_type filter
         type_filter = ""
@@ -571,55 +633,50 @@ def search_database(
 
         # 0. Vector search + RRF fusion (respects doc_type and addon filters)
         fused_ids = set()
-        try:
-            conn.execute("SELECT 1 FROM vec_chunks LIMIT 1").fetchone()
-
-            from rag.embeddings import generate_embeddings
-            query_embedding = generate_embeddings([query])[0]
-
-            # Vector search with doc_type/addon filtering via subquery
-            vec_query = (
-                "SELECT vc.chunk_id, vc.distance FROM vec_chunks vc "
-                "JOIN chunks c ON vc.chunk_id = c.id "
-                "WHERE vc.embedding MATCH ? AND k = ?"
-                + type_filter + addon_filter
-            )
-            vec_rows = conn.execute(
-                vec_query,
-                [str(query_embedding), limit * 3] + type_params + addon_params
-            ).fetchall()
-            vec_results_raw = [{'id': row[0], 'distance': row[1]} for row in vec_rows]
-
-            # FTS5 search for RRF fusion (with doc_type/addon filters)
-            fts_results_raw = []
+        if vector_available:
             try:
-                escaped_query = _smart_tokenize(query)
-                fts_rows = conn.execute(
-                    "SELECT c.id, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
-                    + type_filter + addon_filter
-                    + " ORDER BY rank LIMIT ?",
-                    [escaped_query] + type_params + addon_params + [limit * 3]
-                ).fetchall()
-                for row in fts_rows:
-                    fts_results_raw.append({'id': row['id'], 'rank': row['rank']})
-            except sqlite3.OperationalError:
-                pass
+                from rag.embeddings import generate_embeddings
+                query_embedding = generate_embeddings([query])[0]
 
-            # RRF fusion
-            fused_results = rrf_fusion(fts_results_raw, vec_results_raw)
-            fused_ids = {r['id'] for r in fused_results[:limit * 3]}
+                vec_results_raw = _run_vector_query(
+                    conn, query_embedding, limit,
+                    type_filter, type_params, addon_filter, addon_params,
+                )
 
-            # Add fused results to results dict with RRF scores
-            for rank, fused in enumerate(fused_results[:limit * 3]):
-                cid = fused['id']
-                rrf_score = fused['rrf_score'] * 40.0  # Scale RRF to 0-40 range
-                if cid not in results or results[cid]["score"] < rrf_score:
-                    row = conn.execute("SELECT * FROM chunks WHERE id = ?", (cid,)).fetchone()
-                    if row:
-                        results[cid] = _make_result(row, rrf_score)
-        except Exception:
-            # Vector search not available, skip
-            pass
+                # FTS5 search for RRF fusion (with doc_type/addon filters)
+                fts_results_raw = []
+                try:
+                    escaped_query = _smart_tokenize(query)
+                    fts_rows = conn.execute(
+                        "SELECT c.id, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
+                        + type_filter + addon_filter
+                        + " ORDER BY rank LIMIT ?",
+                        [escaped_query] + type_params + addon_params + [limit * 3]
+                    ).fetchall()
+                    for row in fts_rows:
+                        fts_results_raw.append({'id': row['id'], 'rank': row['rank']})
+                except sqlite3.OperationalError:
+                    pass
+
+                # RRF fusion
+                fused_results = rrf_fusion(fts_results_raw, vec_results_raw)
+                fused_ids = {r['id'] for r in fused_results[:limit * 3]}
+                metadata = SearchMetadata(mode="hybrid", vector_available=True)
+
+                # Add fused results to results dict with RRF scores
+                for rank, fused in enumerate(fused_results[:limit * 3]):
+                    cid = fused['id']
+                    rrf_score = fused['rrf_score'] * 40.0  # Scale RRF to 0-40 range
+                    if cid not in results or results[cid]["score"] < rrf_score:
+                        row = conn.execute("SELECT * FROM chunks WHERE id = ?", (cid,)).fetchone()
+                        if row:
+                            results[cid] = _make_result(row, rrf_score)
+            except Exception:
+                metadata = SearchMetadata(
+                    mode="fts_only",
+                    vector_available=False,
+                    fallback_reason="vector_query_failed",
+                )
 
         # 1. Exact symbol match (+100)
         rows = conn.execute(
@@ -746,7 +803,7 @@ def search_database(
             # Re-sort after expansion
             sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
 
-        return [
+        return ([
             SearchResult(
                 score=r["score"],
                 path=r["path"],
@@ -765,4 +822,4 @@ def search_database(
                 snippet=_extract_snippet(r["text"], query),
             )
             for r in sorted_results[:limit]
-        ]
+        ], metadata)
