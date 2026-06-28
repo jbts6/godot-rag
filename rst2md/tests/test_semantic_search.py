@@ -254,6 +254,82 @@ def test_search_metadata_reports_vector_query_failure(tmp_path, monkeypatch):
     assert response.metadata.fallback_reason == "vector_query_failed"
 
 
+def test_search_metadata_reports_empty_vec_chunks(tmp_path, monkeypatch):
+    from rag import embeddings
+    from rag.store import search_database_with_metadata
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`bool` **is_stopped**() `const`\n\n"
+        "Returns true if the timer is stopped.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts]
+    )
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    # Empty vec_chunks table
+    with get_connection(db_path) as conn:
+        conn.execute("DELETE FROM vec_chunks")
+        conn.commit()
+
+    response = search_database_with_metadata(
+        db_path, "timer stopped", limit=3, expand_graph=False
+    )
+
+    assert response.results
+    assert response.metadata.mode == "fts_only"
+    assert response.metadata.vector_available is False
+    assert response.metadata.fallback_reason == "empty_vec_chunks"
+
+
+def test_search_metadata_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
+    from rag import embeddings
+    from rag.store import search_database_with_metadata
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`bool` **is_stopped**() `const`\n\n"
+        "Returns true if the timer is stopped.\n",
+        encoding="utf-8",
+    )
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAdds a child node.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(
+        embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts]
+    )
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    # Delete one vec_chunks row to create mismatch
+    with get_connection(db_path) as conn:
+        conn.execute("DELETE FROM vec_chunks WHERE chunk_id = (SELECT MIN(id) FROM chunks)")
+        conn.commit()
+
+    response = search_database_with_metadata(
+        db_path, "timer stopped", limit=3, expand_graph=False
+    )
+
+    assert response.results
+    assert response.metadata.mode == "fts_only"
+    assert response.metadata.vector_available is False
+    assert response.metadata.fallback_reason == "vector_row_count_mismatch"
+
+
 def test_diagnostics_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
     from rag import embeddings
     from rag.diagnostics import run_diagnostics
