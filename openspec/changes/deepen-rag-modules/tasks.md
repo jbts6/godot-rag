@@ -26,6 +26,6 @@
 
 ## 5. Final Verification
 
-- [ ] 5.1 Run the relevant RAG, addon, semantic-search, and CLI test suites.
-- [ ] 5.2 Run OpenSpec validation for `deepen-rag-modules`.
-- [ ] 5.3 Review the diff to ensure there are no public behavior changes, unrelated rewrites, generated database artifacts, or vendored source edits.
+- [x] 5.1 Run the relevant RAG, addon, semantic-search, and CLI test suites.
+- [x] 5.2 Run OpenSpec validation for `deepen-rag-modules`.
+- [x] 5.3 Review the diff to ensure there are no public behavior changes, unrelated rewrites, generated database artifacts, or vendored source edits.
