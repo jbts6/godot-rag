@@ -352,7 +352,7 @@ rtk git commit -m "feat: add release build CLI entrypoint"
 - Produces: `BuildReport(command: str, options: dict[str, object], overall_status: str, started_at: str, ended_at: str, stages: list[StageResult], artifacts: dict[str, str])`.
 - Produces: `print_summary(report: BuildReport) -> None` and `write_last_run(report: BuildReport, cache_dir: Path) -> Path`.
 
-- [ ] **Step 1: Write failing stage/report tests**
+- [x] **Step 1: Write failing stage/report tests]**
 
 Create `rst2md/tests/test_build_release_stages.py`:
 
@@ -437,7 +437,7 @@ def test_last_run_json_contains_stage_decisions(tmp_path):
     assert result.value == "RUN"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -561,7 +561,7 @@ def run_stages(
     return results
 ```
 
-- [ ] **Step 4: Implement report serialization and summary**
+- [x] **Step 4: Implement report serialization and summary]**
 
 Create `godot_rag_build/reporting.py`:
 
@@ -623,7 +623,7 @@ def print_summary(report: BuildReport) -> None:
         print(f"{stage.name:<24} {stage.status.value:<6} {elapsed:<8} {stage.reason}")
 ```
 
-- [ ] **Step 5: Run stage/report tests**
+- [x] **Step 5: Run stage/report tests]**
 
 Run:
 
@@ -633,7 +633,7 @@ rtk uv run pytest rst2md/tests/test_build_release_stages.py -q
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit Task 2**
+- [x] **Step 6: Commit Task 2]**
 
 Run:
 
