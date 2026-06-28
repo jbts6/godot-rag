@@ -1,0 +1,14 @@
+{
+  "change": "build-efficiency",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "356caa801bfc2adca44fd25a0c7d99f7275f7eda7d71d927b03556b00cdebbc9",
+  "files": [
+    { "path": "openspec/changes/build-efficiency/proposal.md", "sha256": "683e2e8815959f62ed71ff62246dfc8363d6499644afe29a955befeced357b67" },
+    { "path": "openspec/changes/build-efficiency/design.md", "sha256": "18cefc5c7a3a39dacb33b4855c38f71629ffea1904ad4c01c33a7ab4508118ef" },
+    { "path": "openspec/changes/build-efficiency/tasks.md", "sha256": "56a48409be7753daa6addd0ed79e22f29ddd9f0efe87da15fca5a37aa1fce9a5" },
+    { "path": "openspec/changes/build-efficiency/specs/build-release-efficiency/spec.md", "sha256": "6255ee502f005246144c253c09ed90d84173c10dab95da430200ee6b5774571f" }
+  ]
+}
