@@ -1,0 +1,14 @@
+{
+  "change": "deepen-rag-modules",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "547f7acb69e73544a3499f58a6bb3476ee9f55fc60cf7a0d5790821313e25847",
+  "files": [
+    { "path": "openspec/changes/deepen-rag-modules/proposal.md", "sha256": "09d4eb251116e27b1665114267d31488fc521fdbfac81e2f8c36da7a84be6c25" },
+    { "path": "openspec/changes/deepen-rag-modules/design.md", "sha256": "762cf1877e15f419cfdd2201c019818bcc97d00a11724a4f20c45115cd297d4a" },
+    { "path": "openspec/changes/deepen-rag-modules/tasks.md", "sha256": "04a17c223a6b72a95e1182654049dfd435b063a19cabfa36cea95c33a4d489d7" },
+    { "path": "openspec/changes/deepen-rag-modules/specs/rag-module-architecture/spec.md", "sha256": "a4c92041452280be65f9096dbab0de5836afde1f560a6b0aed307bbe7623ffd2" }
+  ]
+}

@@ -2,6 +2,7 @@
 change: deepen-rag-modules
 design-doc: docs/superpowers/specs/2026-06-28-deepen-rag-modules-design.md
 base-ref: 41c9839784385cc6749e48149000687789958f47
+archived-with: 2026-06-28-deepen-rag-modules
 ---
 
 # Deepen RAG Modules Implementation Plan
@@ -14,6 +15,7 @@ base-ref: 41c9839784385cc6749e48149000687789958f47
 
 **Tech Stack:** Python 3.10+, sqlite3, sqlite-vec optional extension, dataclasses, pathlib, argparse, pytest, uv, OpenSpec, Comet.
 
+archived-with: 2026-06-28-deepen-rag-modules
 ---
 
 ## File Structure
