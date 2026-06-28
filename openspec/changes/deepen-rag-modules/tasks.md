@@ -19,10 +19,10 @@
 
 ## 4. Consolidate CLI Search Orchestration
 
-- [ ] 4.1 Add a shared CLI database guard for commands that read the RAG database.
-- [ ] 4.2 Add a shared CLI search runner for all search subcommands, including debug metadata, JSON/text output, graph expansion, doc type filtering, and addon filtering.
-- [ ] 4.3 Replace duplicated search command bodies with thin wrappers that pass the appropriate filters.
-- [ ] 4.4 Run focused CLI/search tests after CLI consolidation.
+- [x] 4.1 Add a shared CLI database guard for commands that read the RAG database.
+- [x] 4.2 Add a shared CLI search runner for all search subcommands, including debug metadata, JSON/text output, graph expansion, doc type filtering, and addon filtering.
+- [x] 4.3 Replace duplicated search command bodies with thin wrappers that pass the appropriate filters.
+- [x] 4.4 Run focused CLI/search tests after CLI consolidation.
 
 ## 5. Final Verification
 

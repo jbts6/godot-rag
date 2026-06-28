@@ -870,5 +870,150 @@ class IndexerModuleTests(unittest.TestCase):
         self.assertIs(indexer_fn, store_fn)
 
 
+class RequireDbTests(unittest.TestCase):
+    """Task 7: _require_db should guard database access."""
+
+    def test_require_db_returns_path_when_exists(self):
+        from rag.cli import _require_db
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "test.sqlite"
+            db_path.touch()
+            args = MagicMock()
+            args.db = str(db_path)
+            result = _require_db(args)
+            self.assertEqual(result, db_path)
+
+    def test_require_db_exits_when_missing(self):
+        from rag.cli import _require_db
+        from unittest.mock import MagicMock
+
+        args = MagicMock()
+        args.db = "/nonexistent/path/test.sqlite"
+        with self.assertRaises(SystemExit):
+            _require_db(args)
+
+
+class RunSearchTests(unittest.TestCase):
+    """Task 7: _run_search should unify search command logic."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        docs.mkdir()
+        classes = docs / "classes"
+        classes.mkdir()
+        (classes / "class_timer.md").write_text(
+            "# Timer\n\n## Methods\n\n`bool` **is_stopped**() `const`\n\nReturns true.\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_run_search_calls_search_database(self):
+        from rag.cli import _run_search
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "timer"
+            args.limit = 3
+            args.json = True
+            args.no_expand = False
+            args.debug_search = False
+
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                _run_search(args)
+                mock_search.assert_called_once()
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("doc_types"), None)
+                self.assertEqual(call_kwargs.kwargs.get("addon"), None)
+
+    def test_run_search_passes_doc_types(self):
+        from rag.cli import _run_search
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "timer"
+            args.limit = 3
+            args.json = True
+            args.no_expand = False
+            args.debug_search = False
+
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                _run_search(args, doc_types=["class"])
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("doc_types"), ["class"])
+
+    def test_run_search_passes_addon(self):
+        from rag.cli import _run_search
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "timer"
+            args.limit = 3
+            args.json = True
+            args.no_expand = False
+            args.debug_search = False
+            args.addon = "myaddon"
+
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                _run_search(args, doc_types=["addon"], addon="myaddon")
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("doc_types"), ["addon"])
+                self.assertEqual(call_kwargs.kwargs.get("addon"), "myaddon")
+
+    def test_run_search_respects_no_expand(self):
+        from rag.cli import _run_search
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "timer"
+            args.limit = 3
+            args.json = True
+            args.no_expand = True
+            args.debug_search = False
+
+            with patch("rag.cli.search_database") as mock_search:
+                mock_search.return_value = []
+                _run_search(args)
+                call_kwargs = mock_search.call_args
+                self.assertEqual(call_kwargs.kwargs.get("expand_graph"), False)
+
+    def test_run_search_debug_uses_metadata_variant(self):
+        from rag.cli import _run_search
+        from unittest.mock import MagicMock, patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "timer"
+            args.limit = 3
+            args.json = True
+            args.no_expand = False
+            args.debug_search = True
+
+            with patch("rag.cli.search_database_with_metadata") as mock_search:
+                mock_search.return_value = MagicMock(results=[], metadata=MagicMock(mode="fts", vector_available=False, fallback_reason=None))
+                _run_search(args)
+                mock_search.assert_called_once()
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -26,6 +26,14 @@ def _db_path_from_args(args) -> Path:
     return Path(args.db) if args.db else default_db_path()
 
 
+def _require_db(args) -> Path:
+    db_path = _db_path_from_args(args)
+    if not db_path.exists():
+        print(f"Error: database not found: {db_path}", file=sys.stderr)
+        sys.exit(1)
+    return db_path
+
+
 def cmd_build(args):
     """Build the RAG database."""
     docs_dir = Path(args.docs)
@@ -96,97 +104,55 @@ def _print_results(results, as_json: bool, metadata=None, debug_search: bool = F
             print(f"text:\n{r.text}")
 
 
-def cmd_search(args):
-    """Search the RAG database (all doc types)."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
-
-    expand = not getattr(args, 'no_expand', False)
-    if args.debug_search:
-        response = search_database_with_metadata(
-            db_path, args.query, limit=args.limit, expand_graph=expand
-        )
-        _print_results(response.results, args.json, response.metadata, debug_search=True)
-    else:
-        results = search_database(db_path, args.query, limit=args.limit, expand_graph=expand)
-        _print_results(results, args.json)
-
-
-def cmd_search_class(args):
-    """Search class reference docs only."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
-
-    expand = not getattr(args, 'no_expand', False)
-    if args.debug_search:
-        response = search_database_with_metadata(
-            db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand
-        )
-        _print_results(response.results, args.json, response.metadata, debug_search=True)
-    else:
-        results = search_database(db_path, args.query, limit=args.limit, doc_types=["class"], expand_graph=expand)
-        _print_results(results, args.json)
-
-
-def cmd_search_tutorial(args):
-    """Search tutorial and getting-started docs only."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
-
-    expand = not getattr(args, 'no_expand', False)
+def _run_search(args, doc_types=None, addon=None):
+    db_path = _require_db(args)
+    expand = not getattr(args, "no_expand", False)
     if args.debug_search:
         response = search_database_with_metadata(
             db_path,
             args.query,
             limit=args.limit,
-            doc_types=["tutorial", "getting_started"],
+            doc_types=doc_types,
+            addon=addon,
             expand_graph=expand,
         )
         _print_results(response.results, args.json, response.metadata, debug_search=True)
-    else:
-        results = search_database(
-            db_path, args.query, limit=args.limit, doc_types=["tutorial", "getting_started"], expand_graph=expand
-        )
-        _print_results(results, args.json)
+        return
+
+    results = search_database(
+        db_path,
+        args.query,
+        limit=args.limit,
+        doc_types=doc_types,
+        addon=addon,
+        expand_graph=expand,
+    )
+    _print_results(results, args.json)
+
+
+def cmd_search(args):
+    """Search the RAG database (all doc types)."""
+    _run_search(args)
+
+
+def cmd_search_class(args):
+    """Search class reference docs only."""
+    _run_search(args, doc_types=["class"])
+
+
+def cmd_search_tutorial(args):
+    """Search tutorial and getting-started docs only."""
+    _run_search(args, doc_types=["tutorial", "getting_started"])
 
 
 def cmd_search_engine(args):
     """Search engine detail docs only."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
-
-    expand = not getattr(args, 'no_expand', False)
-    if args.debug_search:
-        response = search_database_with_metadata(
-            db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
-        )
-        _print_results(response.results, args.json, response.metadata, debug_search=True)
-    else:
-        results = search_database(
-            db_path, args.query, limit=args.limit, doc_types=["engine_detail"], expand_graph=expand
-        )
-        _print_results(results, args.json)
+    _run_search(args, doc_types=["engine_detail"])
 
 
 def cmd_addons(args):
     """List all indexed addons."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
+    db_path = _require_db(args)
 
     addons = list_addons(db_path)
     if not addons:
@@ -204,11 +170,7 @@ def cmd_addons(args):
 
 def cmd_stats(args):
     """Show database statistics."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
+    db_path = _require_db(args)
 
     stats = get_stats(db_path)
 
@@ -236,30 +198,7 @@ def cmd_stats(args):
 
 def cmd_search_addon(args):
     """Search addon docs and examples."""
-    db_path = _db_path_from_args(args)
-
-    if not db_path.exists():
-        print(f"Error: database not found: {db_path}", file=sys.stderr)
-        sys.exit(1)
-
-    expand = not getattr(args, 'no_expand', False)
-    if args.debug_search:
-        response = search_database_with_metadata(
-            db_path,
-            args.query,
-            limit=args.limit,
-            doc_types=["addon"],
-            addon=getattr(args, 'addon', None),
-            expand_graph=expand,
-        )
-        _print_results(response.results, args.json, response.metadata, debug_search=True)
-    else:
-        results = search_database(
-            db_path, args.query, limit=args.limit,
-            doc_types=["addon"], addon=getattr(args, 'addon', None),
-            expand_graph=expand,
-        )
-        _print_results(results, args.json)
+    _run_search(args, doc_types=["addon"], addon=getattr(args, "addon", None))
 
 
 def cmd_diagnostics(args):
