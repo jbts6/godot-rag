@@ -17,6 +17,6 @@ verification_report: openspec/changes/semantic-search-quality-hardening/.comet/v
 branch_status: handled
 created_at: 2026-06-27
 verified_at: 2026-06-28
-archived: false
+archived: true
 handoff_context: openspec/changes/semantic-search-quality-hardening/.comet/handoff/design-context.json
 handoff_hash: 3f2cc89063b9348049b4f65741d83f04eaa8c3e4bdf3783e55efe04d5a644527

@@ -2,6 +2,8 @@
 comet_change: semantic-search-quality-hardening
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-28-semantic-search-quality-hardening
+status: final
 ---
 
 # Semantic Search Quality Hardening Design

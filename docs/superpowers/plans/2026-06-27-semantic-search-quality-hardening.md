@@ -2,6 +2,7 @@
 change: semantic-search-quality-hardening
 design-doc: docs/superpowers/specs/2026-06-27-semantic-search-quality-hardening-design.md
 base-ref: 4faaf40b2e5d72840e11be8e67687814f63e514d
+archived-with: 2026-06-28-semantic-search-quality-hardening
 ---
 
 # Semantic Search Quality Hardening Implementation Plan
@@ -23,6 +24,7 @@ base-ref: 4faaf40b2e5d72840e11be8e67687814f63e514d
 - warm-query latency 门槛只适用于模型已加载后的热查询，阈值为 1 秒。
 - 每个任务完成后运行对应测试并提交；提交前检查 `git status --short`，不要提交生成数据库。
 
+archived-with: 2026-06-28-semantic-search-quality-hardening
 ---
 
 ## File Structure
