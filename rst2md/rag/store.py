@@ -515,12 +515,26 @@ def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
 
 def _vector_availability(conn) -> tuple[bool, str]:
     try:
-        conn.execute("SELECT 1 FROM vec_chunks LIMIT 1").fetchone()
+        # Check if vec_chunks table exists and is queryable
+        vec_count = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
     except sqlite3.OperationalError as exc:
         message = str(exc).lower()
         if "no such table" in message or "no such module" in message:
             return False, "missing_vec_chunks"
-        return False, "vector_unavailable"
+        return False, "vector_query_failed"
+
+    # Check if vec_chunks is empty
+    if vec_count == 0:
+        return False, "empty_vec_chunks"
+
+    # Check row count parity with chunks table
+    try:
+        chunks_count = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
+        if vec_count != chunks_count:
+            return False, "vector_row_count_mismatch"
+    except sqlite3.OperationalError:
+        return False, "vector_query_failed"
+
     return True, ""
 
 

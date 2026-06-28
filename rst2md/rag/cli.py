@@ -74,6 +74,12 @@ def _print_results(results, as_json: bool, metadata=None, debug_search: bool = F
             }
         print(json.dumps(output, ensure_ascii=False, indent=2))
     else:
+        if debug_search and metadata is not None:
+            print(f"search_mode: {metadata.mode}")
+            print(f"vector_available: {metadata.vector_available}")
+            if metadata.fallback_reason:
+                print(f"fallback_reason: {metadata.fallback_reason}")
+            print("---")
         for i, r in enumerate(results):
             if i > 0:
                 print("---")
