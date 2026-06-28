@@ -66,7 +66,10 @@ def run_publish(options: PublishOptions) -> BuildReport:
 
     build_report = run_build(BuildOptions(options.no_bump, options.with_wiki, cache_dir, root, runner))
     if build_report.overall_status != "OK":
-        return _failed_publish_report(options, build_report, "build failed")
+        report = _failed_publish_report(options, build_report, "build failed")
+        write_last_run(report, cache_dir)
+        print_summary(report)
+        return report
 
     runner.run(["uv", "run", "pytest", "-q"], cwd=root)
     runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "godot_rag/rag/godot_docs.sqlite"], cwd=root, env={"PYTHONPATH": "rst2md"})
