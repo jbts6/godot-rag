@@ -7,5 +7,5 @@
 - [x] Update vector readiness/search metadata to detect empty or row-mismatched `vec_chunks`.
 - [x] Add regression coverage for empty `vec_chunks` and vector row-count mismatch search metadata.
 - [x] Run focused semantic/search tests.
-- [ ] Run full test suite.
+- [x] Run full test suite.
 - [ ] Re-run release DB diagnostics when local release DB is available.
