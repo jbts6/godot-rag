@@ -27,27 +27,21 @@ def test_db(tmp_path, monkeypatch):
         "## Methods\n\n"
         "`void` **start**()\n\nStarts the countdown timer.\n\n"
         "`void` **stop**()\n\nStops the countdown timer.\n\n"
-        "## See Also\n\n"
-        "- `SceneTree`\n"
-        "- `Node`\n",
+        "See also `SceneTree` and `Node`\n",
         encoding="utf-8",
     )
     (classes / "class_node.md").write_text(
         "# Node\n\n"
         "## Methods\n\n"
         "`void` **add_child**(`Node` node)\n\nAdds a child node to the scene tree.\n\n"
-        "## See Also\n\n"
-        "- `Timer`\n"
-        "- `SceneTree`\n",
+        "See also `Timer` and `SceneTree`\n",
         encoding="utf-8",
     )
     (classes / "class_scene_tree.md").write_text(
         "# SceneTree\n\n"
         "## Methods\n\n"
         "`void` **quit**()\n\nQuits the application.\n\n"
-        "## See Also\n\n"
-        "- `Node`\n"
-        "- `Timer`\n",
+        "See also `Node` and `Timer`\n",
         encoding="utf-8",
     )
     (tutorials / "scene_tree.md").write_text(
