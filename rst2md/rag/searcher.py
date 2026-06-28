@@ -221,9 +221,6 @@ def _search_database_impl(
         doc_types: If provided, only search chunks whose doc_type is in this list.
         addon: If provided, only search chunks belonging to this addon.
         expand_graph: If True, expand top results via chunk_relations graph.
-        doc_types: If provided, only search chunks whose doc_type is in this list.
-                   Common values: "class", "tutorial", "getting_started", "engine_detail", "addon".
-        addon: If provided, only search chunks belonging to this addon (e.g. "statecharts").
     """
     with get_connection(db_path) as conn:
         normalized = normalize_symbol(query)
