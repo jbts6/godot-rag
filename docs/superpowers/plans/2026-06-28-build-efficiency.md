@@ -88,7 +88,7 @@ base-ref: 752d1fff4f69cc473b40f953aa12a389d8b41411
 - Produces: project script `godot-rag-build = "godot_rag_build.cli:main"`
 - Consumes: no build implementation from later tasks; command handlers may import later modules lazily inside handler functions.
 
-- [ ] **Step 1: Write failing CLI tests**
+- [x] **Step 1: Write failing CLI tests**
 
 Create `rst2md/tests/test_build_release_cli.py`:
 
@@ -146,7 +146,7 @@ def test_main_returns_zero_for_help(capsys):
     assert "Godot RAG release build tool" in capsys.readouterr().out
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -156,7 +156,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cli.py -q
 
 Expected: FAIL because `godot_rag_build` and the project script do not exist.
 
-- [ ] **Step 3: Add package marker and runner shell**
+- [x] **Step 3: Add package marker and runner shell**
 
 Create `godot_rag_build/__init__.py`:
 
@@ -215,7 +215,7 @@ class CommandRunner:
         return result
 ```
 
-- [ ] **Step 4: Add CLI parser skeleton**
+- [x] **Step 4: Add CLI parser skeleton**
 
 Create `godot_rag_build/cli.py`:
 
@@ -297,7 +297,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     return args.func(args)
 ```
 
-- [ ] **Step 5: Wire project script and package inclusion**
+- [x] **Step 5: Wire project script and package inclusion**
 
 Modify `pyproject.toml`:
 
@@ -315,7 +315,7 @@ packages = ["godot_rag", "godot_rag_build"]
 exclude = ["godot_rag/docs-md/**"]
 ```
 
-- [ ] **Step 6: Run CLI tests**
+- [x] **Step 6: Run CLI tests**
 
 Run:
 
@@ -325,7 +325,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cli.py -q
 
 Expected: PASS for CLI parser and pyproject assertions. Handler imports may remain unexecuted because these tests only parse help and config.
 
-- [ ] **Step 7: Commit Task 1**
+- [x] **Step 7: Commit Task 1**
 
 Run:
 

@@ -1,7 +1,7 @@
 ## 1. Tool Structure and CLI
 
-- [ ] 1.1 Decide the Python module location for the release build tool and add the `godot-rag-build` project script entrypoint.
-- [ ] 1.2 Implement subcommand parsing for `build`, `publish`, `diagnostics`, and `clean-cache`.
+- [x] 1.1 Decide the Python module location for the release build tool and add the `godot-rag-build` project script entrypoint.
+- [x] 1.2 Implement subcommand parsing for `build`, `publish`, `diagnostics`, and `clean-cache`.
 - [ ] 1.3 Replace `build.sh` with a thin wrapper that delegates supported invocations to the Python tool.
 
 ## 2. Stage Orchestration, Cache, and Reports
