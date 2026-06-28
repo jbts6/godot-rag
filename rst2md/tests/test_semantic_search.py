@@ -281,6 +281,33 @@ def test_diagnostics_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
     assert "vector_row_count_mismatch" in report["errors"]
 
 
+def test_pytest_does_not_require_generated_state(tmp_path, monkeypatch):
+    """Verify that ordinary pytest does not require godot_rag/docs-md or other generated state."""
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`bool` **is_stopped**() `const`\n\n"
+        "Returns true if the timer is stopped.\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts]
+    )
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    # Verify we can search without godot_rag/docs-md
+    results = search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+    assert results
+    assert any("timer" in r.path.lower() for r in results)
+
+
 def test_generate_embeddings_reuses_model(monkeypatch):
     from rag import embeddings
 
