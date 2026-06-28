@@ -291,3 +291,53 @@ def test_warm_query_latency_under_one_second(tmp_path, monkeypatch):
     elapsed = time.perf_counter() - start
 
     assert elapsed < 1.0
+
+
+def _build_golden_search_db(tmp_path, monkeypatch):
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    tutorials = docs / "tutorials"
+    classes.mkdir(parents=True)
+    tutorials.mkdir(parents=True)
+
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`void` **start**()\n\nStarts the countdown timer.\n\n"
+        "`void` **stop**()\n\nStops the countdown timer.\n",
+        encoding="utf-8",
+    )
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAdds a child node to the scene tree.\n",
+        encoding="utf-8",
+    )
+    (tutorials / "scene_tree.md").write_text(
+        "# Scene Tree\n\n"
+        "Nodes are arranged as a scene tree. Use add_child to attach nodes.\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
+    db_path = tmp_path / "golden.db"
+    build_database(docs, db_path)
+    return db_path
+
+
+@pytest.mark.parametrize(
+    ("query", "expected_paths"),
+    [
+        ("countdown timer start stop", {"classes/class_timer.md"}),
+        ("attach node to scene tree", {"classes/class_node.md", "tutorials/scene_tree.md"}),
+    ],
+)
+def test_golden_queries_return_expected_path_family(tmp_path, monkeypatch, query, expected_paths):
+    db_path = _build_golden_search_db(tmp_path, monkeypatch)
+
+    results = search_database(db_path, query, limit=5, expand_graph=False)
+    paths = {r.path for r in results}
+
+    assert paths & expected_paths
