@@ -233,3 +233,61 @@ def test_diagnostics_reports_vector_row_count_mismatch(tmp_path, monkeypatch):
     assert report["ok"] is False
     assert report["row_parity"] is False
     assert "vector_row_count_mismatch" in report["errors"]
+
+
+def test_generate_embeddings_reuses_model(monkeypatch):
+    from rag import embeddings
+
+    load_count = 0
+
+    class FakeEncoded:
+        def __init__(self, size):
+            self.size = size
+
+        def tolist(self):
+            return [[0.0] * 256 for _ in range(self.size)]
+
+    class FakeModel:
+        def encode(self, batch):
+            return FakeEncoded(len(batch))
+
+    class FakeStaticModel:
+        @staticmethod
+        def from_pretrained(name):
+            nonlocal load_count
+            load_count += 1
+            return FakeModel()
+
+    monkeypatch.setattr(embeddings, "StaticModel", FakeStaticModel)
+    embeddings.reset_embedding_model_cache()
+
+    embeddings.generate_embeddings(["first"])
+    embeddings.generate_embeddings(["second"])
+
+    assert load_count == 1
+
+
+def test_warm_query_latency_under_one_second(tmp_path, monkeypatch):
+    import time
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`bool` **is_stopped**() `const`\n\n"
+        "Returns true if the timer is stopped.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+    start = time.perf_counter()
+    search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+    elapsed = time.perf_counter() - start
+
+    assert elapsed < 1.0
