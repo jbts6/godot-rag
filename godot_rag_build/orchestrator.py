@@ -97,6 +97,15 @@ def _run_cmd(ctx: StageContext, args: list[str]) -> None:
     ctx.runner.run(args, cwd=ctx.root, env=_env_with_pythonpath(ctx.root))
 
 
+def _tool_version(ctx: StageContext, args: list[str]) -> str:
+    try:
+        result = ctx.runner.run(args, cwd=ctx.root, capture_output=True, check=False)
+    except (RuntimeError, OSError) as exc:
+        return f"unavailable:{' '.join(args)}:{exc}"
+    output = (result.stdout or result.stderr).strip()
+    return output or f"returncode:{result.returncode}"
+
+
 def _stage_submodule(ctx: StageContext) -> list[str]:
     _run_cmd(ctx, ["git", "submodule", "update", "--init", "--depth", "1", "godot-docs"])
     if not (ctx.root / "godot-docs/classes").is_dir():
@@ -175,8 +184,7 @@ def _stage_wheel(ctx: StageContext) -> list[str]:
     version = ctx.artifacts.get("package_version", _read_package_version(ctx.root / "pyproject.toml"))
     wheel = f"dist/godot_rag-{version}-py3-none-any.whl"
     if not (ctx.root / wheel).exists():
-        (ctx.root / "dist").mkdir(exist_ok=True)
-        (ctx.root / wheel).touch()
+        raise StageError(f"expected wheel not found: {wheel}")
     ctx.artifacts["wheel"] = wheel
     return [wheel]
 
@@ -188,16 +196,38 @@ def _stage_twine_check(ctx: StageContext) -> list[str]:
 
 
 def _fingerprint_common(ctx: StageContext, stage: str) -> str:
-    return fingerprint_items(
-        {
-            "stage": stage,
-            "with_wiki": str(ctx.options["with_wiki"]).lower(),
-            "pyproject": fingerprint_file(ctx.root / "pyproject.toml"),
-            "uv_lock": fingerprint_file(ctx.root / "uv.lock"),
-            "build_tool": fingerprint_tree(ctx.root / "godot_rag_build", include_suffixes=(".py",)),
-            "build_sh": fingerprint_file(ctx.root / "build.sh"),
-        }
-    )
+    inputs = {
+        "stage": stage,
+        "with_wiki": str(ctx.options["with_wiki"]).lower(),
+        "python_version": _tool_version(ctx, ["python3", "--version"]),
+        "uv_version": _tool_version(ctx, ["uv", "--version"]),
+        "pandoc_version": _tool_version(ctx, ["pandoc", "--version"]),
+        "pyproject": fingerprint_file(ctx.root / "pyproject.toml"),
+        "uv_lock": fingerprint_file(ctx.root / "uv.lock"),
+        "build_tool": fingerprint_tree(ctx.root / "godot_rag_build", include_suffixes=(".py",)),
+        "build_sh": fingerprint_file(ctx.root / "build.sh"),
+    }
+
+    if stage in {"docs-md", "rag-db"}:
+        inputs["godot_docs"] = fingerprint_tree(ctx.root / "godot-docs", include_suffixes=(".rst", ".py", ".png", ".jpg", ".jpeg", ".webp", ".svg"))
+        inputs["rst2md"] = fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml"))
+
+    if stage in {"wiki", "rag-db"}:
+        inputs["wiki_cache"] = fingerprint_tree(ctx.root / ".cache/addon-wikis/scene_manager", exclude_dirs=(".git",))
+
+    if stage in {"rag-db", "package-tree"}:
+        inputs["addons"] = fingerprint_tree(ctx.root / "addons", include_suffixes=(".md", ".rst", ".gd", ".cs", ".json", ".yaml", ".yml", ".cfg"), exclude_dirs=(".git", ".godot", "__pycache__"))
+        inputs["addon_configs"] = fingerprint_tree(ctx.root / "rst2md/rag/addon_configs", include_suffixes=(".py", ".json", ".yaml", ".yml"))
+
+    if stage == "package-tree":
+        inputs["rag_source"] = fingerprint_tree(ctx.root / "rst2md/rag", include_suffixes=(".py", ".json", ".yaml", ".yml"))
+
+    if stage == "readme":
+        inputs["merge_readme"] = fingerprint_file(ctx.root / "scripts/merge_readme.py")
+        inputs["readme"] = fingerprint_file(ctx.root / "README.md")
+        inputs["readme_zh"] = fingerprint_file(ctx.root / "README_zh.md")
+
+    return fingerprint_items(inputs)
 
 
 def create_build_stages(options: BuildOptions) -> list[StageSpec]:
@@ -248,5 +278,6 @@ def run_build(options: BuildOptions) -> BuildReport:
 
 def run_release_diagnostics(db_path: Path) -> int:
     runner = CommandRunner()
-    result = runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", str(db_path)], check=False)
+    root = Path(".").resolve()
+    result = runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", str(db_path)], cwd=root, env=_env_with_pythonpath(root), check=False)
     return result.returncode

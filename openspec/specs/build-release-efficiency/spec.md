@@ -1,7 +1,7 @@
 # build-release-efficiency Specification
 
 ## Purpose
-TBD - created by archiving change build-efficiency. Update Purpose after archive.
+Define the local release build workflow for `godot-rag-build`, including conservative cache reuse, stage reporting, diagnostics, publishing gates, wrapper compatibility, wiki input handling, and cache cleanup.
 ## Requirements
 ### Requirement: Python release build entrypoint
 The system SHALL provide a Python-based release build tool exposed as the project script `godot-rag-build` with `build`, `publish`, `diagnostics`, and `clean-cache` subcommands.
@@ -76,4 +76,3 @@ The build tool SHALL provide a `clean-cache` command that removes local release 
 #### Scenario: Build after clean cache reruns required stages
 - **WHEN** a developer runs a build after cleaning the cache
 - **THEN** required build stages run instead of reporting cache hits
-

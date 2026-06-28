@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 from urllib.error import HTTPError
 
 import pytest
@@ -13,6 +14,10 @@ class FakeRunner:
 
     def run(self, args, *, cwd=None, env=None, check=True, capture_output=False):
         self.calls.append(tuple(args))
+        if tuple(args) == ("uv", "build", "--wheel") and cwd is not None:
+            dist = Path(cwd) / "dist"
+            dist.mkdir(exist_ok=True)
+            (dist / "godot_rag-4.7.0.post10-py3-none-any.whl").write_text("wheel", encoding="utf-8")
         if tuple(args[:3]) == ("git", "status", "--porcelain"):
             return CommandResult(tuple(args), 0, stdout="")
         if tuple(args[:3]) == ("git", "-C", "godot-docs"):
@@ -79,3 +84,26 @@ def test_existing_package_version_blocks_upload(tmp_path, monkeypatch):
     commands = [" ".join(call) for call in runner.calls]
     assert not any("twine upload" in command for command in commands)
     assert report.overall_status == "FAIL"
+
+
+def test_publish_test_failure_writes_publish_failure_report(tmp_path, monkeypatch):
+    write_tree(tmp_path)
+
+    class FailingTestsRunner(FakeRunner):
+        def run(self, args, *, cwd=None, env=None, check=True, capture_output=False):
+            if tuple(args) == ("uv", "run", "pytest", "-q"):
+                raise RuntimeError("tests failed")
+            return super().run(args, cwd=cwd, env=env, check=check, capture_output=capture_output)
+
+    monkeypatch.setattr("godot_rag_build.publish.package_version_exists", lambda package, version, target: False)
+
+    cache_dir = tmp_path / ".cache/build-release"
+    report = run_publish(PublishOptions(target="testpypi", no_bump=True, cache_dir=cache_dir, root=tmp_path, runner=FailingTestsRunner()))
+    last_run = json.loads((cache_dir / "last-run.json").read_text(encoding="utf-8"))
+
+    assert report.overall_status == "FAIL"
+    assert report.command == "publish"
+    assert report.artifacts["publish_error"] == "tests failed"
+    assert last_run["command"] == "publish"
+    assert last_run["overall_status"] == "FAIL"
+    assert last_run["artifacts"]["publish_error"] == "tests failed"

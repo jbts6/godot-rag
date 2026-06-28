@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
@@ -71,15 +72,22 @@ def run_publish(options: PublishOptions) -> BuildReport:
         print_summary(report)
         return report
 
-    runner.run(["uv", "run", "pytest", "-q"], cwd=root)
-    import os
-    env = dict(os.environ)
-    env["PYTHONPATH"] = "rst2md"
-    runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "godot_rag/rag/godot_docs.sqlite"], cwd=root, env=env)
+    try:
+        runner.run(["uv", "run", "pytest", "-q"], cwd=root)
+        env = dict(os.environ)
+        env["PYTHONPATH"] = "rst2md"
+        runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "godot_rag/rag/godot_docs.sqlite"], cwd=root, env=env)
 
-    version = str(build_report.artifacts["package_version"])
-    wheel = str(build_report.artifacts["wheel"])
-    if package_version_exists("godot-rag", version, options.target):
+        version = str(build_report.artifacts["package_version"])
+        wheel = str(build_report.artifacts["wheel"])
+        version_exists = package_version_exists("godot-rag", version, options.target)
+    except (RuntimeError, OSError, KeyError) as exc:
+        report = _failed_publish_report(options, build_report, str(exc))
+        write_last_run(report, cache_dir)
+        print_summary(report)
+        return report
+
+    if version_exists:
         report = _failed_publish_report(options, build_report, f"version {version} already exists on {options.target}")
         write_last_run(report, cache_dir)
         print_summary(report)
@@ -89,7 +97,13 @@ def run_publish(options: PublishOptions) -> BuildReport:
     if options.target == "testpypi":
         upload += ["--repository", "testpypi"]
     upload.append(wheel)
-    runner.run(upload, cwd=root)
+    try:
+        runner.run(upload, cwd=root)
+    except (RuntimeError, OSError) as exc:
+        report = _failed_publish_report(options, build_report, str(exc))
+        write_last_run(report, cache_dir)
+        print_summary(report)
+        return report
 
     report = BuildReport(
         command="publish",

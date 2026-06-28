@@ -3,6 +3,7 @@ from pathlib import Path
 import pytest
 
 from godot_rag_build.cli import create_parser, main
+from godot_rag_build.runner import CommandResult
 
 
 def test_help_lists_required_subcommands(capsys):
@@ -49,3 +50,18 @@ def test_main_returns_zero_for_help(capsys):
 
     assert exc.value.code == 0
     assert "Godot RAG release build tool" in capsys.readouterr().out
+
+
+def test_diagnostics_command_uses_rst2md_pythonpath(monkeypatch):
+    calls = []
+
+    def fake_run(self, args, *, cwd=None, env=None, check=True, capture_output=False):
+        calls.append((tuple(args), env))
+        return CommandResult(tuple(args), 0)
+
+    monkeypatch.setattr("godot_rag_build.runner.CommandRunner.run", fake_run)
+
+    assert main(["diagnostics", "--db", "missing.sqlite"]) == 0
+    assert calls[0][0] == ("uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "missing.sqlite")
+    assert calls[0][1] is not None
+    assert calls[0][1]["PYTHONPATH"] == "rst2md"
