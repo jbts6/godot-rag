@@ -6,7 +6,7 @@
 ## 2. Deepen Store Internals
 
 - [x] 2.1 Extract shared SQLite connection, schema constants, FTS sync, and text cleanup helpers from `store.py` into a focused database module while preserving `rag.store` imports.
-- [ ] 2.2 Extract chunk relation construction from `store.py` into a focused relation module and keep database build behavior unchanged.
+- [x] 2.2 Extract chunk relation construction from `store.py` into a focused relation module and keep database build behavior unchanged.
 - [ ] 2.3 Extract database indexing/build logic from `store.py` into an indexing module and delegate `rag.store.build_database` to it.
 - [ ] 2.4 Extract search execution, vector fallback, FTS fallback, RRF fusion, graph expansion, snippet extraction, and result mapping from `store.py` into a search module and delegate `rag.store.search_database*` to it.
 - [ ] 2.5 Run focused search tests after the store split.

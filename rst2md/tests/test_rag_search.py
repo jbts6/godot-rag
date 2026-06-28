@@ -175,6 +175,29 @@ class DocTypeFilterTests(unittest.TestCase):
             self.assertEqual(len(all_results), len(filtered))
 
 
+class RelationModuleImportTests(unittest.TestCase):
+    """rag.relations module should expose extract_inherits, INHERITS_RE, and build_chunk_relations."""
+
+    def test_import_extract_inherits(self):
+        from rag.relations import extract_inherits
+        self.assertEqual(extract_inherits("no inherits here"), [])
+
+    def test_import_inherits_re(self):
+        from rag.relations import INHERITS_RE
+        self.assertTrue(INHERITS_RE.search("**Inherits:** `Object`"))
+
+    def test_import_build_chunk_relations(self):
+        from rag.relations import build_chunk_relations
+        import inspect
+        self.assertTrue(callable(build_chunk_relations))
+        self.assertEqual(len(inspect.signature(build_chunk_relations).parameters), 1)
+
+    def test_extract_inherits_finds_backticked_names(self):
+        from rag.relations import extract_inherits
+        result = extract_inherits("**Inherits:** `Node` and `Object`")
+        self.assertEqual(result, ["Node", "Object"])
+
+
 class ChunkRelationTests(unittest.TestCase):
     """chunk_relations table should be created and populated."""
 
