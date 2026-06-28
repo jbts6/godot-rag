@@ -166,7 +166,7 @@ def _stage_package_tree(ctx: StageContext) -> list[str]:
 
 
 def _stage_readme(ctx: StageContext) -> list[str]:
-    ctx.runner.run(["python3", "scripts/merge_readme.py"], cwd=ctx.root)
+    ctx.runner.run(["uv", "run", "python3", "scripts/merge_readme.py"], cwd=ctx.root)
     return ["README_PYPI.md"]
 
 

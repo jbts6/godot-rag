@@ -51,7 +51,7 @@ class StageSpec:
 def run_stages(
     specs: Sequence[StageSpec],
     context: StageContext,
-    cache=None,
+    cache: object = None,
 ) -> list[StageResult]:
     completed: set[str] = set()
     results: list[StageResult] = []

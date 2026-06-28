@@ -72,7 +72,10 @@ def run_publish(options: PublishOptions) -> BuildReport:
         return report
 
     runner.run(["uv", "run", "pytest", "-q"], cwd=root)
-    runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "godot_rag/rag/godot_docs.sqlite"], cwd=root, env={"PYTHONPATH": "rst2md"})
+    import os
+    env = dict(os.environ)
+    env["PYTHONPATH"] = "rst2md"
+    runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", "godot_rag/rag/godot_docs.sqlite"], cwd=root, env=env)
 
     version = str(build_report.artifacts["package_version"])
     wheel = str(build_report.artifacts["wheel"])
