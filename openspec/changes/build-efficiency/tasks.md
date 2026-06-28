@@ -7,10 +7,10 @@
 ## 2. Stage Orchestration, Cache, and Reports
 
 - [x] 2.1 Implement a stage model with status, dependencies, elapsed time, run or skip reason, outputs, and failure handling.
-- [ ] 2.2 Implement conservative input fingerprinting for docs conversion, wiki input, RAG database generation, package assembly, README merge, wheel build, and relevant tool/environment versions.
+- [x] 2.2 Implement conservative input fingerprinting for docs conversion, wiki input, RAG database generation, package assembly, README merge, wheel build, and relevant tool/environment versions.
 - [x] 2.3 Persist cache state to `.cache/build-release/manifest.json` and latest run details to `.cache/build-release/last-run.json`.
 - [x] 2.4 Implement terminal summary output showing each stage's `RUN`, `SKIP`, or `FAIL` status, elapsed time, and reason.
-- [ ] 2.5 Implement `clean-cache` to remove `.cache/build-release`.
+- [x] 2.5 Implement `clean-cache` to remove `.cache/build-release`.
 
 ## 3. Build, Diagnostics, Publish, and Wiki Flows
 

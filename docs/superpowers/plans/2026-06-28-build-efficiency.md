@@ -661,7 +661,7 @@ rtk git commit -m "feat: add release build stage reporting"
 - Produces: `BuildCache.save() -> Path`
 - Produces: `clean_cache(cache_dir: Path) -> None`
 
-- [ ] **Step 1: Write failing cache tests**
+- [x] **Step 1: Write failing cache tests**
 
 Create `rst2md/tests/test_build_release_cache.py`:
 
@@ -746,7 +746,7 @@ def test_clean_cache_removes_cache_dir(tmp_path):
     assert not cache_dir.exists()
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -756,7 +756,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cache.py -q
 
 Expected: FAIL because cache and fingerprint modules do not exist.
 
-- [ ] **Step 3: Implement stable fingerprints**
+- [x] **Step 3: Implement stable fingerprints**
 
 Create `godot_rag_build/fingerprints.py`:
 
@@ -811,7 +811,7 @@ def fingerprint_tree(
     return _hash_bytes(chunks)
 ```
 
-- [ ] **Step 4: Implement manifest cache**
+- [x] **Step 4: Implement manifest cache**
 
 Create `godot_rag_build/cache.py`:
 
@@ -885,7 +885,7 @@ def clean_cache(cache_dir: Path) -> None:
         shutil.rmtree(cache_dir)
 ```
 
-- [ ] **Step 5: Run cache tests**
+- [x] **Step 5: Run cache tests**
 
 Run:
 
@@ -895,7 +895,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cache.py -q
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit Task 3**
+- [x] **Step 6: Commit Task 3**
 
 Run:
 
@@ -922,7 +922,7 @@ rtk git commit -m "feat: add release build cache manifest"
 - Produces: `run_build(options: BuildOptions) -> BuildReport`.
 - Produces: `run_release_diagnostics(db_path: Path) -> int`.
 
-- [ ] **Step 1: Write failing orchestration tests**
+- [x] **Step 1: Write failing orchestration tests**
 
 Create `rst2md/tests/test_build_release_orchestrator.py`:
 
@@ -1000,7 +1000,7 @@ def test_wiki_build_cleans_transient_addon_docs(tmp_path):
     assert not (tmp_path / "addons/scene_manager/docs_wiki/.git").exists()
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -1010,7 +1010,7 @@ rtk uv run pytest rst2md/tests/test_build_release_orchestrator.py -q
 
 Expected: FAIL because `orchestrator.py` does not exist.
 
-- [ ] **Step 3: Implement build options and version helpers**
+- [x] **Step 3: Implement build options and version helpers**
 
 Create `godot_rag_build/orchestrator.py` with these public definitions first:
 
@@ -1074,7 +1074,7 @@ def resolve_package_version(root: Path, godot_version: str, no_bump: bool) -> st
     return version
 ```
 
-- [ ] **Step 4: Implement package assembly helper**
+- [x] **Step 4: Implement package assembly helper**
 
 Add to `godot_rag_build/orchestrator.py`:
 
@@ -1109,7 +1109,7 @@ def assemble_package_tree(root: Path) -> list[str]:
     return [path.relative_to(root).as_posix() for path in sorted(rag_out.rglob("*")) if path.is_file()]
 ```
 
-- [ ] **Step 5: Implement ordered local build stages**
+- [x] **Step 5: Implement ordered local build stages**
 
 Add stage creation to `godot_rag_build/orchestrator.py`:
 
@@ -1213,7 +1213,7 @@ def _stage_twine_check(ctx: StageContext) -> list[str]:
     return [wheel]
 ```
 
-- [ ] **Step 6: Add fingerprints and run_build**
+- [x] **Step 6: Add fingerprints and run_build**
 
 Add to `godot_rag_build/orchestrator.py`:
 
@@ -1283,7 +1283,7 @@ def run_release_diagnostics(db_path: Path) -> int:
     return result.returncode
 ```
 
-- [ ] **Step 7: Run orchestration tests**
+- [x] **Step 7: Run orchestration tests**
 
 Run:
 
@@ -1293,7 +1293,7 @@ rtk uv run pytest rst2md/tests/test_build_release_orchestrator.py -q
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit Task 4**
+- [x] **Step 8: Commit Task 4**
 
 Run:
 
@@ -1317,7 +1317,7 @@ rtk git commit -m "feat: port local release build orchestration"
 - Produces: `package_version_exists(package: str, version: str, target: str, opener=urlopen) -> bool`.
 - Produces: `run_publish(options: PublishOptions) -> BuildReport`.
 
-- [ ] **Step 1: Write failing publish tests**
+- [x] **Step 1: Write failing publish tests**
 
 Create `rst2md/tests/test_build_release_publish.py`:
 
@@ -1405,7 +1405,7 @@ def test_existing_package_version_blocks_upload(tmp_path, monkeypatch):
     assert report.overall_status == "FAIL"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run:
 
@@ -1415,7 +1415,7 @@ rtk uv run pytest rst2md/tests/test_build_release_publish.py -q
 
 Expected: FAIL because publish module does not exist.
 
-- [ ] **Step 3: Implement publish helpers and gates**
+- [x] **Step 3: Implement publish helpers and gates**
 
 Create `godot_rag_build/publish.py`:
 
@@ -1521,7 +1521,7 @@ def run_publish(options: PublishOptions) -> BuildReport:
     return report
 ```
 
-- [ ] **Step 4: Run publish tests**
+- [x] **Step 4: Run publish tests**
 
 Run:
 
@@ -1531,7 +1531,7 @@ rtk uv run pytest rst2md/tests/test_build_release_publish.py -q
 
 Expected: PASS.
 
-- [ ] **Step 5: Re-run CLI tests for no skip-tests**
+- [x] **Step 5: Re-run CLI tests for no skip-tests**
 
 Run:
 
@@ -1541,7 +1541,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cli.py::test_publish_help_has_
 
 Expected: PASS and `--skip-tests` absent from publish help.
 
-- [ ] **Step 6: Commit Task 5**
+- [x] **Step 6: Commit Task 5**
 
 Run:
 
@@ -1570,7 +1570,7 @@ rtk git commit -m "feat: add gated release publishing"
   - publish combinations preserve `--no-bump` and `--with-wiki`
 - Produces: hidden test env `GODOT_RAG_BUILD_WRAPPER_DRY_RUN=1` that prints delegated command without executing it.
 
-- [ ] **Step 1: Write failing wrapper tests**
+- [x] **Step 1: Write failing wrapper tests**
 
 Create `rst2md/tests/test_build_release_wrapper.py`:
 
@@ -1605,7 +1605,7 @@ def test_wrapper_maps_test_pypi_target():
     assert run_wrapper("--test-pypi", "--no-bump") == "uv run godot-rag-build publish --target testpypi --no-bump"
 ```
 
-- [ ] **Step 2: Run tests to verify they fail against old wrapper**
+- [x] **Step 2: Run tests to verify they fail against old wrapper**
 
 Run:
 
@@ -1615,7 +1615,7 @@ rtk uv run pytest rst2md/tests/test_build_release_wrapper.py -q
 
 Expected: FAIL because current `build.sh` contains inline build logic and no dry-run delegation.
 
-- [ ] **Step 3: Replace `build.sh` with a thin wrapper**
+- [x] **Step 3: Replace `build.sh` with a thin wrapper**
 
 Replace `build.sh` content with:
 
@@ -1704,7 +1704,7 @@ fi
 exec "${CMD[@]}"
 ```
 
-- [ ] **Step 4: Update README usage**
+- [x] **Step 4: Update README usage**
 
 In `README.md`, replace the update block with:
 
@@ -1732,7 +1732,7 @@ uv run godot-rag-build build --with-wiki
 ./build.sh
 ```
 
-- [ ] **Step 5: Run wrapper and docs-adjacent tests**
+- [x] **Step 5: Run wrapper and docs-adjacent tests**
 
 Run:
 
@@ -1743,7 +1743,7 @@ rtk bash -n build.sh
 
 Expected: PASS and Bash syntax check exits 0.
 
-- [ ] **Step 6: Commit Task 6**
+- [x] **Step 6: Commit Task 6**
 
 Run:
 
@@ -1766,7 +1766,7 @@ rtk git commit -m "feat: delegate build script to Python tool"
 - Produces: checked OpenSpec task list for implemented items.
 - Produces: verification evidence from focused build-tool tests, full project tests, wrapper syntax check, OpenSpec validation, and command help smoke test.
 
-- [ ] **Step 1: Run focused build-tool tests**
+- [x] **Step 1: Run focused build-tool tests**
 
 Run:
 
@@ -1776,7 +1776,7 @@ rtk uv run pytest rst2md/tests/test_build_release_cli.py rst2md/tests/test_build
 
 Expected: PASS.
 
-- [ ] **Step 2: Run full project tests**
+- [x] **Step 2: Run full project tests**
 
 Run:
 
@@ -1786,7 +1786,7 @@ rtk uv run pytest -q
 
 Expected: PASS.
 
-- [ ] **Step 3: Run syntax and CLI smoke checks**
+- [x] **Step 3: Run syntax and CLI smoke checks**
 
 Run:
 
@@ -1798,7 +1798,7 @@ rtk uv run godot-rag-build publish --help
 
 Expected: `bash -n` exits 0, root help lists four subcommands, publish help does not contain `--skip-tests`.
 
-- [ ] **Step 4: Run OpenSpec validation**
+- [x] **Step 4: Run OpenSpec validation**
 
 Run:
 
@@ -1808,7 +1808,7 @@ rtk openspec validate build-efficiency --strict
 
 Expected: PASS.
 
-- [ ] **Step 5: Confirm CI compatibility scope**
+- [x] **Step 5: Confirm CI compatibility scope**
 
 Inspect workflow references:
 
@@ -1818,7 +1818,7 @@ rtk rg -n "build.sh|godot-rag-build|uv run pytest|uv build" .github/workflows
 
 Expected: existing `bash -n build.sh` checks remain valid. The existing CI publish workflow may keep explicit docs/database/package commands because CI speed is not the goal of this change.
 
-- [ ] **Step 6: Update OpenSpec tasks**
+- [x] **Step 6: Update OpenSpec tasks**
 
 Edit `openspec/changes/build-efficiency/tasks.md` so completed implementation items are checked:
 
@@ -1830,7 +1830,7 @@ Edit `openspec/changes/build-efficiency/tasks.md` so completed implementation it
 
 Apply the same `[x]` update to sections 2 through 5 only for behavior verified by Steps 1 through 5.
 
-- [ ] **Step 7: Commit final verification bookkeeping**
+- [x] **Step 7: Commit final verification bookkeeping**
 
 Run:
 
