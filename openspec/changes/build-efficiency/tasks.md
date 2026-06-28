@@ -17,8 +17,8 @@
 - [x] 3.1 Port the local wheel build flow from `build.sh` into the Python orchestrator.
 - [x] 3.2 Preserve release database diagnostics and git-ignore validation for generated database outputs.
 - [x] 3.3 Preserve optional Scene Manager wiki inclusion and cleanup behavior.
-- [ ] 3.4 Implement `publish --target pypi|testpypi` with mandatory full build, tests, diagnostics, package version checks, and upload.
-- [ ] 3.5 Ensure publish does not expose a skip-tests bypass.
+- [x] 3.4 Implement `publish --target pypi|testpypi` with mandatory full build, tests, diagnostics, package version checks, and upload.
+- [x] 3.5 Ensure publish does not expose a skip-tests bypass.
 
 ## 4. Tests and Compatibility
 
