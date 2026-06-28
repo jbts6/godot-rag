@@ -8,4 +8,4 @@
 - [x] Add regression coverage for empty `vec_chunks` and vector row-count mismatch search metadata.
 - [x] Run focused semantic/search tests.
 - [x] Run full test suite.
-- [ ] Re-run release DB diagnostics when local release DB is available.
+- [x] Re-run release DB diagnostics when local release DB is available.
