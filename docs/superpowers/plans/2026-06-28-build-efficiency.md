@@ -2,6 +2,7 @@
 change: build-efficiency
 design-doc: docs/superpowers/specs/2026-06-28-build-efficiency-design.md
 base-ref: 752d1fff4f69cc473b40f953aa12a389d8b41411
+archived-with: 2026-06-28-build-efficiency
 ---
 
 # Build Efficiency Implementation Plan
@@ -28,6 +29,7 @@ base-ref: 752d1fff4f69cc473b40f953aa12a389d8b41411
 - `build.sh` 不得保留 docs conversion、RAG database build、package assembly、upload 等主构建逻辑。
 - 每个实现任务完成后运行该任务列出的测试命令并提交；提交前用 `rtk git status --short` 检查生成物没有进入 git 跟踪。
 
+archived-with: 2026-06-28-build-efficiency
 ---
 
 ## File Structure

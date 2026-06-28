@@ -2,6 +2,8 @@
 comet_change: build-efficiency
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-28-build-efficiency
+status: final
 ---
 
 # Build Efficiency Technical Design
