@@ -757,6 +757,86 @@ class RegressionTests(unittest.TestCase):
                 self.assertIn("mode", output["metadata"])
                 self.assertIn("results", output)
 
+    def test_cli_search_debug_text_includes_metadata(self):
+        from rag import embeddings
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n"
+                "## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\n"
+                "Returns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            with patch.object(embeddings, "generate_embeddings", return_value=[[0.0] * 256]):
+                db_path = Path(tmp) / "test.db"
+                build_database(docs, db_path)
+
+                args = MagicMock()
+                args.db = str(db_path)
+                args.query = "timer stopped"
+                args.limit = 3
+                args.json = False
+                args.no_expand = True
+                args.debug_search = True
+
+                import io
+                from contextlib import redirect_stdout
+
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    cmd_search(args)
+                output = f.getvalue()
+
+                # Text mode should include metadata header
+                self.assertIn("search_mode:", output)
+                self.assertIn("vector_available:", output)
+
+    def test_cli_search_without_debug_no_metadata(self):
+        from rag import embeddings
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n"
+                "## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\n"
+                "Returns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            with patch.object(embeddings, "generate_embeddings", return_value=[[0.0] * 256]):
+                db_path = Path(tmp) / "test.db"
+                build_database(docs, db_path)
+
+                args = MagicMock()
+                args.db = str(db_path)
+                args.query = "timer stopped"
+                args.limit = 3
+                args.json = False
+                args.no_expand = True
+                args.debug_search = False
+
+                import io
+                from contextlib import redirect_stdout
+
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    cmd_search(args)
+                output = f.getvalue()
+
+                # Without debug_search, should not include metadata
+                self.assertNotIn("search_mode:", output)
+                self.assertNotIn("vector_available:", output)
+
 
 if __name__ == "__main__":
     unittest.main()
