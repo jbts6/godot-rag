@@ -1,6 +1,6 @@
 # Tasks
 
-- [ ] Replace `rst2md/tests/test_semantic_search.py` tests that depend on `godot_rag/docs-md` with deterministic `tmp_path` fixtures.
+- [x] Replace `rst2md/tests/test_semantic_search.py` tests that depend on `godot_rag/docs-md` with deterministic `tmp_path` fixtures.
 - [ ] Add a regression test showing ordinary pytest does not require ignored `godot_rag/` generated state.
 - [ ] Make `--debug-search` metadata visible in text mode, or explicitly reject/redirect non-JSON debug usage.
 - [ ] Add CLI coverage for `--debug-search` text output and JSON output.

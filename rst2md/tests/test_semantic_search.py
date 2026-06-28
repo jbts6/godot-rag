@@ -11,10 +11,56 @@ from rag.store import (
 
 
 @pytest.fixture
-def test_db(tmp_path):
-    """Build a small test database."""
+def test_db(tmp_path, monkeypatch):
+    """Build a small test database with deterministic fixtures."""
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    tutorials = docs / "tutorials"
+    classes.mkdir(parents=True)
+    tutorials.mkdir(parents=True)
+
+    # Create class docs with see_also relations
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "## Methods\n\n"
+        "`void` **start**()\n\nStarts the countdown timer.\n\n"
+        "`void` **stop**()\n\nStops the countdown timer.\n\n"
+        "## See Also\n\n"
+        "- `SceneTree`\n"
+        "- `Node`\n",
+        encoding="utf-8",
+    )
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAdds a child node to the scene tree.\n\n"
+        "## See Also\n\n"
+        "- `Timer`\n"
+        "- `SceneTree`\n",
+        encoding="utf-8",
+    )
+    (classes / "class_scene_tree.md").write_text(
+        "# SceneTree\n\n"
+        "## Methods\n\n"
+        "`void` **quit**()\n\nQuits the application.\n\n"
+        "## See Also\n\n"
+        "- `Node`\n"
+        "- `Timer`\n",
+        encoding="utf-8",
+    )
+    (tutorials / "scene_tree.md").write_text(
+        "# Scene Tree\n\n"
+        "Nodes are arranged as a scene tree. Use add_child to attach nodes.\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts]
+    )
     db_path = tmp_path / "test.db"
-    build_database(Path("godot_rag/docs-md"), db_path)
+    build_database(docs, db_path)
     return db_path
 
 
@@ -24,14 +70,14 @@ def test_see_also_relations(test_db):
         count = conn.execute(
             "SELECT COUNT(*) FROM chunk_relations WHERE relation = 'see_also'"
         ).fetchone()[0]
-        assert count >= 100, f"Expected >= 100 see_also relations, got {count}"
+        assert count >= 3, f"Expected >= 3 see_also relations, got {count}"
 
 
 def test_vec_chunks_populated(test_db):
     """Verify vec_chunks table is populated."""
     with get_connection(test_db) as conn:
         count = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
-        assert count >= 28000, f"Expected >= 28000 vec_chunks, got {count}"
+        assert count >= 1, f"Expected >= 1 vec_chunks, got {count}"
 
 
 def test_search_skips_embeddings_when_vec_table_missing(tmp_path, monkeypatch):
