@@ -447,7 +447,7 @@ rtk uv run pytest rst2md/tests/test_build_release_stages.py -q
 
 Expected: FAIL because stage and reporting modules do not exist.
 
-- [ ] **Step 3: Implement stage primitives**
+- [x] **Step 3: Implement stage primitives**
 
 Create `godot_rag_build/stages.py`:
 
