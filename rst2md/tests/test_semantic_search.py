@@ -240,7 +240,8 @@ def test_search_metadata_reports_vector_query_failure(tmp_path, monkeypatch):
     def fail_vector_search(*args, **kwargs):
         raise RuntimeError("vector query failed")
 
-    monkeypatch.setattr(store, "_run_vector_query", fail_vector_search)
+    from rag import searcher
+    monkeypatch.setattr(searcher, "_run_vector_query", fail_vector_search)
     response = store.search_database_with_metadata(db_path, "child node", limit=3, expand_graph=False)
 
     assert response.results
