@@ -2,6 +2,7 @@
 change: stabilize-search-quality-loop
 design-doc: docs/superpowers/specs/2026-06-29-stabilize-search-quality-loop-design.md
 base-ref: 8c531568f7c29f90992aaef8b14a02e5a5ec0680
+archived-with: 2026-06-29-stabilize-search-quality-loop
 ---
 
 # Stabilize Search Quality Loop Implementation Plan
@@ -23,6 +24,7 @@ base-ref: 8c531568f7c29f90992aaef8b14a02e5a5ec0680
 - Keep addon queries report-only unless diagnostics prove expected addon rows exist in the canonical database.
 - Use TDD unless the user explicitly chooses direct execution.
 
+archived-with: 2026-06-29-stabilize-search-quality-loop
 ---
 
 ## File Structure

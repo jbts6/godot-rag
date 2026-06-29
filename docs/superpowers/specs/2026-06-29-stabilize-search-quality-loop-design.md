@@ -2,6 +2,8 @@
 comet_change: stabilize-search-quality-loop
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-29-stabilize-search-quality-loop
+status: final
 ---
 
 # Stabilize Search Quality Loop - Technical Design
