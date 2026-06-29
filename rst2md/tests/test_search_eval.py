@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from rag.models import SearchResult
 from rag.search_eval import evaluate_results, load_queries
 
@@ -446,3 +448,63 @@ def test_database_fingerprint_returns_nonzero_counts(tmp_path, monkeypatch):
     assert fp.documents > 0
     assert fp.chunks > 0
     assert fp.symbols > 0
+
+
+def test_apply_baseline_writes_metadata(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("godot_rag.db", 123, 10, 20, 30, 20),
+        query_suite_hash="abc123",
+    )
+    baseline = tmp_path / "baseline.json"
+
+    updated = apply_baseline(report, baseline, write_baseline=True)
+    payload = json.loads(baseline.read_text(encoding="utf-8"))
+
+    assert updated.baseline_written is True
+    assert payload["metadata"]["query_suite_hash"] == "abc123"
+    assert payload["metadata"]["database"]["chunks"] == 20
+
+
+def test_baseline_write_rejects_invalid_database(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("empty.sqlite", 0, 0, 0, 0, 0),
+        query_suite_hash="abc123",
+    )
+
+    with pytest.raises(ValueError, match="documents=0"):
+        apply_baseline(report, tmp_path / "baseline.json", write_baseline=True)
+
+
+def test_category_coverage_warns_missing_addon_category():
+    from rag.search_eval import GoldenQuery, evaluate_results, calculate_metrics
+
+    query = GoldenQuery(
+        id="q1",
+        query="test query",
+        category="class",
+        required_at=5,
+        expected_paths=("classes/class_node.md",),
+    )
+    result = evaluate_results(query, [_result(path="classes/class_node.md")])
+    overall, categories = calculate_metrics([result])
+    report = EvaluationReport(
+        overall=overall,
+        categories=categories,
+        failures=[],
+        query_results=[result],
+        graph_changes=[],
+    )
+
+    data = report_to_dict(report)
+
+    assert "addon" in data["category_warnings"]

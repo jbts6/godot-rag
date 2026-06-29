@@ -248,13 +248,17 @@ def cmd_eval_search(args):
     queries = load_queries(queries_path)
     report = evaluate_database(db_path, queries, limit=args.limit, compare_graph=args.compare_graph)
     baseline_path = Path(args.baseline) if args.baseline else None
-    report = apply_baseline(
-        report,
-        baseline_path,
-        write_baseline=args.write_baseline,
-        hit5_drop_threshold=args.hit5_drop_threshold,
-        mrr5_relative_drop_threshold=args.mrr5_relative_drop_threshold,
-    )
+    try:
+        report = apply_baseline(
+            report,
+            baseline_path,
+            write_baseline=args.write_baseline,
+            hit5_drop_threshold=args.hit5_drop_threshold,
+            mrr5_relative_drop_threshold=args.mrr5_relative_drop_threshold,
+        )
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
     if args.json:
         print(json.dumps(report_to_dict(report), ensure_ascii=False, indent=2))
     else:
