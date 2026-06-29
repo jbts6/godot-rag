@@ -620,6 +620,30 @@ def _query_result_to_dict(result: QueryResult) -> dict:
     }
 
 
+def _package_version() -> str:
+    """Resolve the godot-rag package version, falling back to pyproject.toml then 'unknown'."""
+    try:
+        from importlib.metadata import version as _dist_version
+
+        return _dist_version("godot-rag")
+    except Exception:
+        pass
+    try:
+        import tomllib
+
+        pyproject = Path(__file__).resolve().parents[2] / "pyproject.toml"
+        with pyproject.open("rb") as handle:
+            data = tomllib.load(handle)
+        return str(data["project"]["version"])
+    except Exception:
+        return "unknown"
+
+
+def _evaluation_versions() -> dict[str, str]:
+    version = _package_version()
+    return {"evaluator": version, "search": version}
+
+
 def report_to_dict(report: EvaluationReport) -> dict:
     category_warnings = report.category_warnings
     if not category_warnings and report.query_results:
@@ -651,5 +675,6 @@ def report_to_dict(report: EvaluationReport) -> dict:
                 "symbols": report.database.symbols,
                 "vectors": report.database.vectors,
             },
+            "versions": _evaluation_versions(),
         }
     return result

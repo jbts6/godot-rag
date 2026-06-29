@@ -566,6 +566,46 @@ def test_apply_baseline_writes_metadata(tmp_path):
     assert payload["metadata"]["database"]["chunks"] == 20
 
 
+def test_report_to_dict_includes_version_metadata():
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("godot_rag.db", 123, 10, 20, 30, 20),
+        query_suite_hash="abc123",
+    )
+
+    data = report_to_dict(report)
+
+    versions = data["metadata"]["versions"]
+    assert isinstance(versions["evaluator"], str) and versions["evaluator"]
+    assert isinstance(versions["search"], str) and versions["search"]
+    assert versions["evaluator"] == versions["search"]
+
+
+def test_apply_baseline_write_includes_version_metadata(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("godot_rag.db", 123, 10, 20, 30, 20),
+        query_suite_hash="abc123",
+    )
+    baseline = tmp_path / "baseline.json"
+
+    apply_baseline(report, baseline, write_baseline=True)
+    payload = json.loads(baseline.read_text(encoding="utf-8"))
+
+    versions = payload["metadata"]["versions"]
+    assert versions["evaluator"]
+    assert versions["search"]
+    assert versions["evaluator"] == versions["search"]
+
+
 def test_baseline_write_rejects_invalid_database(tmp_path):
     report = EvaluationReport(
         overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
