@@ -151,3 +151,42 @@ def test_graph_comparison_marks_changed_query_status(tmp_path, monkeypatch):
     report = evaluate_database(db_path, queries, limit=5, compare_graph=True)
 
     assert all(hasattr(result, "graph_changed") for result in report.query_results)
+
+
+import json
+
+from rag.search_eval import EvaluationReport, apply_baseline
+
+
+def test_apply_baseline_writes_first_run_baseline(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+    )
+    baseline = tmp_path / "baseline.json"
+
+    updated = apply_baseline(report, baseline, write_baseline=True)
+
+    assert updated.baseline_written is True
+    assert json.loads(baseline.read_text(encoding="utf-8"))["overall"]["hit@5"] == 1.0
+
+
+def test_apply_baseline_marks_regression_failure(tmp_path):
+    baseline = tmp_path / "baseline.json"
+    baseline.write_text(json.dumps({"overall": {"hit@5": 1.0, "mrr@5": 1.0}}), encoding="utf-8")
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+    )
+
+    updated = apply_baseline(report, baseline, write_baseline=False)
+
+    assert updated.regression_failed is True
+    assert updated.baseline_compared is True
+    assert updated.regression_messages

@@ -226,6 +226,83 @@ def evaluate_database(
     )
 
 
+def apply_baseline(
+    report: EvaluationReport,
+    baseline_path: Path | None,
+    *,
+    write_baseline: bool = False,
+    hit5_drop_threshold: float = 0.05,
+    mrr5_relative_drop_threshold: float = 0.10,
+) -> EvaluationReport:
+    if baseline_path is None:
+        return report
+
+    if write_baseline:
+        baseline_path.parent.mkdir(parents=True, exist_ok=True)
+        baseline_path.write_text(json.dumps(report_to_dict(report), ensure_ascii=False, indent=2), encoding="utf-8")
+        return EvaluationReport(
+            overall=report.overall,
+            categories=report.categories,
+            failures=report.failures,
+            query_results=report.query_results,
+            graph_changes=report.graph_changes,
+            regression_failed=False,
+            regression_messages=(),
+            baseline_written=True,
+            baseline_compared=False,
+        )
+
+    if not baseline_path.exists():
+        return report
+
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    failed, messages = compare_with_baseline(
+        report.overall,
+        baseline.get("overall", {}),
+        hit5_drop_threshold=hit5_drop_threshold,
+        mrr5_relative_drop_threshold=mrr5_relative_drop_threshold,
+    )
+    return EvaluationReport(
+        overall=report.overall,
+        categories=report.categories,
+        failures=report.failures,
+        query_results=report.query_results,
+        graph_changes=report.graph_changes,
+        regression_failed=failed,
+        regression_messages=tuple(messages),
+        baseline_written=False,
+        baseline_compared=True,
+    )
+
+
+def format_text_report(report: EvaluationReport) -> str:
+    lines = ["=== Search Quality Evaluation ==="]
+    lines.append(
+        "overall: "
+        f"count={report.overall['count']} "
+        f"hit@1={report.overall['hit@1']:.3f} "
+        f"hit@3={report.overall['hit@3']:.3f} "
+        f"hit@5={report.overall['hit@5']:.3f} "
+        f"mrr@5={report.overall['mrr@5']:.3f}"
+    )
+    for category, metrics in report.categories.items():
+        lines.append(
+            f"{category}: count={metrics['count']} "
+            f"hit@5={metrics['hit@5']:.3f} mrr@5={metrics['mrr@5']:.3f}"
+        )
+    if report.baseline_written:
+        lines.append("baseline: written")
+    if report.baseline_compared:
+        lines.append("baseline: compared")
+    for message in report.regression_messages:
+        lines.append(f"regression: {message}")
+    if report.failures:
+        lines.append("failures:")
+        for failure in report.failures:
+            lines.append(f"- {failure.query.id}: {failure.failure_classification}")
+    return "\n".join(lines)
+
+
 def _query_result_to_dict(result: QueryResult) -> dict:
     return {
         "id": result.query.id,
