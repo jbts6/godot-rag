@@ -358,6 +358,67 @@ def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch)
     assert "best_rank=" in text
 
 
+def test_query_suite_hash_is_stable_for_same_queries():
+    from rag.search_eval import GoldenQuery, query_suite_hash
+
+    queries = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach node to scene tree",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+            tags=("normalization", "alias"),
+        )
+    ]
+
+    assert query_suite_hash(queries) == query_suite_hash(list(queries))
+
+
+def test_query_suite_hash_changes_when_query_definition_changes():
+    from rag.search_eval import GoldenQuery, query_suite_hash
+
+    original = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach node to scene tree",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+        )
+    ]
+    changed = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach child node",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+        )
+    ]
+
+    assert query_suite_hash(original) != query_suite_hash(changed)
+
+
+def test_validate_baseline_input_rejects_empty_counts():
+    from rag.search_eval import DatabaseFingerprint, validate_baseline_input
+
+    fingerprint = DatabaseFingerprint(
+        path="empty.sqlite",
+        size_bytes=0,
+        documents=0,
+        chunks=0,
+        symbols=0,
+        vectors=0,
+    )
+
+    messages = validate_baseline_input(fingerprint)
+
+    assert "documents=0" in messages
+    assert "chunks=0" in messages
+    assert "symbols=0" in messages
+
+
 def test_packaged_eval_queries_are_broad_and_tiered():
     queries = load_queries(Path("rst2md/rag/search_eval_queries.json"))
     ids = [query.id for query in queries]

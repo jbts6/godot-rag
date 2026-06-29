@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -20,6 +21,47 @@ class GoldenQuery:
     expected_addons: tuple[str, ...] = ()
     report_only: bool = False
     tags: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DatabaseFingerprint:
+    path: str
+    size_bytes: int
+    documents: int
+    chunks: int
+    symbols: int
+    vectors: int | None
+
+
+def query_suite_hash(queries: Sequence[GoldenQuery]) -> str:
+    payload = [
+        {
+            "id": query.id,
+            "query": query.query,
+            "category": query.category,
+            "required_at": query.required_at,
+            "expected_symbols": list(query.expected_symbols),
+            "expected_paths": list(query.expected_paths),
+            "expected_doc_types": list(query.expected_doc_types),
+            "expected_addons": list(query.expected_addons),
+            "tags": list(query.tags),
+            "report_only": query.report_only,
+        }
+        for query in sorted(queries, key=lambda item: item.id)
+    ]
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def validate_baseline_input(fingerprint: DatabaseFingerprint) -> list[str]:
+    messages = []
+    if fingerprint.documents == 0:
+        messages.append("documents=0")
+    if fingerprint.chunks == 0:
+        messages.append("chunks=0")
+    if fingerprint.symbols == 0:
+        messages.append("symbols=0")
+    return messages
 
 
 @dataclass(frozen=True)
