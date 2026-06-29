@@ -12,12 +12,12 @@
 
 ## 3. Search Quality Promotion
 
-- [ ] 3.1 Add promotion checks that determine whether report-only queries are eligible to become gating queries.
-- [ ] 3.2 Promote only stable natural-language symbol queries that pass against the canonical database.
-- [ ] 3.3 Keep addon and missing-data queries report-only until diagnostics prove expected rows are present.
+- [x] 3.1 Add promotion checks that determine whether report-only queries are eligible to become gating queries.
+- [x] 3.2 Promote only stable natural-language symbol queries that pass against the canonical database.
+- [x] 3.3 Keep addon and missing-data queries report-only until diagnostics prove expected rows are present.
 
 ## 4. Verification
 
-- [ ] 4.1 Add focused tests for baseline metadata, invalid database rejection, query planning, reranking, and promotion rules.
-- [ ] 4.2 Refresh the real-database baseline after quality improvements pass.
-- [ ] 4.3 Run focused search tests, full search quality evaluation, and baseline comparison.
+- [x] 4.1 Add focused tests for baseline metadata, invalid database rejection, query planning, reranking, and promotion rules.
+- [x] 4.2 Refresh the real-database baseline after quality improvements pass.
+- [x] 4.3 Run focused search tests, full search quality evaluation, and baseline comparison.
