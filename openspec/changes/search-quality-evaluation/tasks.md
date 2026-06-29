@@ -7,10 +7,10 @@
 
 ## 2. Deterministic Fixture Evaluation
 
-- [ ] 2.1 Create a small deterministic fixture database builder or fixture dataset covering class, tutorial, addon, symbol-variant, doc type, and graph expansion cases.
-- [ ] 2.2 Add 30-50 categorized fixture golden queries with stable expected result constraints.
-- [ ] 2.3 Add focused tests that execute fixture evaluation without relying on generated local database artifacts.
-- [ ] 2.4 Add graph expansion enabled/disabled comparison coverage for queries where relation expansion matters.
+- [x] 2.1 Create a small deterministic fixture database builder or fixture dataset covering class, tutorial, addon, symbol-variant, doc type, and graph expansion cases.
+- [x] 2.2 Add 30-50 categorized fixture golden queries with stable expected result constraints.
+- [x] 2.3 Add focused tests that execute fixture evaluation without relying on generated local database artifacts.
+- [x] 2.4 Add graph expansion enabled/disabled comparison coverage for queries where relation expansion matters.
 
 ## 3. Real Database Evaluation And Regression Gate
 

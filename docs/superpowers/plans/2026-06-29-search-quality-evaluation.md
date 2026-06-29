@@ -414,7 +414,7 @@ rtk git commit -m "feat: add search quality evaluation metrics"
   - `evaluate_database(db_path: Path, queries: Sequence[GoldenQuery], *, limit: int = 5, compare_graph: bool = False) -> EvaluationReport`
   - `report_to_dict(report: EvaluationReport) -> dict`
 
-- [ ] **Step 1: Write failing tests for fixture database evaluation and graph comparison**
+- [x] **Step 1: Write failing tests for fixture database evaluation and graph comparison**
 
 Append to `rst2md/tests/test_search_eval.py`:
 
@@ -485,7 +485,7 @@ Run: `rtk uv run pytest -q rst2md/tests/test_search_eval.py::test_evaluate_datab
 
 Expected: FAIL because `EvaluationReport`, `evaluate_database`, and `report_to_dict` are not implemented.
 
-- [ ] **Step 2: Expand deterministic fixture query set**
+- [x] **Step 2: Expand deterministic fixture query set**
 
 Replace `rst2md/tests/fixtures/search_eval_fixture_queries.json` with at least these entries. Keep the full fixture between 30 and 50 entries by adding variants after this initial set; use `report_only: true` for experimental cases if needed.
 
@@ -531,7 +531,7 @@ Replace `rst2md/tests/fixtures/search_eval_fixture_queries.json` with at least t
 ]
 ```
 
-- [ ] **Step 3: Implement `EvaluationReport`, database evaluation, graph comparison, and report dict**
+- [x] **Step 3: Implement `EvaluationReport`, database evaluation, graph comparison, and report dict**
 
 Add to `rst2md/rag/search_eval.py`:
 
@@ -625,13 +625,13 @@ def report_to_dict(report: EvaluationReport) -> dict:
     }
 ```
 
-- [ ] **Step 4: Run fixture evaluation tests**
+- [x] **Step 4: Run fixture evaluation tests**
 
 Run: `rtk uv run pytest -q rst2md/tests/test_search_eval.py`
 
 Expected: PASS.
 
-- [ ] **Step 5: Commit Task 2**
+- [x] **Step 5: Commit Task 2**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py rst2md/tests/fixtures/search_eval_fixture_queries.json
