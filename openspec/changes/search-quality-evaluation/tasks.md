@@ -1,9 +1,9 @@
 ## 1. Evaluation Model And Metrics
 
-- [ ] 1.1 Define the golden-query fixture format and loader for query, category, top-K requirement, expected constraints, and report-only status.
-- [ ] 1.2 Implement metric calculation for `hit@1`, `hit@3`, `hit@5`, and `MRR@5` overall and by category.
-- [ ] 1.3 Implement failed-query result detail including expected constraints, observed top results, and failure classification.
-- [ ] 1.4 Add focused unit tests for metric calculation, expected-constraint matching, and failure classification.
+- [x] 1.1 Define the golden-query fixture format and loader for query, category, top-K requirement, expected constraints, and report-only status.
+- [x] 1.2 Implement metric calculation for `hit@1`, `hit@3`, `hit@5`, and `MRR@5` overall and by category.
+- [x] 1.3 Implement failed-query result detail including expected constraints, observed top results, and failure classification.
+- [x] 1.4 Add focused unit tests for metric calculation, expected-constraint matching, and failure classification.
 
 ## 2. Deterministic Fixture Evaluation
 
