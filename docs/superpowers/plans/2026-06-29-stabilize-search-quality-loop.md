@@ -322,10 +322,10 @@ def test_query_plan_detects_tutorial_and_addon_intent():
     assert addon.addon_intent == "addon"
 ```
 
-- [ ] **Step 2: Run tests and verify they fail**
+- [x] **Step 2: Run tests and verify they fail**
 
 ```bash
-rtk uv run pytest rst2md/tests/test_searcher_module.py -q
+rtk uv run pytest rst2md/tests/test_search_eval.py -q
 ```
 
 - [x] **Step 3: Implement `query_plan.py`**
@@ -535,7 +535,7 @@ rtk git commit -m "feat: rerank search results with query plan signals"
 - Consumes: failure diagnostics and `QueryResult`.
 - Produces: promotion eligibility checks and refreshed baseline.
 
-- [ ] **Step 1: Write failing tests for promotion eligibility**
+- [x] **Step 1: Write failing tests for promotion eligibility**
 
 Add tests:
 
@@ -579,7 +579,7 @@ If implementing promotion eligibility directly from `QueryResult` is cleaner, ad
 rtk uv run pytest rst2md/tests/test_searcher_module.py -q
 ```
 
-- [ ] **Step 3: Implement promotion status**
+- [x] **Step 3: Implement promotion status**
 
 Add:
 
@@ -592,7 +592,7 @@ class PromotionStatus:
 
 Implement promotion logic with explicit reasons: `not_report_only`, `expected_not_present`, `not_passing`, `rank_too_low`, `eligible`, `addon_data_unstable`.
 
-- [ ] **Step 4: Run canonical eval to decide promotions**
+- [x] **Step 4: Run canonical eval to decide promotions**
 
 Run:
 
@@ -608,7 +608,7 @@ Inspect the JSON summary for natural-language symbol queries:
 
 Promote only the ones now passing within `required_at` and with expected targets present.
 
-- [ ] **Step 5: Update query fixture and refresh baseline**
+- [x] **Step 5: Update query fixture and refresh baseline**
 
 Edit `rst2md/rag/search_eval_queries.json` by removing `"report_only": true` only from passing natural-language symbol queries. Do not promote addon queries in this task.
 
@@ -626,7 +626,7 @@ rtk uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-qualit
 
 Expected: non-report-only failures are zero, baseline comparison succeeds, and metadata is present in `docs/search-quality/baseline.json`.
 
-- [ ] **Step 6: Run final focused suite and commit**
+- [x] **Step 6: Run final focused suite and commit**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic_search.py -q
@@ -636,27 +636,27 @@ rtk git commit -m "feat: promote stable search quality queries"
 
 ## Final Verification
 
-- [ ] Run focused tests:
+- [x] Run focused tests:
 
 ```bash
 rtk uv run pytest rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic_search.py -q
 ```
 
-- [ ] Run baseline comparison:
+- [x] Run baseline comparison:
 
 ```bash
 rtk uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph
 ```
 
-- [ ] Run build:
+- [x] Run build:
 
 ```bash
 rtk uv build
 ```
 
-- [ ] Update OpenSpec task checkboxes in `openspec/changes/stabilize-search-quality-loop/tasks.md`.
+- [x] Update OpenSpec task checkboxes in `openspec/changes/stabilize-search-quality-loop/tasks.md`.
 
-- [ ] Commit final task/status updates:
+- [x] Commit final task/status updates:
 
 ```bash
 rtk git add openspec/changes/stabilize-search-quality-loop/tasks.md
