@@ -9,7 +9,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
 
-from rag.models import SearchResult
+from rag.models import SearchMetadata, SearchResult
 
 
 @dataclass(frozen=True)
@@ -122,6 +122,8 @@ class FailureDiagnostics:
     best_rank: int | None
     best_rank_no_graph: int | None
     diagnostic_window: int
+    search_mode: str = ""
+    fallback_reason: str = ""
 
 
 @dataclass(frozen=True)
@@ -239,6 +241,7 @@ def diagnose_failure(
     no_graph_results: Sequence[SearchResult],
     *,
     diagnostic_window: int,
+    metadata: SearchMetadata | None = None,
 ) -> FailureDiagnostics:
     expected_rows = _fetch_expected_rows(db_path, query)
     return FailureDiagnostics(
@@ -247,6 +250,8 @@ def diagnose_failure(
         best_rank=_find_matching_rank(query, expanded_results[:diagnostic_window]),
         best_rank_no_graph=_find_matching_rank(query, no_graph_results[:diagnostic_window]),
         diagnostic_window=diagnostic_window,
+        search_mode=metadata.mode if metadata else "",
+        fallback_reason=metadata.fallback_reason if metadata else "",
     )
 
 
@@ -426,7 +431,7 @@ def evaluate_database(
     compare_graph: bool = False,
     diagnostic_limit: int = 50,
 ) -> EvaluationReport:
-    from rag.searcher import search_database
+    from rag.searcher import search_database, search_database_with_metadata
 
     query_results = []
     graph_changes = []
@@ -435,7 +440,8 @@ def evaluate_database(
     diagnostic_window = max(required_window, diagnostic_limit)
     for query in queries:
         started = time.perf_counter()
-        results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=True)
+        response = search_database_with_metadata(db_path, query.query, limit=diagnostic_window, expand_graph=True)
+        results = response.results
         elapsed_seconds.append(time.perf_counter() - started)
         evaluated = evaluate_results(query, results, required_window=required_window)
         no_graph_results = []
@@ -455,6 +461,7 @@ def evaluate_database(
                     results,
                     no_graph_results,
                     diagnostic_window=diagnostic_window,
+                    metadata=response.metadata,
                 ),
             )
         query_results.append(evaluated)
@@ -608,6 +615,12 @@ def format_text_report(report: EvaluationReport) -> str:
                     f"best_rank_no_graph={failure.diagnostics.best_rank_no_graph} "
                     f"diagnostic_window={failure.diagnostics.diagnostic_window}"
                 )
+                if failure.diagnostics.search_mode:
+                    lines.append(
+                        "  "
+                        f"search_mode={failure.diagnostics.search_mode} "
+                        f"fallback_reason={failure.diagnostics.fallback_reason}"
+                    )
             if failure.observed:
                 lines.append("  observed:")
                 for observed in failure.observed:
@@ -646,6 +659,8 @@ def _query_result_to_dict(result: QueryResult) -> dict:
                 "best_rank": result.diagnostics.best_rank,
                 "best_rank_no_graph": result.diagnostics.best_rank_no_graph,
                 "diagnostic_window": result.diagnostics.diagnostic_window,
+                "search_mode": result.diagnostics.search_mode,
+                "fallback_reason": result.diagnostics.fallback_reason,
             }
             if result.diagnostics
             else None

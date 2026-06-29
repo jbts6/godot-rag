@@ -689,3 +689,35 @@ def test_report_to_dict_includes_latency_summary():
     )
 
     assert report_to_dict(report)["latency"] == {"count": 2, "p50_ms": 1.0, "p95_ms": 2.0}
+
+
+def test_failure_diagnostics_include_search_execution_metadata():
+    from rag.search_eval import FailureDiagnostics, GoldenQuery, QueryResult, _query_result_to_dict
+
+    query = GoldenQuery(
+        id="missing",
+        query="missing",
+        category="symbol",
+        expected_symbols=("Missing.symbol",),
+    )
+    result = QueryResult(
+        query=query,
+        matched_rank=None,
+        passed=False,
+        failure_classification="missing_recall",
+        observed=[],
+        diagnostics=FailureDiagnostics(
+            expected_present=False,
+            expected_rows=(),
+            best_rank=None,
+            best_rank_no_graph=None,
+            diagnostic_window=50,
+            search_mode="fts_only",
+            fallback_reason="missing_vec_chunks",
+        ),
+    )
+
+    data = _query_result_to_dict(result)
+
+    assert data["diagnostics"]["search_mode"] == "fts_only"
+    assert data["diagnostics"]["fallback_reason"] == "missing_vec_chunks"
