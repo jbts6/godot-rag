@@ -1,0 +1,39 @@
+[
+  {
+    "id": "node-add-child",
+    "query": "attach node to scene tree",
+    "category": "class",
+    "required_at": 5,
+    "expected_symbols": ["Node.add_child"],
+    "tags": ["symbol_variant"]
+  },
+  {
+    "id": "timer-stopped",
+    "query": "check if timer is stopped",
+    "category": "class",
+    "required_at": 5,
+    "expected_symbols": ["Timer.is_stopped"]
+  },
+  {
+    "id": "signal-emit",
+    "query": "emit a signal from code",
+    "category": "class",
+    "required_at": 5,
+    "expected_symbols": ["Signal.emit"]
+  },
+  {
+    "id": "scene-tree-tutorial",
+    "query": "how to use scene tree nodes",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_doc_types": ["tutorial"]
+  },
+  {
+    "id": "addon-state-machine",
+    "query": "state machine addon",
+    "category": "addon",
+    "required_at": 5,
+    "expected_doc_types": ["addon"],
+    "report_only": true
+  }
+]

@@ -8,6 +8,13 @@ from pathlib import Path
 from importlib import resources
 
 from rag.diagnostics import run_diagnostics
+from rag.search_eval import (
+    apply_baseline,
+    evaluate_database,
+    format_text_report,
+    load_queries,
+    report_to_dict,
+)
 from rag.store import (
     build_database,
     get_stats,
@@ -230,6 +237,32 @@ def _add_search_args(parser):
     parser.add_argument("--no-expand", action="store_true", help="Disable graph expansion")
 
 
+def _default_eval_queries_path() -> Path:
+    return Path(__file__).with_name("search_eval_queries.json")
+
+
+def cmd_eval_search(args):
+    """Evaluate search quality against golden queries."""
+    db_path = _require_db(args)
+    queries_path = Path(args.queries) if args.queries else _default_eval_queries_path()
+    queries = load_queries(queries_path)
+    report = evaluate_database(db_path, queries, limit=args.limit, compare_graph=args.compare_graph)
+    baseline_path = Path(args.baseline) if args.baseline else None
+    report = apply_baseline(
+        report,
+        baseline_path,
+        write_baseline=args.write_baseline,
+        hit5_drop_threshold=args.hit5_drop_threshold,
+        mrr5_relative_drop_threshold=args.mrr5_relative_drop_threshold,
+    )
+    if args.json:
+        print(json.dumps(report_to_dict(report), ensure_ascii=False, indent=2))
+    else:
+        print(format_text_report(report))
+    if report.regression_failed:
+        sys.exit(1)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Godot Docs RAG CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -284,6 +317,18 @@ def main():
     diagnostics_parser.add_argument("--json", action="store_true", help="Output as JSON")
     diagnostics_parser.add_argument("--no-model", action="store_true", help="Skip embedding model availability check")
     diagnostics_parser.set_defaults(func=cmd_diagnostics)
+
+    eval_parser = subparsers.add_parser("eval-search", help="Evaluate search quality")
+    eval_parser.add_argument("--db", help="Path to SQLite database")
+    eval_parser.add_argument("--queries", help="Path to golden query JSON file")
+    eval_parser.add_argument("--baseline", help="Path to baseline JSON file")
+    eval_parser.add_argument("--write-baseline", action="store_true", help="Write baseline JSON and skip comparison")
+    eval_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    eval_parser.add_argument("--limit", type=int, default=5, help="Max results per query")
+    eval_parser.add_argument("--compare-graph", action="store_true", help="Compare graph expansion enabled and disabled")
+    eval_parser.add_argument("--hit5-drop-threshold", type=float, default=0.05, help="Allowed hit@5 drop before failing")
+    eval_parser.add_argument("--mrr5-relative-drop-threshold", type=float, default=0.10, help="Allowed relative MRR@5 drop before failing")
+    eval_parser.set_defaults(func=cmd_eval_search)
 
     args = parser.parse_args()
     args.func(args)

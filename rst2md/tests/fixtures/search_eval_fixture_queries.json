@@ -1,0 +1,234 @@
+[
+  {
+    "id": "node-add-child",
+    "query": "attach node to scene tree",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "tags": ["symbol_variant"]
+  },
+  {
+    "id": "node-add-child-symbol",
+    "query": "Node.add_child",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Node.add_child"],
+    "tags": ["normalization"]
+  },
+  {
+    "id": "timer-start",
+    "query": "start countdown timer",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"]
+  },
+  {
+    "id": "timer-stopped",
+    "query": "check if timer is stopped",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"]
+  },
+  {
+    "id": "scene-tree-tutorial",
+    "query": "scene tree attach nodes tutorial",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"]
+  },
+  {
+    "id": "node-scene-tree",
+    "query": "Node scene tree",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "tags": ["symbol_variant"]
+  },
+  {
+    "id": "timer-methods",
+    "query": "timer methods start stop",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"]
+  },
+  {
+    "id": "add-child-method",
+    "query": "add_child method",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Node.add_child"],
+    "tags": ["normalization"]
+  },
+  {
+    "id": "scene-tree-nodes",
+    "query": "how to attach nodes in scene tree",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"]
+  },
+  {
+    "id": "timer-countdown",
+    "query": "countdown timer node",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"]
+  },
+  {
+    "id": "node-child-attach",
+    "query": "child node attach",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "tags": ["symbol_variant"]
+  },
+  {
+    "id": "is-stopped-check",
+    "query": "is_stopped",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Timer.is_stopped"],
+    "tags": ["normalization"]
+  },
+  {
+    "id": "scene-tree-attach",
+    "query": "scene tree attach",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"]
+  },
+  {
+    "id": "node-scene",
+    "query": "node in scene",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"]
+  },
+  {
+    "id": "timer-start-method",
+    "query": "timer start",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Timer.start"],
+    "tags": ["normalization"]
+  },
+  {
+    "id": "tutorial-tree",
+    "query": "tutorial scene tree",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"]
+  },
+  {
+    "id": "node-add",
+    "query": "add node",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "tags": ["symbol_variant"]
+  },
+  {
+    "id": "timer-stopped-bool",
+    "query": "timer stopped boolean",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"]
+  },
+  {
+    "id": "scene-tree-guide",
+    "query": "scene tree guide",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"]
+  },
+  {
+    "id": "node-tree-attach",
+    "query": "attach to tree node",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "report_only": true
+  },
+  {
+    "id": "timer-countdown-start",
+    "query": "start timer countdown",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"],
+    "report_only": true
+  },
+  {
+    "id": "add-child-node",
+    "query": "add child to node",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "tags": ["symbol_variant"],
+    "report_only": true
+  },
+  {
+    "id": "scene-attach-tutorial",
+    "query": "attach nodes scene tutorial",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"],
+    "report_only": true
+  },
+  {
+    "id": "timer-node-start",
+    "query": "timer node start method",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"],
+    "report_only": true
+  },
+  {
+    "id": "node-methods",
+    "query": "node methods",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "report_only": true
+  },
+  {
+    "id": "timer-methods-list",
+    "query": "timer available methods",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_timer.md"],
+    "report_only": true
+  },
+  {
+    "id": "scene-tree-overview",
+    "query": "scene tree overview",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"],
+    "report_only": true
+  },
+  {
+    "id": "node-child-method",
+    "query": "node child method",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Node.add_child"],
+    "tags": ["normalization"],
+    "report_only": true
+  },
+  {
+    "id": "timer-is-stopped",
+    "query": "timer is stopped method",
+    "category": "symbol",
+    "required_at": 3,
+    "expected_symbols": ["Timer.is_stopped"],
+    "tags": ["normalization"],
+    "report_only": true
+  },
+  {
+    "id": "scene-tree-basics",
+    "query": "scene tree basics",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_paths": ["tutorials/scene_tree.md"],
+    "report_only": true
+  }
+]
