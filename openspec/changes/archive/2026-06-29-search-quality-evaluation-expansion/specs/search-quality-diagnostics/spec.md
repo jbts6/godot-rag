@@ -1,8 +1,5 @@
-# search-quality-diagnostics Specification
+## MODIFIED Requirements
 
-## Purpose
-TBD - created by archiving change search-quality-optimization-loop. Update Purpose after archive.
-## Requirements
 ### Requirement: Failure diagnostics for evaluation queries
 The system SHALL attach diagnostic metadata to failed evaluation queries when `diagnostic_limit` is specified. Diagnostics SHALL also expose enough search execution metadata to distinguish ranking failures from degraded search mode, vector fallback, graph expansion changes, and filter precision issues.
 
@@ -27,26 +24,6 @@ The system SHALL attach diagnostic metadata to failed evaluation queries when `d
 - **WHEN** evaluation produces failures with diagnostics enabled
 - **THEN** the text report SHALL include `diagnostics:` lines showing `expected_present`, `best_rank` values, search mode, and fallback/degraded reason
 
-### Requirement: Diagnostic limit is opt-in
-The system SHALL only compute diagnostics when `diagnostic_limit` parameter is explicitly provided.
-
-#### Scenario: Default evaluation skips diagnostics
-- **WHEN** `evaluate_database` is called without `diagnostic_limit`
-- **THEN** `QueryResult.diagnostics` SHALL be `None` for all results
-
-### Requirement: Evaluation reports baseline input validity
-Search quality diagnostics SHALL report whether the evaluated database is valid for baseline writes and regression comparisons.
-
-#### Scenario: invalid baseline input is diagnosed
-- **WHEN** a database fails baseline input validation
-- **THEN** diagnostics MUST include the failing count or consistency check
-- **AND** the command output MUST explain why the baseline was not written
-
-#### Scenario: baseline comparison reports query-suite mismatch
-- **WHEN** a baseline comparison uses a query suite whose hash differs from the baseline metadata
-- **THEN** diagnostics MUST report the mismatch
-- **AND** regression messages MUST distinguish query-suite drift from ranking regression
-
 ### Requirement: Failure diagnostics guide promotion decisions
 Search quality diagnostics SHALL expose whether a failed or report-only query is blocked by missing data, recall, ranking, filtering, graph expansion, or degraded search execution.
 
@@ -64,6 +41,8 @@ Search quality diagnostics SHALL expose whether a failed or report-only query is
 - **WHEN** a report-only query fails while vector search is unavailable or degraded
 - **THEN** diagnostics MUST identify the degraded mode
 - **AND** promotion decisions MUST not treat the failure as a pure ranking regression
+
+## ADDED Requirements
 
 ### Requirement: Evaluation diagnostics include latency summaries
 Search quality diagnostics SHALL include latency summaries for evaluated query runs.
@@ -86,4 +65,3 @@ Internal searcher restructuring SHALL preserve externally visible search results
 #### Scenario: metadata remains available after refactor
 - **WHEN** search execution internals are reorganized
 - **THEN** evaluation diagnostics MUST still receive search mode, fallback/degraded reason, and latency data
-

@@ -1,0 +1,15 @@
+{
+  "change": "search-quality-evaluation-expansion",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "e84066c02ae4aae20172001bde2b4819b6ca29eb1090369b7c618c43d99ae4fd",
+  "files": [
+    { "path": "openspec/changes/search-quality-evaluation-expansion/proposal.md", "sha256": "9968b13c442587da23e47ea83b6f3dd8aa884573d17a3b6b2582e5a7ec04120d" },
+    { "path": "openspec/changes/search-quality-evaluation-expansion/design.md", "sha256": "36a6d881f45d950ca7d5d71737b67acfa69e62548e29ca1ab4255829c01e6f69" },
+    { "path": "openspec/changes/search-quality-evaluation-expansion/tasks.md", "sha256": "6d6d545eaa7b8177d828c2cd46f8c0bac6d93d74c6f59f2dbb31cdbb146df325" },
+    { "path": "openspec/changes/search-quality-evaluation-expansion/specs/search-quality-diagnostics/spec.md", "sha256": "514ac8426617fb60588d6c19610b54dd2bdf757a3efd92c94f6f546ecc0dc43d" },
+    { "path": "openspec/changes/search-quality-evaluation-expansion/specs/semantic-search-quality/spec.md", "sha256": "efd4a94eb98e7aeeba6891c6b5285d8b2681e9049097d02ba5faaecd1c9891fc" }
+  ]
+}

@@ -2,6 +2,7 @@
 change: search-quality-evaluation-expansion
 design-doc: docs/superpowers/specs/2026-06-29-search-quality-evaluation-expansion-design.md
 base-ref: 5c9010127c71f7dac05c8130de6a3b75a7d8ff96
+archived-with: 2026-06-29-search-quality-evaluation-expansion
 ---
 
 # Search Quality Evaluation Expansion Implementation Plan
@@ -14,6 +15,7 @@ base-ref: 5c9010127c71f7dac05c8130de6a3b75a7d8ff96
 
 **Tech Stack:** Python 3.10+, stdlib `time`, `statistics`, `dataclasses`, `json`, existing `rag.search_eval`, `rag.searcher`, `pytest`, OpenSpec/Comet docs.
 
+archived-with: 2026-06-29-search-quality-evaluation-expansion
 ---
 
 ## File Structure
