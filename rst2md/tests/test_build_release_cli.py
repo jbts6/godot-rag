@@ -41,7 +41,7 @@ def test_project_script_points_to_packaged_module():
     text = Path("pyproject.toml").read_text(encoding="utf-8")
 
     assert 'godot-rag-build = "godot_rag_build.cli:main"' in text
-    assert 'packages = ["godot_rag", "godot_rag_build"]' in text
+    assert 'packages = ["rst2md/rag", "godot_rag", "godot_rag_build"]' in text
 
 
 def test_main_returns_zero_for_help(capsys):
