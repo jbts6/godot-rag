@@ -90,6 +90,31 @@ def test_eval_search_exits_nonzero_on_regression(tmp_path):
     assert exc.value.code == 1
 
 
+def test_eval_search_exits_nonzero_on_baseline_write_value_error(tmp_path, capsys):
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = argparse.Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        baseline=str(tmp_path / "baseline.json"),
+        write_baseline=True,
+        json=False,
+        limit=5,
+        compare_graph=False,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+    )
+
+    with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=_report()), patch("rag.cli.apply_baseline", side_effect=ValueError("documents=0")):
+        with pytest.raises(SystemExit) as exc:
+            cmd_eval_search(args)
+
+    assert exc.value.code == 1
+    assert "documents=0" in capsys.readouterr().err
+
+
 def test_project_script_targets_importable_rag_cli():
     import importlib
     import re

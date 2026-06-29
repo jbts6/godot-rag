@@ -485,3 +485,27 @@ def test_golden_queries_return_expected_path_family(tmp_path, monkeypatch, query
     paths = {r.path for r in results}
 
     assert paths & expected_paths
+
+
+def test_alias_query_uses_symbol_recall(tmp_path, monkeypatch):
+    """Query with alias tokens should find the aliased symbol even when FTS text doesn't match."""
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    classes.mkdir(parents=True)
+
+    (classes / "class_node.md").write_text(
+        "# Node\n\n## Methods\n\n`void` **add_child**(`Node` node)\n\nRegisters a sub-element.\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts]
+    )
+    db_path = tmp_path / "test.db"
+    build_database(docs, db_path)
+
+    results = search_database(db_path, "attach child node", limit=5, expand_graph=False)
+
+    assert any(result.symbol == "Node.add_child" for result in results)

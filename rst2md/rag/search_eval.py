@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import hashlib
 import json
+import os
+import sqlite3
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
@@ -20,6 +23,70 @@ class GoldenQuery:
     expected_addons: tuple[str, ...] = ()
     report_only: bool = False
     tags: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class DatabaseFingerprint:
+    path: str
+    size_bytes: int
+    documents: int
+    chunks: int
+    symbols: int
+    vectors: int | None
+
+
+def database_fingerprint(db_path: str) -> DatabaseFingerprint:
+    conn = sqlite3.connect(db_path)
+    try:
+        documents = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+        chunks = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
+        symbols = conn.execute("SELECT COUNT(*) FROM symbols").fetchone()[0]
+        try:
+            vectors = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
+        except sqlite3.OperationalError:
+            vectors = None
+    finally:
+        conn.close()
+    size_bytes = os.path.getsize(db_path)
+    return DatabaseFingerprint(
+        path=db_path,
+        size_bytes=size_bytes,
+        documents=documents,
+        chunks=chunks,
+        symbols=symbols,
+        vectors=vectors,
+    )
+
+
+def query_suite_hash(queries: Sequence[GoldenQuery]) -> str:
+    payload = [
+        {
+            "id": query.id,
+            "query": query.query,
+            "category": query.category,
+            "required_at": query.required_at,
+            "expected_symbols": list(query.expected_symbols),
+            "expected_paths": list(query.expected_paths),
+            "expected_doc_types": list(query.expected_doc_types),
+            "expected_addons": list(query.expected_addons),
+            "tags": list(query.tags),
+            "report_only": query.report_only,
+        }
+        for query in sorted(queries, key=lambda item: item.id)
+    ]
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def validate_baseline_input(fingerprint: DatabaseFingerprint) -> list[str]:
+    messages = []
+    if fingerprint.documents == 0:
+        messages.append("documents=0")
+    if fingerprint.chunks == 0:
+        messages.append("chunks=0")
+    if fingerprint.symbols == 0:
+        messages.append("symbols=0")
+    return messages
 
 
 @dataclass(frozen=True)
@@ -157,6 +224,41 @@ def diagnose_failure(
     )
 
 
+@dataclass(frozen=True)
+class PromotionStatus:
+    eligible: bool
+    reason: str
+
+
+def promotion_eligibility(
+    *,
+    passed: bool,
+    report_only: bool,
+    expected_present: bool,
+    matched_rank: int | None,
+    required_at: int,
+    category: str,
+) -> PromotionStatus:
+    """Determine whether a report-only query is eligible for promotion to gating.
+
+    This is a library helper for programmatic use (e.g. CLI ``promote``
+    sub-commands).  It is intentionally **not** called automatically inside
+    the evaluation pipeline so that callers can apply their own promotion
+    policies.
+    """
+    if not report_only:
+        return PromotionStatus(eligible=False, reason="not_report_only")
+    if not expected_present:
+        return PromotionStatus(eligible=False, reason="expected_not_present")
+    if not passed:
+        if matched_rank is not None and matched_rank > required_at:
+            return PromotionStatus(eligible=False, reason="rank_too_low")
+        return PromotionStatus(eligible=False, reason="not_passing")
+    if category == "addon":
+        return PromotionStatus(eligible=False, reason="addon_data_unstable")
+    return PromotionStatus(eligible=True, reason="eligible")
+
+
 def _classify_failure(query: GoldenQuery, results: Sequence[SearchResult], matched_rank: int | None) -> str:
     if matched_rank is not None and matched_rank > query.required_at:
         return "low_ranking"
@@ -268,6 +370,25 @@ class EvaluationReport:
     regression_messages: tuple[str, ...] = ()
     baseline_written: bool = False
     baseline_compared: bool = False
+    database: DatabaseFingerprint | None = None
+    query_suite_hash: str = ""
+    category_warnings: tuple[str, ...] = ()
+    baseline_warnings: tuple[str, ...] = ()
+
+
+_REQUIRED_CATEGORIES = {"class", "symbol", "tutorial", "engine", "addon"}
+
+
+def _compute_category_warnings(
+    queries: Sequence[GoldenQuery],
+    query_results: Sequence[QueryResult],
+) -> tuple[str, ...]:
+    gating_categories = {
+        result.query.category
+        for result in query_results
+        if not result.query.report_only
+    }
+    return tuple(sorted(_REQUIRED_CATEGORIES - gating_categories))
 
 
 def evaluate_database(
@@ -310,12 +431,20 @@ def evaluate_database(
 
     overall, categories = calculate_metrics(query_results)
     failures = [result for result in query_results if not result.passed]
+
+    fp = database_fingerprint(str(db_path))
+    suite_hash = query_suite_hash(queries)
+    category_warnings = _compute_category_warnings(queries, query_results)
+
     return EvaluationReport(
         overall=overall,
         categories=categories,
         failures=failures,
         query_results=query_results,
         graph_changes=graph_changes,
+        database=fp,
+        query_suite_hash=suite_hash,
+        category_warnings=category_warnings,
     )
 
 
@@ -331,6 +460,10 @@ def apply_baseline(
         return report
 
     if write_baseline:
+        if report.database:
+            issues = validate_baseline_input(report.database)
+            if issues:
+                raise ValueError(f"Invalid database for baseline write: {', '.join(issues)}")
         baseline_report = EvaluationReport(
             overall=report.overall,
             categories=report.categories,
@@ -341,6 +474,10 @@ def apply_baseline(
             regression_messages=(),
             baseline_written=True,
             baseline_compared=False,
+            database=report.database,
+            query_suite_hash=report.query_suite_hash,
+            category_warnings=report.category_warnings,
+            baseline_warnings=report.baseline_warnings,
         )
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
         baseline_path.write_text(json.dumps(report_to_dict(baseline_report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -355,6 +492,13 @@ def apply_baseline(
     if gating_ids is not None:
         comparison_results = [result for result in report.query_results if result.query.id in gating_ids]
         comparison_overall, _ = calculate_metrics(comparison_results)
+
+    baseline_warnings = list(report.baseline_warnings)
+    baseline_hash = (baseline.get("metadata") or {}).get("query_suite_hash", "")
+    if baseline_hash and report.query_suite_hash and baseline_hash != report.query_suite_hash:
+        baseline_warnings.append(
+            f"query_suite_hash mismatch: baseline={baseline_hash[:12]} current={report.query_suite_hash[:12]}"
+        )
 
     failed, messages = compare_with_baseline(
         comparison_overall,
@@ -372,6 +516,10 @@ def apply_baseline(
         regression_messages=tuple(messages),
         baseline_written=False,
         baseline_compared=True,
+        database=report.database,
+        query_suite_hash=report.query_suite_hash,
+        category_warnings=report.category_warnings,
+        baseline_warnings=tuple(baseline_warnings),
     )
 
 
@@ -407,6 +555,10 @@ def format_text_report(report: EvaluationReport) -> str:
         lines.append("baseline: compared")
     for message in report.regression_messages:
         lines.append(f"regression: {message}")
+    for warning in report.category_warnings:
+        lines.append(f"category_warning: missing gating queries for '{warning}'")
+    for warning in report.baseline_warnings:
+        lines.append(f"baseline_warning: {warning}")
     if report.failures:
         lines.append("failures:")
         for failure in report.failures:
@@ -469,7 +621,13 @@ def _query_result_to_dict(result: QueryResult) -> dict:
 
 
 def report_to_dict(report: EvaluationReport) -> dict:
-    return {
+    category_warnings = report.category_warnings
+    if not category_warnings and report.query_results:
+        category_warnings = _compute_category_warnings(
+            [r.query for r in report.query_results],
+            report.query_results,
+        )
+    result = {
         "overall": report.overall,
         "categories": report.categories,
         "failures": [_query_result_to_dict(result) for result in report.failures],
@@ -479,4 +637,19 @@ def report_to_dict(report: EvaluationReport) -> dict:
         "regression_messages": list(report.regression_messages),
         "baseline_written": report.baseline_written,
         "baseline_compared": report.baseline_compared,
+        "category_warnings": list(category_warnings),
+        "baseline_warnings": list(report.baseline_warnings),
     }
+    if report.database:
+        result["metadata"] = {
+            "query_suite_hash": report.query_suite_hash,
+            "database": {
+                "path": report.database.path,
+                "size_bytes": report.database.size_bytes,
+                "documents": report.database.documents,
+                "chunks": report.database.chunks,
+                "symbols": report.database.symbols,
+                "vectors": report.database.vectors,
+            },
+        }
+    return result

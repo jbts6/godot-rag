@@ -1,0 +1,17 @@
+{
+  "change": "stabilize-search-quality-loop",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "fa16739c0afee46429fecad0e028923452de106902917c8ef2baab4bf2370cff",
+  "files": [
+    { "path": "openspec/changes/stabilize-search-quality-loop/proposal.md", "sha256": "fe07e1fa4e3753a26db52afdb6ce53af5b378049e7e968baf13105fb04760fe9" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/design.md", "sha256": "ce9d885492248b1859dd86f84672c46b31b3530f7ac467d00d37fd38e072a11e" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/tasks.md", "sha256": "2bb4cd386164fe0dd0dd07b007900d1a5707e39df5e6f89ee0188514b9b72254" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/specs/intent-ranking/spec.md", "sha256": "1680a359e5d05058ce0ea556ed1b1a0880706c0bac91d933e482db2a9129e3a0" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/specs/query-rewrite/spec.md", "sha256": "71ba38c2f2c7185d4f3b6a1e7eb9cbd0d581059f5e90df92cfd11143d3c9ec8c" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/specs/search-quality-diagnostics/spec.md", "sha256": "6c414534df686cc4551adb19d17262aea76d811e507b4903b32562636573784b" },
+    { "path": "openspec/changes/stabilize-search-quality-loop/specs/semantic-search-quality/spec.md", "sha256": "63d170e82a2291a45c3d543c92652d86b5797f9e59d32a5d845abff3c6f5bfdd" }
+  ]
+}

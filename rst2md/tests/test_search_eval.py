@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from rag.models import SearchResult
 from rag.search_eval import evaluate_results, load_queries
 
@@ -127,7 +129,7 @@ def test_text_report_includes_failed_query_diagnostic_detail():
 
 from rag.indexer import build_database
 from rag.db import get_connection
-from rag.search_eval import evaluate_database, report_to_dict
+from rag.search_eval import evaluate_database, report_to_dict, database_fingerprint, DatabaseFingerprint
 
 
 def _build_eval_db(tmp_path, monkeypatch):
@@ -358,6 +360,67 @@ def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch)
     assert "best_rank=" in text
 
 
+def test_query_suite_hash_is_stable_for_same_queries():
+    from rag.search_eval import GoldenQuery, query_suite_hash
+
+    queries = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach node to scene tree",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+            tags=("normalization", "alias"),
+        )
+    ]
+
+    assert query_suite_hash(queries) == query_suite_hash(list(queries))
+
+
+def test_query_suite_hash_changes_when_query_definition_changes():
+    from rag.search_eval import GoldenQuery, query_suite_hash
+
+    original = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach node to scene tree",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+        )
+    ]
+    changed = [
+        GoldenQuery(
+            id="node-add-child",
+            query="attach child node",
+            category="class",
+            required_at=5,
+            expected_symbols=("Node.add_child",),
+        )
+    ]
+
+    assert query_suite_hash(original) != query_suite_hash(changed)
+
+
+def test_validate_baseline_input_rejects_empty_counts():
+    from rag.search_eval import DatabaseFingerprint, validate_baseline_input
+
+    fingerprint = DatabaseFingerprint(
+        path="empty.sqlite",
+        size_bytes=0,
+        documents=0,
+        chunks=0,
+        symbols=0,
+        vectors=0,
+    )
+
+    messages = validate_baseline_input(fingerprint)
+
+    assert "documents=0" in messages
+    assert "chunks=0" in messages
+    assert "symbols=0" in messages
+
+
 def test_packaged_eval_queries_are_broad_and_tiered():
     queries = load_queries(Path("rst2md/rag/search_eval_queries.json"))
     ids = [query.id for query in queries]
@@ -372,3 +435,172 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert {"class", "symbol", "tutorial", "engine", "addon"}.issubset(categories)
     assert any("normalization" in query.tags for query in queries)
     assert any("graph" in query.tags for query in queries)
+
+
+def test_report_only_query_with_missing_expected_rows_is_not_promotable():
+    from rag.search_eval import PromotionStatus, promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=False,
+        matched_rank=None,
+        required_at=5,
+        category="addon",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "expected_not_present"
+
+
+def test_report_only_query_that_passes_with_present_expected_rows_is_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=True,
+        expected_present=True,
+        matched_rank=3,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is True
+    assert status.reason == "eligible"
+
+
+def test_not_report_only_query_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=False,
+        expected_present=True,
+        matched_rank=1,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "not_report_only"
+
+
+def test_report_only_query_that_fails_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=True,
+        matched_rank=None,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "not_passing"
+
+
+def test_report_only_query_with_rank_above_required_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=True,
+        matched_rank=7,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "rank_too_low"
+
+
+def test_report_only_addon_query_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=True,
+        expected_present=True,
+        matched_rank=2,
+        required_at=5,
+        category="addon",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "addon_data_unstable"
+
+
+def test_database_fingerprint_returns_nonzero_counts(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+
+    fp = database_fingerprint(str(db_path))
+
+    assert isinstance(fp, DatabaseFingerprint)
+    assert fp.path == str(db_path)
+    assert fp.size_bytes > 0
+    assert fp.documents > 0
+    assert fp.chunks > 0
+    assert fp.symbols > 0
+
+
+def test_apply_baseline_writes_metadata(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("godot_rag.db", 123, 10, 20, 30, 20),
+        query_suite_hash="abc123",
+    )
+    baseline = tmp_path / "baseline.json"
+
+    updated = apply_baseline(report, baseline, write_baseline=True)
+    payload = json.loads(baseline.read_text(encoding="utf-8"))
+
+    assert updated.baseline_written is True
+    assert payload["metadata"]["query_suite_hash"] == "abc123"
+    assert payload["metadata"]["database"]["chunks"] == 20
+
+
+def test_baseline_write_rejects_invalid_database(tmp_path):
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        database=DatabaseFingerprint("empty.sqlite", 0, 0, 0, 0, 0),
+        query_suite_hash="abc123",
+    )
+
+    with pytest.raises(ValueError, match="documents=0"):
+        apply_baseline(report, tmp_path / "baseline.json", write_baseline=True)
+
+
+def test_category_coverage_warns_missing_addon_category():
+    from rag.search_eval import GoldenQuery, evaluate_results, calculate_metrics
+
+    query = GoldenQuery(
+        id="q1",
+        query="test query",
+        category="class",
+        required_at=5,
+        expected_paths=("classes/class_node.md",),
+    )
+    result = evaluate_results(query, [_result(path="classes/class_node.md")])
+    overall, categories = calculate_metrics([result])
+    report = EvaluationReport(
+        overall=overall,
+        categories=categories,
+        failures=[],
+        query_results=[result],
+        graph_changes=[],
+    )
+
+    data = report_to_dict(report)
+
+    assert "addon" in data["category_warnings"]

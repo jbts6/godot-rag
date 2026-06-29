@@ -6,7 +6,7 @@ from typing import List, Optional
 from rag.db import clean_chunk_text, get_connection
 from rag.models import SearchMetadata, SearchResponse, SearchResult
 from dataclasses import replace
-from rag.query_rewrite import doc_type_boost, expand_query_variants
+from rag.query_plan import QueryPlan, build_query_plan
 from rag.symbols import normalize_symbol
 
 
@@ -107,9 +107,22 @@ def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) ->
     return results
 
 
-def _apply_intent_boost(query: str, results: list[SearchResult]) -> list[SearchResult]:
+def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
+    bonus = 0.0
+    if result.symbol in plan.alias_symbol_candidates:
+        bonus += 5.0
+    elif result.symbol in plan.symbol_candidates:
+        bonus += 2.0
+    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent and not plan.symbol_candidates:
+        bonus += 0.05
+    if plan.addon_intent and result.doc_type == "addon":
+        bonus += 0.5
+    return bonus
+
+
+def rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchResult]:
     boosted = [
-        replace(result, score=result.score + doc_type_boost(query, result.doc_type))
+        replace(result, score=result.score + _rerank_bonus(plan, result))
         for result in results
     ]
     return sorted(boosted, key=lambda result: result.score, reverse=True)
@@ -262,7 +275,7 @@ def _search_database_impl(
         expand_graph: If True, expand top results via chunk_relations graph.
     """
     with get_connection(db_path) as conn:
-        normalized = normalize_symbol(query)
+        plan = build_query_plan(query)
         results = {}
         vector_available, fallback_reason = _vector_availability(conn)
         metadata = SearchMetadata(
@@ -352,38 +365,42 @@ def _search_database_impl(
                     fallback_reason="vector_query_failed",
                 )
 
-        # 1. Exact symbol match (+100)
-        rows = conn.execute(
-            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
-            + type_filter + addon_filter,
-            [normalized] + type_params + addon_params,
-        ).fetchall()
-        for row in rows:
-            cid = row["id"]
-            if cid not in results or results[cid]["score"] < 100:
-                results[cid] = _make_result(row, 100.0)
+        # 1-3. Symbol recall: iterate over plan.symbol_candidates and alias_symbol_candidates
+        for candidate in plan.symbol_candidates + plan.alias_symbol_candidates:
+            normalized = normalize_symbol(candidate)
 
-        # 2. Suffix symbol match (+80)
-        rows = conn.execute(
-            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
-            + type_filter + addon_filter,
-            [f"%.{normalized}"] + type_params + addon_params,
-        ).fetchall()
-        for row in rows:
-            cid = row["id"]
-            if cid not in results or results[cid]["score"] < 80:
-                results[cid] = _make_result(row, 80.0)
+            # Exact symbol match (+100)
+            rows = conn.execute(
+                "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name = ?"
+                + type_filter + addon_filter,
+                [normalized] + type_params + addon_params,
+            ).fetchall()
+            for row in rows:
+                cid = row["id"]
+                if cid not in results or results[cid]["score"] < 100:
+                    results[cid] = _make_result(row, 100.0)
 
-        # 3. Prefix symbol match (+40)
-        rows = conn.execute(
-            "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
-            + type_filter + addon_filter,
-            [f"{normalized}%"] + type_params + addon_params,
-        ).fetchall()
-        for row in rows:
-            cid = row["id"]
-            if cid not in results or results[cid]["score"] < 40:
-                results[cid] = _make_result(row, 40.0)
+            # Suffix symbol match (+80)
+            rows = conn.execute(
+                "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
+                + type_filter + addon_filter,
+                [f"%.{normalized}"] + type_params + addon_params,
+            ).fetchall()
+            for row in rows:
+                cid = row["id"]
+                if cid not in results or results[cid]["score"] < 80:
+                    results[cid] = _make_result(row, 80.0)
+
+            # Prefix symbol match (+40)
+            rows = conn.execute(
+                "SELECT s.name, c.* FROM symbols s JOIN chunks c ON s.chunk_id = c.id WHERE s.normalized_name LIKE ?"
+                + type_filter + addon_filter,
+                [f"{normalized}%"] + type_params + addon_params,
+            ).fetchall()
+            for row in rows:
+                cid = row["id"]
+                if cid not in results or results[cid]["score"] < 40:
+                    results[cid] = _make_result(row, 40.0)
 
         # 4. FTS5 search (bm25 → 0-40 score, skip chunks already in fused results)
         try:
@@ -409,7 +426,7 @@ def _search_database_impl(
                 fused_exclude_params = list(fused_ids)
 
             fts_results_by_id: dict = {}
-            for variant in expand_query_variants(query):
+            for variant in plan.fts_variants:
                 for row in _run_fts_query(
                     conn,
                     variant,
@@ -505,5 +522,5 @@ def _search_database_impl(
             )
             for r in sorted_results
         ]
-        search_results = _apply_intent_boost(query, search_results)
+        search_results = rerank_results(plan, search_results)
         return (search_results[:limit], metadata)
