@@ -286,7 +286,7 @@ rtk git commit -m "feat: guard search quality baseline writes"
 - Produces: `QueryPlan`, `build_query_plan(query: str) -> QueryPlan`.
 - Consumes: existing `expand_query_variants()` and alias rules.
 
-- [ ] **Step 1: Write failing QueryPlan unit tests**
+- [x] **Step 1: Write failing QueryPlan unit tests**
 
 Add to `rst2md/tests/test_searcher_module.py`:
 
@@ -328,7 +328,7 @@ def test_query_plan_detects_tutorial_and_addon_intent():
 rtk uv run pytest rst2md/tests/test_searcher_module.py -q
 ```
 
-- [ ] **Step 3: Implement `query_plan.py`**
+- [x] **Step 3: Implement `query_plan.py`**
 
 Create `rst2md/rag/query_plan.py` with a frozen dataclass. Reuse `normalize_symbol()` from `rag.symbols` and `expand_query_variants()` from `rag.query_rewrite`. Keep intent detection conservative:
 
@@ -344,7 +344,7 @@ def _doc_type_intent(query: str) -> str | None:
 
 For addon intent, return `"addon"` when tokens include `"addon"` or `"plugin"`.
 
-- [ ] **Step 4: Preserve existing query rewrite behavior**
+- [x] **Step 4: Preserve existing query rewrite behavior**
 
 Ensure these existing tests still pass:
 
@@ -352,7 +352,7 @@ Ensure these existing tests still pass:
 rtk uv run pytest rst2md/tests/test_searcher_module.py::test_expand_query_variants_adds_node_add_child_alias rst2md/tests/test_searcher_module.py::test_expand_query_variants_deduplicates_exact_symbol_query -q
 ```
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_searcher_module.py -q
@@ -573,10 +573,10 @@ def test_report_only_query_that_passes_with_present_expected_rows_is_promotable(
 
 If implementing promotion eligibility directly from `QueryResult` is cleaner, adjust the test to construct `QueryResult` and `FailureDiagnostics`, but keep the same assertions.
 
-- [ ] **Step 2: Run tests and verify they fail**
+- [x] **Step 2: Run tests and verify they fail**
 
 ```bash
-rtk uv run pytest rst2md/tests/test_search_eval.py -q
+rtk uv run pytest rst2md/tests/test_searcher_module.py -q
 ```
 
 - [ ] **Step 3: Implement promotion status**
