@@ -426,7 +426,7 @@ rtk git commit -m "feat: use query plan for symbol recall"
 - Produces: `rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchResult]`.
 - Replaces: `_apply_intent_boost(query, results)` call site.
 
-- [ ] **Step 1: Write failing unit tests for reranking**
+- [x] **Step 1: Write failing unit tests for reranking**
 
 Add tests with constructed `SearchResult` objects:
 
@@ -473,13 +473,13 @@ def test_rerank_promotes_alias_symbol_match():
 
 Add a second test proving `build_query_plan("Node.add_child")` keeps symbol behavior and does not apply tutorial intent.
 
-- [ ] **Step 2: Run tests and verify they fail**
+- [x] **Step 2: Run tests and verify they fail**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_searcher_module.py -q
 ```
 
-- [ ] **Step 3: Implement named reranking signals**
+- [x] **Step 3: Implement named reranking signals**
 
 In `rst2md/rag/searcher.py`, add helpers:
 
@@ -499,7 +499,7 @@ def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
 
 Use `replace(result, score=result.score + bonus)` and stable sort descending by score. Adjust values only if tests show existing exact symbol ranking is harmed; document any changed constants near the helper.
 
-- [ ] **Step 4: Replace `_apply_intent_boost()` call**
+- [x] **Step 4: Replace `_apply_intent_boost()` call**
 
 Change final ranking from:
 
@@ -515,7 +515,7 @@ search_results = rerank_results(plan, search_results)
 
 Remove or keep `_apply_intent_boost()` only if tests still import it. If kept, make it a compatibility wrapper around `build_query_plan()` and `rerank_results()`.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic_search.py -q
