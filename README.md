@@ -159,13 +159,13 @@ Run the deterministic fixture tests during development:
 uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py
 ```
 
-Evaluate a generated release database manually:
+Run the packaged quality suite against a release database:
 
 ```bash
-godot-rag eval-search --db godot_rag/rag/godot_docs.sqlite
+godot-rag eval-search --db godot_rag/rag/godot_docs.sqlite --compare-graph
 ```
 
-Write or refresh a baseline:
+Write or refresh the reviewed baseline:
 
 ```bash
 godot-rag eval-search \
@@ -174,7 +174,7 @@ godot-rag eval-search \
   --write-baseline
 ```
 
-Compare against a baseline and fail only on clear regressions:
+Compare against the reviewed baseline:
 
 ```bash
 godot-rag eval-search \
@@ -182,6 +182,8 @@ godot-rag eval-search \
   --baseline docs/search-quality/baseline.json \
   --compare-graph
 ```
+
+Failed queries include diagnostics showing whether expected targets exist in the database and where the best match appears inside the diagnostic window.
 
 Use `--json` for machine-readable reports.
 
