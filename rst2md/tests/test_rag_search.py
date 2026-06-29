@@ -887,6 +887,34 @@ class RegressionTests(unittest.TestCase):
                 self.assertNotIn("vector_available:", output)
 
 
+class IntentBoostTests(unittest.TestCase):
+    """Tutorial-intent queries should boost tutorial doc_type results."""
+
+    def test_how_to_query_prefers_tutorial_result(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            tutorials = docs / "tutorials"
+            classes.mkdir(parents=True)
+            tutorials.mkdir(parents=True)
+            (classes / "class_animation.md").write_text(
+                "# Animation\n\nScene tree nodes can be animated from code.\n",
+                encoding="utf-8",
+            )
+            (tutorials / "scene_tree.md").write_text(
+                "# Scene tree\n\nHow to use scene tree nodes and attach child nodes.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "godot_docs.sqlite"
+            build_database(docs, db_path)
+
+            results = search_database(db_path, "how to use scene tree nodes", limit=3, expand_graph=False)
+
+            self.assertTrue(results)
+            self.assertEqual(results[0].doc_type, "tutorial")
+            self.assertEqual(results[0].path, "tutorials/scene_tree.md")
+
+
 class IndexerModuleTests(unittest.TestCase):
     """Task 4: build_database should be importable from rag.indexer."""
 

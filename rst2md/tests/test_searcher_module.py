@@ -88,5 +88,18 @@ def test_expand_query_variants_deduplicates_exact_symbol_query():
     assert expand_query_variants("Node.add_child") == ["Node.add_child"]
 
 
+from rag.query_rewrite import doc_type_boost
+
+
+def test_doc_type_boost_prefers_tutorial_for_how_to_query():
+    assert doc_type_boost("how to use scene tree nodes", "tutorial") > 0
+    assert doc_type_boost("how to use scene tree nodes", "class") == 0
+
+
+def test_doc_type_boost_does_not_boost_symbol_query():
+    assert doc_type_boost("Node.add_child", "tutorial") == 0
+    assert doc_type_boost("Node.add_child", "class") == 0
+
+
 if __name__ == "__main__":
     unittest.main()

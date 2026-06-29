@@ -14,6 +14,21 @@ def _tokens(query: str) -> frozenset[str]:
     return frozenset(re.findall(r"[a-z0-9]+", query.lower()))
 
 
+def doc_type_boost(query: str, doc_type: str) -> float:
+    lowered = query.lower()
+    if "." in query or "_" in query:
+        return 0.0
+    tutorial_intent = (
+        lowered.startswith("how to ")
+        or " tutorial" in lowered
+        or " guide" in lowered
+        or "learn " in lowered
+    )
+    if tutorial_intent and doc_type == "tutorial":
+        return 0.05
+    return 0.0
+
+
 def expand_query_variants(query: str) -> list[str]:
     variants = [query]
     query_tokens = _tokens(query)

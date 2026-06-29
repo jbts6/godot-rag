@@ -5,7 +5,8 @@ from typing import List, Optional
 
 from rag.db import clean_chunk_text, get_connection
 from rag.models import SearchMetadata, SearchResponse, SearchResult
-from rag.query_rewrite import expand_query_variants
+from dataclasses import replace
+from rag.query_rewrite import doc_type_boost, expand_query_variants
 from rag.symbols import normalize_symbol
 
 
@@ -104,6 +105,14 @@ def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) ->
             results.append(result)
 
     return results
+
+
+def _apply_intent_boost(query: str, results: list[SearchResult]) -> list[SearchResult]:
+    boosted = [
+        replace(result, score=result.score + doc_type_boost(query, result.doc_type))
+        for result in results
+    ]
+    return sorted(boosted, key=lambda result: result.score, reverse=True)
 
 
 def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
@@ -473,7 +482,7 @@ def _search_database_impl(
             # Re-sort after expansion
             sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
 
-        return ([
+        search_results = [
             SearchResult(
                 score=r["score"],
                 path=r["path"],
@@ -491,5 +500,7 @@ def _search_database_impl(
                 distance=r.get("distance", 0),
                 snippet=_extract_snippet(r["text"], query),
             )
-            for r in sorted_results[:limit]
-        ], metadata)
+            for r in sorted_results
+        ]
+        search_results = _apply_intent_boost(query, search_results)
+        return (search_results[:limit], metadata)
