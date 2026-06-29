@@ -57,6 +57,28 @@ Run real-database gate (when `godot_rag.db` available):
 uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph
 ```
 
+## CodeGraph
+
+This project uses CodeGraph for code intelligence. The `.codegraph/` directory contains a pre-built index of all symbols, edges, and files.
+
+**Use CodeGraph BEFORE reading files** — it returns verbatim source with call paths in one call, faster than grep + read loops.
+
+```bash
+# Query via MCP tool (preferred)
+codegraph_explore("searcher search_database")
+
+# Or via shell
+codegraph explore "searcher search_database"
+```
+
+CodeGraph follows dynamic dispatch (callbacks, re-exports, polymorphism) that grep cannot. Use it for:
+- Understanding how code works
+- Finding where symbols are defined/used
+- Tracing call paths across files
+- Pre-edit blast radius analysis
+
+**Do NOT re-verify CodeGraph results with grep** — they come from AST parsing and are more accurate.
+
 ## Workflow
 
 This project uses OpenSpec + Comet for change management:

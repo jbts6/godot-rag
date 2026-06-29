@@ -43,6 +43,47 @@ docs/                 # Documentation
 openspec/             # Change management
 ```
 
+## Code Intelligence
+
+This project uses **CodeGraph** for code navigation and understanding. The `.codegraph/` directory contains a pre-built SQLite knowledge graph of every symbol, edge, and file.
+
+### When to Use CodeGraph
+
+**Always use CodeGraph BEFORE grep or reading files** for code questions:
+- "How does X work?" → `codegraph_explore("X")`
+- "Where is X defined?" → `codegraph_explore("X")`
+- "What calls X?" → `codegraph_explore("X")`
+- "What does X affect?" → `codegraph_explore("X")`
+
+### How to Query
+
+```bash
+# Via MCP tool (preferred in agent environments)
+codegraph_explore("search_database hybrid search")
+
+# Via shell
+codegraph explore "search_database hybrid search"
+```
+
+### What CodeGraph Returns
+
+- Verbatim, line-numbered source code grouped by file
+- Call paths between symbols (including dynamic dispatch)
+- Blast radius summary of what depends on them
+
+### Advantages Over Grep
+
+- Follows dynamic dispatch (callbacks, re-exports, polymorphism)
+- Returns call paths, not just text matches
+- One call replaces dozens of grep + read cycles
+- More accurate than regex-based search
+
+### Anti-Patterns
+
+- **Don't grep first** — use CodeGraph, then grep only for specifics CodeGraph missed
+- **Don't re-verify CodeGraph results** — they come from AST parsing
+- **Don't read files separately** — CodeGraph returns verbatim source you can edit from
+
 ## Development
 
 ### Setup
