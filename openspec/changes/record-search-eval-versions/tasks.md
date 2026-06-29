@@ -6,5 +6,5 @@
 
 ## 2. Verification
 
-- [ ] 2.1 Run focused search evaluation tests.
-- [ ] 2.2 Run full tests, build, search quality baseline comparison, and OpenSpec validation.
+- [x] 2.1 Run focused search evaluation tests.
+- [x] 2.2 Run full tests, build, search quality baseline comparison, and OpenSpec validation.
