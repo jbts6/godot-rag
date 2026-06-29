@@ -66,6 +66,10 @@ def _percentile(values: Sequence[float], percentile: float) -> float:
     n = len(ordered)
     if n == 1:
         return ordered[0]
+    # Median of even-length sequences requires averaging the two middle
+    # elements.  The plan's round((n-1)*p) formula picks only one index,
+    # which gives the wrong result (e.g. p50 of [0.01,0.02,0.03,0.04]
+    # would be 0.03 instead of the correct 0.025).
     if percentile == 0.50 and n % 2 == 0:
         return (ordered[n // 2 - 1] + ordered[n // 2]) / 2
     index = min(n - 1, max(0, int((n - 1) * percentile + 0.5)))
