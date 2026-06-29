@@ -2,6 +2,7 @@
 change: search-quality-optimization-loop
 design-doc: docs/superpowers/specs/2026-06-29-search-quality-optimization-loop-design.md
 base-ref: 9dde7807289149a4481cba172a46568b24d44416
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 # Search Quality Optimization Loop Implementation Plan
@@ -23,6 +24,7 @@ base-ref: 9dde7807289149a4481cba172a46568b24d44416
 - Use `rtk` before shell commands.
 - Use `rtk uv run pytest ...` for pytest verification.
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ## File Structure
@@ -39,6 +41,7 @@ base-ref: 9dde7807289149a4481cba172a46568b24d44416
 - Modify `rst2md/tests/test_rag_search.py`: cover search integration for alias recall and tutorial intent ranking.
 - Create `docs/search-quality/baseline.json`: reviewed baseline generated after final local release-database evaluation.
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 1: Fix the Documented CLI Entry Point
@@ -119,6 +122,7 @@ rtk git add pyproject.toml rst2md/tests/test_search_eval_cli.py
 rtk git commit -m "fix: make eval-search CLI entrypoint importable"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 2: Add Failure Diagnostics to Evaluation Output
@@ -404,6 +408,7 @@ rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py
 rtk git commit -m "feat: add search evaluation failure diagnostics"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 3: Expand and Tier Packaged Golden Queries
@@ -506,6 +511,7 @@ rtk git add rst2md/rag/search_eval_queries.json rst2md/tests/test_search_eval.py
 rtk git commit -m "test: expand tiered search quality queries"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 4: Add Conservative Query Rewriting for Missing Recall
@@ -706,6 +712,7 @@ rtk git add rst2md/rag/query_rewrite.py rst2md/rag/searcher.py rst2md/rag/search
 rtk git commit -m "feat: add conservative query rewrite aliases"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 5: Add Intent-Aware Ranking for Tutorial Queries
@@ -851,6 +858,7 @@ rtk git add rst2md/rag/query_rewrite.py rst2md/rag/searcher.py rst2md/rag/search
 rtk git commit -m "feat: boost tutorial intent in search ranking"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ### Task 6: Document the Loop and Establish a Reviewable Baseline
@@ -954,6 +962,7 @@ rtk git add README.md docs/search-quality/baseline.json
 rtk git commit -m "docs: document search quality optimization loop"
 ```
 
+archived-with: 2026-06-29-search-quality-optimization-loop
 ---
 
 ## Final Verification

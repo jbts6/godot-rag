@@ -52,22 +52,19 @@ Semantic search SHALL make vector-path fallback explicit enough to diagnose and 
 - **AND** a diagnostics command MUST report the vector-search availability problem
 
 ### Requirement: Search quality is evaluated with categorized golden queries
-Semantic search quality SHALL be evaluated with a categorized golden-query set that supports both deterministic fixture tests and real-database evaluation.
+The packaged query suite SHALL contain at least 30 unique query IDs with at least 12 gating queries and at least 8 report-only queries, covering `class`, `symbol`, `tutorial`, `engine`, and `addon` categories.
 
-#### Scenario: fixture golden queries run in normal verification
-- **WHEN** the focused search quality test suite runs
-- **THEN** it MUST build or use a small deterministic fixture database
-- **AND** it MUST execute categorized golden queries without depending on untracked generated database files
+#### Scenario: Query suite meets size and tier requirements
+- **WHEN** `load_queries` loads the packaged query file
+- **THEN** the result SHALL contain >= 30 queries with >= 12 gating and >= 8 report-only
 
-#### Scenario: real database evaluation runs from an explicit database path
-- **WHEN** a developer runs the search quality evaluation against a provided release database path
-- **THEN** the evaluator MUST execute the real-database golden query set against that database
-- **AND** it MUST NOT require the generated SQLite database file to be committed
+#### Scenario: Query suite covers all required categories
+- **WHEN** `load_queries` loads the packaged query file
+- **THEN** the query categories SHALL include `class`, `symbol`, `tutorial`, `engine`, and `addon`
 
-#### Scenario: query entries describe expected result constraints
-- **WHEN** a golden query entry is loaded
-- **THEN** it MUST include a query string, category, and top-K requirement
-- **AND** it MUST be able to express expected path, symbol, doc type, or addon constraints
+#### Scenario: Query suite includes normalization and graph tags
+- **WHEN** `load_queries` loads the packaged query file
+- **THEN** at least one query SHALL have tag `normalization` and at least one SHALL have tag `graph`
 
 ### Requirement: Search quality metrics are reported consistently
 Search quality evaluation SHALL report ranking metrics in a stable shape suitable for humans and regression checks.
@@ -122,4 +119,15 @@ Search quality evaluation SHALL classify failed queries into actionable failure 
 #### Scenario: graph expansion impact can be isolated
 - **WHEN** evaluation compares graph expansion enabled and disabled modes
 - **THEN** the report MUST identify queries whose pass or fail status changes between those modes
+
+### Requirement: CLI entry point is importable
+The `godot-rag` project script SHALL point to `rag.cli:main` and the wheel SHALL include `rst2md/rag` package.
+
+#### Scenario: pyproject.toml has correct script target
+- **WHEN** `pyproject.toml` is parsed
+- **THEN** `[project.scripts]` SHALL contain `godot-rag = "rag.cli:main"`
+
+#### Scenario: pyproject.toml includes rag package in wheel
+- **WHEN** `pyproject.toml` is parsed
+- **THEN** `[tool.hatch.build.targets.wheel]` `packages` SHALL include `"rst2md/rag"`
 
