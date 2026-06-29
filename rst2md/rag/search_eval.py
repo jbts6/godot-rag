@@ -390,6 +390,27 @@ def compare_with_baseline(
     return bool(messages), messages
 
 
+def compare_latency_with_baseline(
+    current: dict | None,
+    baseline: dict | None,
+    *,
+    p95_latency_threshold_ms: float | None = None,
+) -> tuple[bool, list[str]]:
+    if p95_latency_threshold_ms is None or not current or not baseline:
+        return False, []
+
+    current_p95 = float(current.get("p95_ms", 0.0))
+    baseline_p95 = float(baseline.get("p95_ms", 0.0))
+    latency_increase = current_p95 - baseline_p95
+    if latency_increase <= p95_latency_threshold_ms:
+        return False, []
+
+    return True, [
+        f"p95 latency regressed from {baseline_p95:.3f}ms to {current_p95:.3f}ms; "
+        f"increase {latency_increase:.3f}ms exceeds threshold {p95_latency_threshold_ms:.3f}ms"
+    ]
+
+
 @dataclass(frozen=True)
 class EvaluationReport:
     overall: dict
@@ -429,7 +450,7 @@ def evaluate_database(
     *,
     limit: int = 5,
     compare_graph: bool = False,
-    diagnostic_limit: int = 50,
+    diagnostic_limit: int | None = None,
 ) -> EvaluationReport:
     from rag.searcher import search_database, search_database_with_metadata
 
@@ -437,7 +458,7 @@ def evaluate_database(
     graph_changes = []
     elapsed_seconds = []
     required_window = max(10, limit)
-    diagnostic_window = max(required_window, diagnostic_limit)
+    diagnostic_window = max(required_window, diagnostic_limit or 0)
     for query in queries:
         started = time.perf_counter()
         response = search_database_with_metadata(db_path, query.query, limit=diagnostic_window, expand_graph=True)
@@ -445,14 +466,15 @@ def evaluate_database(
         elapsed_seconds.append(time.perf_counter() - started)
         evaluated = evaluate_results(query, results, required_window=required_window)
         no_graph_results = []
-        if compare_graph or not evaluated.passed:
+        diagnostics_enabled = diagnostic_limit is not None
+        if compare_graph or (diagnostics_enabled and not evaluated.passed):
             no_graph_results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=False)
         if compare_graph:
             no_graph = evaluate_results(query, no_graph_results, required_window=required_window)
             if no_graph.passed != evaluated.passed:
                 evaluated = replace(evaluated, graph_changed=True)
                 graph_changes.append(evaluated)
-        if not evaluated.passed:
+        if diagnostics_enabled and not evaluated.passed:
             evaluated = replace(
                 evaluated,
                 diagnostics=diagnose_failure(
@@ -493,6 +515,7 @@ def apply_baseline(
     write_baseline: bool = False,
     hit5_drop_threshold: float = 0.05,
     mrr5_relative_drop_threshold: float = 0.10,
+    p95_latency_threshold_ms: float | None = None,
 ) -> EvaluationReport:
     if baseline_path is None:
         return report
@@ -545,13 +568,19 @@ def apply_baseline(
         hit5_drop_threshold=hit5_drop_threshold,
         mrr5_relative_drop_threshold=mrr5_relative_drop_threshold,
     )
+    latency_failed, latency_messages = compare_latency_with_baseline(
+        report.latency,
+        baseline.get("latency"),
+        p95_latency_threshold_ms=p95_latency_threshold_ms,
+    )
+    messages = [*messages, *latency_messages]
     return EvaluationReport(
         overall=report.overall,
         categories=report.categories,
         failures=report.failures,
         query_results=report.query_results,
         graph_changes=report.graph_changes,
-        regression_failed=failed,
+        regression_failed=failed or latency_failed,
         regression_messages=tuple(messages),
         baseline_written=False,
         baseline_compared=True,

@@ -162,10 +162,11 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_e
 Run the real-database gate when `godot_rag.db` is available:
 
 ```bash
-rtk uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph
+rtk uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph --diagnostic-limit 50
 ```
 
 Reports include ranking metrics, failed-query diagnostics, and latency summaries.
+Use `--p95-latency-threshold-ms` to fail on configured p95 latency regressions.
 
 Write or refresh the reviewed baseline:
 
@@ -182,10 +183,11 @@ Compare against the reviewed baseline:
 godot-rag eval-search \
   --db godot_rag/rag/godot_docs.sqlite \
   --baseline docs/search-quality/baseline.json \
-  --compare-graph
+  --compare-graph \
+  --diagnostic-limit 50
 ```
 
-Failed queries include diagnostics showing whether expected targets exist in the database and where the best match appears inside the diagnostic window.
+When `--diagnostic-limit` is set, failed queries include diagnostics showing whether expected targets exist in the database and where the best match appears inside the diagnostic window.
 
 Use `--json` for machine-readable reports.
 

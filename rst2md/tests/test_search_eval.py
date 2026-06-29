@@ -93,6 +93,38 @@ def test_compare_with_baseline_reports_hit5_regression():
     assert any("hit@5" in message for message in messages)
 
 
+def test_apply_baseline_marks_latency_regression_when_p95_threshold_exceeded(tmp_path):
+    baseline = tmp_path / "baseline.json"
+    baseline.write_text(
+        json.dumps(
+            {
+                "overall": {"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+                "latency": {"count": 1, "p50_ms": 20.0, "p95_ms": 100.0},
+            }
+        ),
+        encoding="utf-8",
+    )
+    report = EvaluationReport(
+        overall={"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        latency={"count": 1, "p50_ms": 30.0, "p95_ms": 225.0},
+    )
+
+    updated = apply_baseline(
+        report,
+        baseline,
+        write_baseline=False,
+        p95_latency_threshold_ms=100.0,
+    )
+
+    assert updated.regression_failed is True
+    assert any("p95 latency" in message for message in updated.regression_messages)
+    assert any("threshold 100.000ms" in message for message in updated.regression_messages)
+
+
 def test_text_report_includes_failed_query_diagnostic_detail():
     base = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
     query = replace(
@@ -338,6 +370,24 @@ def test_evaluate_database_attaches_failure_diagnostics(tmp_path, monkeypatch):
     data = report_to_dict(report)
     assert data["failures"][0]["diagnostics"]["expected_present"] is True
     assert "best_rank" in data["failures"][0]["diagnostics"]
+
+
+def test_evaluate_database_skips_failure_diagnostics_by_default(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    base = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
+    query = replace(
+        base,
+        id="timer-default-no-diagnostics",
+        query="timer start",
+        expected_paths=("classes/class_timer.md",),
+        expected_symbols=("Timer.is_stopped",),
+        required_at=1,
+    )
+
+    report = evaluate_database(db_path, [query], limit=1)
+
+    assert report.failures
+    assert report.failures[0].diagnostics is None
 
 
 def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch):

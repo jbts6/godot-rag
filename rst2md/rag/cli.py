@@ -246,7 +246,13 @@ def cmd_eval_search(args):
     db_path = _require_db(args)
     queries_path = Path(args.queries) if args.queries else _default_eval_queries_path()
     queries = load_queries(queries_path)
-    report = evaluate_database(db_path, queries, limit=args.limit, compare_graph=args.compare_graph)
+    report = evaluate_database(
+        db_path,
+        queries,
+        limit=args.limit,
+        compare_graph=args.compare_graph,
+        diagnostic_limit=args.diagnostic_limit,
+    )
     baseline_path = Path(args.baseline) if args.baseline else None
     try:
         report = apply_baseline(
@@ -255,6 +261,7 @@ def cmd_eval_search(args):
             write_baseline=args.write_baseline,
             hit5_drop_threshold=args.hit5_drop_threshold,
             mrr5_relative_drop_threshold=args.mrr5_relative_drop_threshold,
+            p95_latency_threshold_ms=args.p95_latency_threshold_ms,
         )
     except ValueError as exc:
         print(f"Error: {exc}", file=sys.stderr)
@@ -330,8 +337,10 @@ def main():
     eval_parser.add_argument("--json", action="store_true", help="Output as JSON")
     eval_parser.add_argument("--limit", type=int, default=5, help="Max results per query")
     eval_parser.add_argument("--compare-graph", action="store_true", help="Compare graph expansion enabled and disabled")
+    eval_parser.add_argument("--diagnostic-limit", type=int, help="Result window for failure diagnostics")
     eval_parser.add_argument("--hit5-drop-threshold", type=float, default=0.05, help="Allowed hit@5 drop before failing")
     eval_parser.add_argument("--mrr5-relative-drop-threshold", type=float, default=0.10, help="Allowed relative MRR@5 drop before failing")
+    eval_parser.add_argument("--p95-latency-threshold-ms", type=float, help="Allowed p95 latency increase in ms before failing")
     eval_parser.set_defaults(func=cmd_eval_search)
 
     args = parser.parse_args()

@@ -35,8 +35,10 @@ def test_eval_search_text_output(tmp_path, capsys):
         json=False,
         limit=5,
         compare_graph=False,
+        diagnostic_limit=None,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=_report()), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
@@ -58,8 +60,10 @@ def test_eval_search_json_output(tmp_path, capsys):
         json=True,
         limit=5,
         compare_graph=False,
+        diagnostic_limit=None,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=_report()), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
@@ -81,8 +85,10 @@ def test_eval_search_exits_nonzero_on_regression(tmp_path):
         json=False,
         limit=5,
         compare_graph=False,
+        diagnostic_limit=None,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=_report()), patch("rag.cli.apply_baseline", return_value=_report(regression_failed=True)):
@@ -105,8 +111,10 @@ def test_eval_search_exits_nonzero_on_baseline_write_value_error(tmp_path, capsy
         json=False,
         limit=5,
         compare_graph=False,
+        diagnostic_limit=None,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=_report()), patch("rag.cli.apply_baseline", side_effect=ValueError("documents=0")):
@@ -134,6 +142,8 @@ def test_eval_search_json_output_includes_latency(capsys, tmp_path):
         json=True,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        diagnostic_limit=None,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
@@ -160,6 +170,8 @@ def test_eval_search_text_output_includes_latency(capsys, tmp_path):
         json=False,
         hit5_drop_threshold=0.05,
         mrr5_relative_drop_threshold=0.10,
+        diagnostic_limit=None,
+        p95_latency_threshold_ms=None,
     )
 
     with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
@@ -170,6 +182,44 @@ def test_eval_search_text_output_includes_latency(capsys, tmp_path):
     assert "count=5" in output
     assert "p50=12.345ms" in output
     assert "p95=23.456ms" in output
+
+
+def test_eval_search_passes_diagnostic_and_latency_threshold_args(capsys, tmp_path):
+    report = _report()
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        limit=5,
+        compare_graph=False,
+        diagnostic_limit=25,
+        baseline=str(tmp_path / "baseline.json"),
+        write_baseline=False,
+        json=True,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+        p95_latency_threshold_ms=100.0,
+    )
+
+    with (
+        patch("rag.cli.load_queries", return_value=[]),
+        patch("rag.cli.evaluate_database", return_value=report) as evaluate_database,
+        patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report) as apply_baseline,
+    ):
+        cmd_eval_search(args)
+
+    evaluate_database.assert_called_once_with(
+        db_path,
+        [],
+        limit=5,
+        compare_graph=False,
+        diagnostic_limit=25,
+    )
+    assert apply_baseline.call_args.kwargs["p95_latency_threshold_ms"] == 100.0
+    capsys.readouterr()
 
 
 def test_project_script_targets_importable_rag_cli():
