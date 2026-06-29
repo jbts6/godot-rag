@@ -153,17 +153,19 @@ godot-rag diagnostics --no-model
 
 ## Search Quality Evaluation
 
-Run the deterministic fixture tests during development:
+Run deterministic evaluator tests during development:
 
 ```bash
-uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py
+rtk uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py
 ```
 
-Run the packaged quality suite against a release database:
+Run the real-database gate when `godot_rag.db` is available:
 
 ```bash
-godot-rag eval-search --db godot_rag/rag/godot_docs.sqlite --compare-graph
+rtk uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph
 ```
+
+Reports include ranking metrics, failed-query diagnostics, and latency summaries.
 
 Write or refresh the reviewed baseline:
 

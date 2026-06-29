@@ -1,5 +1,7 @@
 import argparse
 import json
+from argparse import Namespace
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -113,6 +115,61 @@ def test_eval_search_exits_nonzero_on_baseline_write_value_error(tmp_path, capsy
 
     assert exc.value.code == 1
     assert "documents=0" in capsys.readouterr().err
+
+
+def test_eval_search_json_output_includes_latency(capsys, tmp_path):
+    report = _report()
+    report = replace(report, latency={"count": 1, "p50_ms": 1.0, "p95_ms": 1.0})
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        limit=5,
+        compare_graph=False,
+        baseline=None,
+        write_baseline=False,
+        json=True,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+    )
+
+    with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
+        cmd_eval_search(args)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["latency"] == {"count": 1, "p50_ms": 1.0, "p95_ms": 1.0}
+
+
+def test_eval_search_text_output_includes_latency(capsys, tmp_path):
+    report = _report()
+    report = replace(report, latency={"count": 5, "p50_ms": 12.345, "p95_ms": 23.456})
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        limit=5,
+        compare_graph=False,
+        baseline=None,
+        write_baseline=False,
+        json=False,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+    )
+
+    with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
+        cmd_eval_search(args)
+
+    output = capsys.readouterr().out
+    assert "latency:" in output
+    assert "count=5" in output
+    assert "p50=12.345ms" in output
+    assert "p95=23.456ms" in output
 
 
 def test_project_script_targets_importable_rag_cli():
