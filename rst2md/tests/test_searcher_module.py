@@ -216,5 +216,15 @@ def test_rerank_symbol_query_does_not_apply_tutorial_intent():
     assert ranked[0].symbol == "Node.add_child"
 
 
+def test_search_response_metadata_shape_is_stable():
+    from rag.models import SearchMetadata
+
+    metadata = SearchMetadata(mode="fts_only", vector_available=False, fallback_reason="missing_vec_chunks")
+
+    assert metadata.mode == "fts_only"
+    assert metadata.vector_available is False
+    assert metadata.fallback_reason == "missing_vec_chunks"
+
+
 if __name__ == "__main__":
     unittest.main()
