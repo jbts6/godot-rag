@@ -1,6 +1,12 @@
+---
+change: search-quality-optimization-loop
+design-doc: docs/superpowers/specs/2026-06-29-search-quality-optimization-loop-design.md
+base-ref: 9dde7807289149a4481cba172a46568b24d44416
+---
+
 # Search Quality Optimization Loop Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Build a repeatable search-quality optimization loop that makes `eval-search` runnable, expands golden-query coverage, diagnoses failures, and fixes the first observed recall and ranking failures.
 
@@ -45,7 +51,7 @@
 - Consumes: existing `rag.cli.main()` in `rst2md/rag/cli.py`.
 - Produces: project script target `godot-rag = "rag.cli:main"` and wheel package inclusion for `rst2md/rag`.
 
-- [ ] **Step 1: Write the failing packaging test**
+- [x] **Step 1: Write the failing packaging test**
 
 Append this test to `rst2md/tests/test_search_eval_cli.py`:
 
@@ -68,7 +74,7 @@ def test_project_script_targets_importable_rag_cli():
     assert callable(getattr(module, attr_name))
 ```
 
-- [ ] **Step 2: Run the targeted failing test**
+- [x] **Step 2: Run the targeted failing test**
 
 Run:
 
@@ -78,7 +84,7 @@ rtk uv run pytest rst2md/tests/test_search_eval_cli.py::test_project_script_targ
 
 Expected: FAIL because `pyproject.toml` currently targets `godot_rag.rag.cli:main` and does not include `"rst2md/rag"` in wheel packages.
 
-- [ ] **Step 3: Fix `pyproject.toml`**
+- [x] **Step 3: Fix `pyproject.toml`**
 
 Change the script and packages block to:
 
@@ -92,7 +98,7 @@ packages = ["rst2md/rag", "godot_rag", "godot_rag_build"]
 exclude = ["godot_rag/docs-md/**"]
 ```
 
-- [ ] **Step 4: Verify the test and the command**
+- [x] **Step 4: Verify the test and the command**
 
 Run:
 
@@ -106,7 +112,7 @@ Expected:
 - pytest prints `1 passed`.
 - help output includes `usage:` and `eval-search`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add pyproject.toml rst2md/tests/test_search_eval_cli.py
@@ -130,7 +136,7 @@ rtk git commit -m "fix: make eval-search CLI entrypoint importable"
   - JSON field `failures[].diagnostics`.
   - text report lines for `expected_present`, `best_rank`, and `best_rank_no_graph`.
 
-- [ ] **Step 1: Write the failing diagnostics test**
+- [x] **Step 1: Write the failing diagnostics test**
 
 Add these imports near the existing imports in `rst2md/tests/test_search_eval.py`:
 
@@ -188,7 +194,7 @@ def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch)
     assert "best_rank=" in text
 ```
 
-- [ ] **Step 2: Run the failing diagnostics tests**
+- [x] **Step 2: Run the failing diagnostics tests**
 
 Run:
 
@@ -201,7 +207,7 @@ rtk uv run pytest \
 
 Expected: FAIL because `diagnostic_limit`, `FailureDiagnostics`, and `QueryResult.diagnostics` do not exist yet.
 
-- [ ] **Step 3: Add diagnostics data structures**
+- [x] **Step 3: Add diagnostics data structures**
 
 In `rst2md/rag/search_eval.py`, update imports and dataclasses:
 
@@ -235,7 +241,7 @@ class QueryResult:
     diagnostics: FailureDiagnostics | None = None
 ```
 
-- [ ] **Step 4: Add diagnostic helpers**
+- [x] **Step 4: Add diagnostic helpers**
 
 Add these helpers after `result_matches`:
 
@@ -301,7 +307,7 @@ def diagnose_failure(
     )
 ```
 
-- [ ] **Step 5: Attach diagnostics in `evaluate_database`**
+- [x] **Step 5: Attach diagnostics in `evaluate_database`**
 
 Change the signature:
 
@@ -346,7 +352,7 @@ Inside the query loop, compute an extended diagnostic window and attach diagnost
         query_results.append(evaluated)
 ```
 
-- [ ] **Step 6: Serialize and print diagnostics**
+- [x] **Step 6: Serialize and print diagnostics**
 
 In `_query_result_to_dict`, add:
 
@@ -378,7 +384,7 @@ In `format_text_report`, inside the failure block, after expected output and bef
                 )
 ```
 
-- [ ] **Step 7: Run diagnostics tests**
+- [x] **Step 7: Run diagnostics tests**
 
 Run:
 
@@ -391,7 +397,7 @@ rtk uv run pytest \
 
 Expected: `2 passed`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py
@@ -410,7 +416,7 @@ rtk git commit -m "feat: add search evaluation failure diagnostics"
 - Consumes: existing `GoldenQuery.report_only` tier flag.
 - Produces: packaged query suite with at least 30 unique IDs, at least 12 gating queries, and coverage for `class`, `symbol`, `tutorial`, `engine`, and `addon` categories.
 
-- [ ] **Step 1: Write the failing query-suite shape test**
+- [x] **Step 1: Write the failing query-suite shape test**
 
 Append this test to `rst2md/tests/test_search_eval.py`:
 
@@ -431,7 +437,7 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert any("graph" in query.tags for query in queries)
 ```
 
-- [ ] **Step 2: Run the failing query-suite shape test**
+- [x] **Step 2: Run the failing query-suite shape test**
 
 Run:
 
@@ -441,7 +447,7 @@ rtk uv run pytest rst2md/tests/test_search_eval.py::test_packaged_eval_queries_a
 
 Expected: FAIL because the packaged query suite currently has 5 entries.
 
-- [ ] **Step 3: Replace `rst2md/rag/search_eval_queries.json`**
+- [x] **Step 3: Replace `rst2md/rag/search_eval_queries.json`**
 
 Replace the file with this JSON:
 
@@ -480,7 +486,7 @@ Replace the file with this JSON:
 ]
 ```
 
-- [ ] **Step 4: Run query loading and shape tests**
+- [x] **Step 4: Run query loading and shape tests**
 
 Run:
 
@@ -493,7 +499,7 @@ rtk uv run pytest \
 
 Expected: `2 passed`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 rtk git add rst2md/rag/search_eval_queries.json rst2md/tests/test_search_eval.py
@@ -516,7 +522,7 @@ rtk git commit -m "test: expand tiered search quality queries"
 - `search_database(...)` keeps its existing public signature.
 - Query variants are lexical recall candidates only; vector search continues to use the original query text.
 
-- [ ] **Step 1: Write failing unit tests for query rewriting**
+- [x] **Step 1: Write failing unit tests for query rewriting**
 
 Append to `rst2md/tests/test_searcher_module.py`:
 
@@ -549,7 +555,7 @@ def test_expand_query_variants_deduplicates_exact_symbol_query():
     assert expand_query_variants("Node.add_child") == ["Node.add_child"]
 ```
 
-- [ ] **Step 2: Write failing search integration test**
+- [x] **Step 2: Write failing search integration test**
 
 Add this method inside `SearchTests` in `rst2md/tests/test_rag_search.py`:
 
@@ -575,7 +581,7 @@ Add this method inside `SearchTests` in `rst2md/tests/test_rag_search.py`:
             self.assertEqual(results[0].symbol, "Node.add_child")
 ```
 
-- [ ] **Step 3: Run the failing rewrite tests**
+- [x] **Step 3: Run the failing rewrite tests**
 
 Run:
 
@@ -591,7 +597,7 @@ rtk uv run pytest \
 
 Expected: FAIL because `rag.query_rewrite` does not exist and search does not use aliases.
 
-- [ ] **Step 4: Create `rst2md/rag/query_rewrite.py`**
+- [x] **Step 4: Create `rst2md/rag/query_rewrite.py`**
 
 ```python
 import re
@@ -619,7 +625,7 @@ def expand_query_variants(query: str) -> list[str]:
     return variants
 ```
 
-- [ ] **Step 5: Use query variants in `rst2md/rag/searcher.py`**
+- [x] **Step 5: Use query variants in `rst2md/rag/searcher.py`**
 
 Add the import:
 
@@ -670,7 +676,7 @@ Replace the single FTS execution with variant merging:
 
 Keep the existing vector query and RRF code unchanged after `fts_results_raw`.
 
-- [ ] **Step 6: Promote fixed alias queries out of report-only**
+- [x] **Step 6: Promote fixed alias queries out of report-only**
 
 In `rst2md/rag/search_eval_queries.json`, remove `"report_only": true` from:
 
@@ -680,7 +686,7 @@ In `rst2md/rag/search_eval_queries.json`, remove `"report_only": true` from:
 
 Keep their `tags` values unchanged.
 
-- [ ] **Step 7: Verify rewrite tests**
+- [x] **Step 7: Verify rewrite tests**
 
 Run:
 
@@ -693,7 +699,7 @@ rtk uv run pytest \
 
 Expected: all selected tests pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add rst2md/rag/query_rewrite.py rst2md/rag/searcher.py rst2md/rag/search_eval_queries.json rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py
@@ -715,7 +721,7 @@ rtk git commit -m "feat: add conservative query rewrite aliases"
 - Produces `doc_type_boost(query: str, doc_type: str) -> float`.
 - Search results preserve the existing `SearchResult` fields and public search function signatures.
 
-- [ ] **Step 1: Write failing unit tests for intent boost**
+- [x] **Step 1: Write failing unit tests for intent boost**
 
 Append to `rst2md/tests/test_searcher_module.py`:
 
@@ -733,7 +739,7 @@ def test_doc_type_boost_does_not_boost_symbol_query():
     assert doc_type_boost("Node.add_child", "class") == 0
 ```
 
-- [ ] **Step 2: Write failing integration test**
+- [x] **Step 2: Write failing integration test**
 
 Add this method inside `SearchTests` in `rst2md/tests/test_rag_search.py`:
 
@@ -763,7 +769,7 @@ Add this method inside `SearchTests` in `rst2md/tests/test_rag_search.py`:
             self.assertEqual(results[0].path, "tutorials/scene_tree.md")
 ```
 
-- [ ] **Step 3: Run the failing intent tests**
+- [x] **Step 3: Run the failing intent tests**
 
 Run:
 
@@ -777,7 +783,7 @@ rtk uv run pytest \
 
 Expected: FAIL because `doc_type_boost` does not exist and ranking does not apply doc-type intent.
 
-- [ ] **Step 4: Add `doc_type_boost` to `query_rewrite.py`**
+- [x] **Step 4: Add `doc_type_boost` to `query_rewrite.py`**
 
 ```python
 def doc_type_boost(query: str, doc_type: str) -> float:
@@ -795,7 +801,7 @@ def doc_type_boost(query: str, doc_type: str) -> float:
     return 0.0
 ```
 
-- [ ] **Step 5: Apply the boost in `searcher.py`**
+- [x] **Step 5: Apply the boost in `searcher.py`**
 
 Update imports:
 
@@ -821,11 +827,11 @@ After direct and graph-expanded `SearchResult` objects are assembled and before 
     sorted_results = _apply_intent_boost(query, sorted_results)
 ```
 
-- [ ] **Step 6: Promote the tutorial intent query out of report-only**
+- [x] **Step 6: Promote the tutorial intent query out of report-only**
 
 In `rst2md/rag/search_eval_queries.json`, remove `"report_only": true` from `how-to-use-scene-tree-nodes`.
 
-- [ ] **Step 7: Verify intent tests**
+- [x] **Step 7: Verify intent tests**
 
 Run:
 
@@ -838,7 +844,7 @@ rtk uv run pytest \
 
 Expected: all selected tests pass.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add rst2md/rag/query_rewrite.py rst2md/rag/searcher.py rst2md/rag/search_eval_queries.json rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py
@@ -857,7 +863,7 @@ rtk git commit -m "feat: boost tutorial intent in search ranking"
 - Consumes: runnable `godot-rag eval-search`.
 - Produces: documented diagnostics workflow and a baseline JSON file for release-database comparison.
 
-- [ ] **Step 1: Update README evaluation docs**
+- [x] **Step 1: Update README evaluation docs**
 
 In `README.md`, update the `Search Quality Evaluation` section so it includes these command examples:
 
@@ -889,7 +895,7 @@ godot-rag eval-search \
 Failed queries include diagnostics showing whether expected targets exist in the database and where the best match appears inside the diagnostic window.
 ````
 
-- [ ] **Step 2: Run the full focused test suite**
+- [x] **Step 2: Run the full focused test suite**
 
 Run:
 
@@ -899,7 +905,7 @@ rtk uv run pytest rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval
 
 Expected: all selected tests pass.
 
-- [ ] **Step 3: Run manual evaluation text output**
+- [x] **Step 3: Run manual evaluation text output**
 
 Run:
 
@@ -914,7 +920,7 @@ Expected:
 - output includes absolute `hit@5` and `mrr@5`.
 - any failed query includes a `diagnostics:` block.
 
-- [ ] **Step 4: Create or refresh baseline**
+- [x] **Step 4: Create or refresh baseline**
 
 Run:
 
@@ -928,7 +934,7 @@ Expected:
 - `docs/search-quality/baseline.json` exists.
 - JSON includes `overall`, `categories`, `query_results`, and `baseline_written`.
 
-- [ ] **Step 5: Compare against baseline**
+- [x] **Step 5: Compare against baseline**
 
 Run:
 
@@ -941,7 +947,7 @@ Expected:
 - output includes `baseline: compared`.
 - command exits 0 immediately after baseline creation.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add README.md docs/search-quality/baseline.json
