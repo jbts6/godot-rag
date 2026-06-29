@@ -4719,6 +4719,10 @@
       "chunks": 15560,
       "symbols": 11265,
       "vectors": null
+    },
+    "versions": {
+      "evaluator": "4.7.0.post10",
+      "search": "4.7.0.post10"
     }
   }
 }
