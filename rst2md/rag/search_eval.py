@@ -217,7 +217,7 @@ def calculate_metrics(query_results: Sequence[QueryResult]) -> tuple[dict, dict]
 
 
 def _baseline_gating_ids(baseline: dict) -> set[str] | None:
-    queries = baseline.get("queries")
+    queries = baseline.get("query_results")
     if not isinstance(queries, list):
         return None
     return {
@@ -331,9 +331,7 @@ def apply_baseline(
         return report
 
     if write_baseline:
-        baseline_path.parent.mkdir(parents=True, exist_ok=True)
-        baseline_path.write_text(json.dumps(report_to_dict(report), ensure_ascii=False, indent=2), encoding="utf-8")
-        return EvaluationReport(
+        baseline_report = EvaluationReport(
             overall=report.overall,
             categories=report.categories,
             failures=report.failures,
@@ -344,6 +342,9 @@ def apply_baseline(
             baseline_written=True,
             baseline_compared=False,
         )
+        baseline_path.parent.mkdir(parents=True, exist_ok=True)
+        baseline_path.write_text(json.dumps(report_to_dict(baseline_report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return baseline_report
 
     if not baseline_path.exists():
         return report
@@ -472,7 +473,7 @@ def report_to_dict(report: EvaluationReport) -> dict:
         "overall": report.overall,
         "categories": report.categories,
         "failures": [_query_result_to_dict(result) for result in report.failures],
-        "queries": [_query_result_to_dict(result) for result in report.query_results],
+        "query_results": [_query_result_to_dict(result) for result in report.query_results],
         "graph_changes": [_query_result_to_dict(result) for result in report.graph_changes],
         "regression_failed": report.regression_failed,
         "regression_messages": list(report.regression_messages),

@@ -274,7 +274,7 @@ def test_apply_baseline_ignores_new_queries_outside_baseline_gate(tmp_path):
         json.dumps(
             {
                 "overall": {"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
-                "queries": [
+                "query_results": [
                     {
                         "id": "existing",
                         "query": "existing query",
