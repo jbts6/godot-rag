@@ -56,7 +56,7 @@ def test_evaluate_results_passes_when_expected_path_is_in_top_k():
 
 from dataclasses import replace
 
-from rag.search_eval import calculate_metrics, compare_with_baseline
+from rag.search_eval import calculate_metrics, compare_with_baseline, format_text_report
 
 
 def test_calculate_metrics_overall_and_by_category():
@@ -91,7 +91,42 @@ def test_compare_with_baseline_reports_hit5_regression():
     assert any("hit@5" in message for message in messages)
 
 
+def test_text_report_includes_failed_query_diagnostic_detail():
+    base = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
+    query = replace(
+        base,
+        id="missing-node-add-child",
+        query="missing node add_child",
+        category="class",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=("Node.add_child",),
+        expected_doc_types=("class",),
+    )
+    failed = evaluate_results(
+        query,
+        [_result(path="classes/class_timer.md", symbol="Timer.start", doc_type="class")],
+    )
+    overall, categories = calculate_metrics([failed])
+    report = EvaluationReport(
+        overall=overall,
+        categories=categories,
+        failures=[failed],
+        query_results=[failed],
+        graph_changes=[],
+    )
+
+    text = format_text_report(report)
+
+    assert "missing-node-add-child" in text
+    assert "missing node add_child" in text
+    assert "category=class" in text
+    assert "classes/class_node.md" in text
+    assert "Node.add_child" in text
+    assert "classes/class_timer.md" in text
+
+
 from rag.indexer import build_database
+from rag.db import get_connection
 from rag.search_eval import evaluate_database, report_to_dict
 
 
@@ -101,6 +136,7 @@ def _build_eval_db(tmp_path, monkeypatch):
     docs = tmp_path / "docs"
     classes = docs / "classes"
     tutorials = docs / "tutorials"
+    addons = tmp_path / "addons"
     classes.mkdir(parents=True)
     tutorials.mkdir(parents=True)
 
@@ -123,9 +159,36 @@ def _build_eval_db(tmp_path, monkeypatch):
         "# Scene Tree\n\nUse add_child to attach nodes to the scene tree.\n",
         encoding="utf-8",
     )
+    (tutorials / "graph_links.md").write_text(
+        "# Graph Links\n\nGraph expansion seed. See also `Node.add_child`.\n",
+        encoding="utf-8",
+    )
+    statecharts = addons / "statecharts"
+    statecharts_docs = statecharts / "docs"
+    statecharts_addon = statecharts / "addons" / "godot_state_charts"
+    statecharts_docs.mkdir(parents=True)
+    statecharts_addon.mkdir(parents=True)
+    (statecharts_addon / "plugin.cfg").write_text(
+        '[plugin]\nname="Godot State Charts"\n',
+        encoding="utf-8",
+    )
+    (statecharts / "README.md").write_text(
+        "# Statecharts\n\nState machine addon for Godot.\n",
+        encoding="utf-8",
+    )
+    (statecharts_docs / "usage.md").write_text(
+        "# Usage\n\nCreate a state machine and add transitions.\n",
+        encoding="utf-8",
+    )
     monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
     db_path = tmp_path / "eval.db"
-    build_database(docs, db_path)
+    build_database(docs, db_path, addons_dir=addons)
+    with get_connection(db_path) as conn:
+        try:
+            conn.execute("DELETE FROM vec_chunks")
+            conn.commit()
+        except Exception:
+            pass
     return db_path
 
 
@@ -149,6 +212,21 @@ def test_graph_comparison_marks_changed_query_status(tmp_path, monkeypatch):
     report = evaluate_database(db_path, queries, limit=5, compare_graph=True)
 
     assert all(hasattr(result, "graph_changed") for result in report.query_results)
+
+
+def test_fixture_evaluation_covers_addon_doc_type_and_graph_expansion(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    queries = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))
+
+    assert any(query.expected_doc_types for query in queries)
+    assert any(query.expected_addons for query in queries)
+
+    report = evaluate_database(db_path, queries, limit=5, compare_graph=True)
+    data = report_to_dict(report)
+
+    assert "addon" in data["categories"]
+    assert any(result.query.expected_addons and result.passed for result in report.query_results)
+    assert any(result.graph_changed for result in report.graph_changes)
 
 
 import json
@@ -188,3 +266,47 @@ def test_apply_baseline_marks_regression_failure(tmp_path):
     assert updated.regression_failed is True
     assert updated.baseline_compared is True
     assert updated.regression_messages
+
+
+def test_apply_baseline_ignores_new_queries_outside_baseline_gate(tmp_path):
+    baseline = tmp_path / "baseline.json"
+    baseline.write_text(
+        json.dumps(
+            {
+                "overall": {"count": 1, "hit@1": 1.0, "hit@3": 1.0, "hit@5": 1.0, "mrr@5": 1.0},
+                "queries": [
+                    {
+                        "id": "existing",
+                        "query": "existing query",
+                        "category": "class",
+                        "required_at": 5,
+                        "matched_rank": 1,
+                        "passed": True,
+                        "failure_classification": "",
+                        "report_only": False,
+                        "graph_changed": False,
+                        "expected": {"paths": [], "symbols": [], "doc_types": [], "addons": []},
+                        "observed": [],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+    existing_query = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
+    existing = evaluate_results(replace(existing_query, id="existing"), [_result(path=existing_query.expected_paths[0])])
+    new_query = replace(existing_query, id="new-query")
+    new_failure = evaluate_results(new_query, [_result(path="classes/class_timer.md", symbol="Timer.start")])
+    overall, categories = calculate_metrics([existing, new_failure])
+    report = EvaluationReport(
+        overall=overall,
+        categories=categories,
+        failures=[new_failure],
+        query_results=[existing, new_failure],
+        graph_changes=[],
+    )
+
+    updated = apply_baseline(report, baseline, write_baseline=False)
+
+    assert updated.baseline_compared is True
+    assert updated.regression_failed is False

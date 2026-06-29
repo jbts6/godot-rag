@@ -145,6 +145,17 @@ def calculate_metrics(query_results: Sequence[QueryResult]) -> tuple[dict, dict]
     return overall, {category: _metric_summary(results) for category, results in sorted(categories.items())}
 
 
+def _baseline_gating_ids(baseline: dict) -> set[str] | None:
+    queries = baseline.get("queries")
+    if not isinstance(queries, list):
+        return None
+    return {
+        str(query["id"])
+        for query in queries
+        if isinstance(query, dict) and "id" in query and not query.get("report_only", False)
+    }
+
+
 def compare_with_baseline(
     current: dict,
     baseline: dict,
@@ -259,8 +270,14 @@ def apply_baseline(
         return report
 
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    comparison_overall = report.overall
+    gating_ids = _baseline_gating_ids(baseline)
+    if gating_ids is not None:
+        comparison_results = [result for result in report.query_results if result.query.id in gating_ids]
+        comparison_overall, _ = calculate_metrics(comparison_results)
+
     failed, messages = compare_with_baseline(
-        report.overall,
+        comparison_overall,
         baseline.get("overall", {}),
         hit5_drop_threshold=hit5_drop_threshold,
         mrr5_relative_drop_threshold=mrr5_relative_drop_threshold,
@@ -276,6 +293,17 @@ def apply_baseline(
         baseline_written=False,
         baseline_compared=True,
     )
+
+
+def _format_expected(query: GoldenQuery) -> str:
+    expected = {
+        "paths": query.expected_paths,
+        "symbols": query.expected_symbols,
+        "doc_types": query.expected_doc_types,
+        "addons": query.expected_addons,
+    }
+    parts = [f"{key}={list(values)}" for key, values in expected.items() if values]
+    return " ".join(parts) if parts else "<none>"
 
 
 def format_text_report(report: EvaluationReport) -> str:
@@ -303,6 +331,19 @@ def format_text_report(report: EvaluationReport) -> str:
         lines.append("failures:")
         for failure in report.failures:
             lines.append(f"- {failure.query.id}: {failure.failure_classification}")
+            lines.append(f"  query: {failure.query.query}")
+            lines.append(f"  category={failure.query.category} required_at={failure.query.required_at}")
+            lines.append(f"  expected: {_format_expected(failure.query)}")
+            if failure.observed:
+                lines.append("  observed:")
+                for observed in failure.observed:
+                    lines.append(
+                        "  "
+                        f"#{observed['rank']} path={observed['path']} "
+                        f"symbol={observed['symbol']} doc_type={observed['doc_type']} addon={observed['addon']}"
+                    )
+            else:
+                lines.append("  observed: <none>")
     return "\n".join(lines)
 
 

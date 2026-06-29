@@ -230,5 +230,30 @@
     "required_at": 5,
     "expected_paths": ["tutorials/scene_tree.md"],
     "report_only": true
+  },
+  {
+    "id": "scene-tree-doc-type",
+    "query": "scene tree attach nodes tutorial",
+    "category": "tutorial",
+    "required_at": 5,
+    "expected_doc_types": ["tutorial"],
+    "report_only": true
+  },
+  {
+    "id": "statecharts-addon",
+    "query": "state machine addon",
+    "category": "addon",
+    "required_at": 5,
+    "expected_doc_types": ["addon"],
+    "expected_addons": ["statecharts"],
+    "report_only": true
+  },
+  {
+    "id": "graph-expansion-add-child",
+    "query": "graph expansion seed",
+    "category": "symbol",
+    "required_at": 5,
+    "expected_symbols": ["Node.add_child"],
+    "report_only": true
   }
 ]
