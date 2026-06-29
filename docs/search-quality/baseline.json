@@ -1,301 +1,58 @@
 {
   "overall": {
-    "count": 16,
-    "hit@1": 0.0,
-    "hit@3": 0.0,
-    "hit@5": 0.0,
-    "mrr@5": 0.0
+    "count": 12,
+    "hit@1": 1.0,
+    "hit@3": 1.0,
+    "hit@5": 1.0,
+    "mrr@5": 1.0
   },
   "categories": {
     "addon": {
-      "count": 1,
+      "count": 0,
       "hit@1": 0.0,
       "hit@3": 0.0,
       "hit@5": 0.0,
       "mrr@5": 0.0
     },
     "class": {
-      "count": 6,
-      "hit@1": 0.0,
-      "hit@3": 0.0,
-      "hit@5": 0.0,
-      "mrr@5": 0.0
+      "count": 4,
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "mrr@5": 1.0
     },
     "engine": {
       "count": 1,
-      "hit@1": 0.0,
-      "hit@3": 0.0,
-      "hit@5": 0.0,
-      "mrr@5": 0.0
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "mrr@5": 1.0
     },
     "symbol": {
       "count": 5,
-      "hit@1": 0.0,
-      "hit@3": 0.0,
-      "hit@5": 0.0,
-      "mrr@5": 0.0
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "mrr@5": 1.0
     },
     "tutorial": {
-      "count": 3,
-      "hit@1": 0.0,
-      "hit@3": 0.0,
-      "hit@5": 0.0,
-      "mrr@5": 0.0
+      "count": 2,
+      "hit@1": 1.0,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
+      "mrr@5": 1.0
     }
   },
   "failures": [
-    {
-      "id": "node-add-child-symbol",
-      "query": "Node.add_child",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Node.add_child"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "timer-start-symbol",
-      "query": "Timer.start",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.start"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "timer-stop-symbol",
-      "query": "Timer.stop",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.stop"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "timer-is-stopped-symbol",
-      "query": "Timer.is_stopped",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.is_stopped"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "object-emit-signal-symbol",
-      "query": "Object.emit_signal",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Object.emit_signal"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "node-class",
-      "query": "Node",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [
-          "classes/class_node.md"
-        ],
-        "symbols": [],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "timer-class",
-      "query": "Timer",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [
-          "classes/class_timer.md"
-        ],
-        "symbols": [],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "object-class",
-      "query": "Object",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [
-          "classes/class_object.md"
-        ],
-        "symbols": [],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "scene-tree-tutorial",
-      "query": "scene tree tutorial",
-      "category": "tutorial",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
-        ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
     {
       "id": "nodes-and-scenes-tutorial",
       "query": "nodes and scenes",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 7,
       "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
+      "failure_classification": "low_ranking",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -305,39 +62,174 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 39.479291078597186,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 39.314800682246016,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.AfterGUIInput",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 3,
+          "score": 39.31471144383528,
+          "path": "classes/class_environment.md",
+          "symbol": "Environment",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Environment"
+        },
+        {
+          "rank": 4,
+          "score": 39.080779780723226,
+          "path": "classes/class_editorsettings.md",
+          "symbol": "EditorSettings.NOTIFICATION_EDITOR_SETTINGS_CHANGED",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 39.07596551771592,
+          "path": "classes/class_camera2d.md",
+          "symbol": "Camera2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Camera2D"
+        },
+        {
+          "rank": 6,
+          "score": 38.94494177149152,
+          "path": "classes/class_lightmapgi.md",
+          "symbol": "LightmapGI",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "LightmapGI"
+        },
+        {
+          "rank": 7,
+          "score": 38.94146211771565,
+          "path": "tutorials/best_practices/godot_interfaces.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Accessing data or logic from an object"
+        },
+        {
+          "rank": 8,
+          "score": 38.94125141030556,
+          "path": "classes/class_editorscenepostimportplugin.md",
+          "symbol": "EditorScenePostImportPlugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "EditorScenePostImportPlugin"
+        },
+        {
+          "rank": 9,
+          "score": 38.85131435560437,
+          "path": "classes/class_gltfdocument.md",
+          "symbol": "GLTFDocument",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GLTFDocument"
+        },
+        {
+          "rank": 10,
+          "score": 19.739645539298593,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "ProjectSettings"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "gdextension-engine",
-      "query": "GDExtension C example",
-      "category": "engine",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "2D coordinate systems and 2D transforms"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Introduction"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Godot 2D coordinate systems"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Node transforms"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Common engine methods and macros"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Print text"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Format a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Convert an integer or float to a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Internationalize a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Clamp a value"
+          }
         ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "best_rank": 7,
+        "best_rank_no_graph": 7,
         "diagnostic_window": 50
       }
     },
@@ -348,8 +240,8 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
+      "failure_classification": "filter_mismatch",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -359,7 +251,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "engine_details/engine_api/custom_godot_servers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What for?"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_animationnodestatemachine.md",
+          "symbol": "AnimationNodeStateMachine",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "AnimationNodeStateMachine"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "tutorials/scripting/gdscript/gdscript_styleguide.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Methods and static functions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "tutorials/animation/animation_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "StateMachine travel"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "tutorials/3d/csg_tools.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Making an existing mesh manifold with Blender"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "tutorials/3d/procedural_geometry/surfacetool.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "add_index() can be called before or after add_vertex()"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "tutorials/xr/xr_action_map.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Binding modifiers on individual bindings"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/export/one-click_deploy.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What is one-click deploy?"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "tutorials/editor/using_engine_compilation_configuration_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using the engine compilation configuration editor"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/xr/deploying_to_android.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating the export presets"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -376,7 +359,7 @@
       "matched_rank": null,
       "passed": false,
       "failure_classification": "query_normalization",
-      "report_only": false,
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -386,10 +369,109 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.8685036623648413,
+          "path": "tutorials/physics/soft_body.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Cloak simulation"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "tutorials/scripting/change_scenes_manually.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Change scenes manually"
+        },
+        {
+          "rank": 3,
+          "score": 0.6666666666666666,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first scene"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "tutorials/scripting/groups.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using code"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "classes/class_scenetree.md",
+          "symbol": "SceneTree.node_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 7,
+          "score": 0.6349206349206349,
+          "path": "getting_started/first_3d_game/08.score_and_replay.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Adding music"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "tutorials/performance/cpu_optimization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "SceneTree"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "tutorials/ui/creating_applications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating an icon in the system tray"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Overridable functions"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.add_child",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
         "best_rank": null,
         "best_rank_no_graph": null,
         "diagnostic_window": 50
@@ -403,7 +485,7 @@
       "matched_rank": null,
       "passed": false,
       "failure_classification": "query_normalization",
-      "report_only": false,
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -413,12 +495,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_inputeventmousemotion.md",
+          "symbol": "InputEventMouseMotion",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "InputEventMouseMotion"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6153846153846154,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.6060606060606061,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 10,
+          "score": 0.5970149253731343,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_timer.md",
+            "symbol": "Timer.is_stopped",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
+        "best_rank": 12,
+        "best_rank_no_graph": 12,
         "diagnostic_window": 50
       }
     },
@@ -427,10 +608,10 @@
       "query": "emit a signal from code",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 7,
       "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
+      "failure_classification": "low_ranking",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -440,12 +621,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.1685582177385456,
+          "path": "getting_started/first_2d_game/03.coding_the_player.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Preparing for collisions"
+        },
+        {
+          "rank": 2,
+          "score": 1.0618279569892473,
+          "path": "classes/class_signal.md",
+          "symbol": "Signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signal"
+        },
+        {
+          "rank": 3,
+          "score": 0.9651741293532339,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Registering and emitting a signal"
+        },
+        {
+          "rank": 4,
+          "score": 0.9459631277813096,
+          "path": "getting_started/step_by_step/signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using signals"
+        },
+        {
+          "rank": 5,
+          "score": 0.8551165146909828,
+          "path": "getting_started/first_3d_game/05.spawning_mobs.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Spawning monsters randomly"
+        },
+        {
+          "rank": 6,
+          "score": 0.6666666666666666,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "`Signal `"
+        },
+        {
+          "rank": 7,
+          "score": 0.6557377049180328,
+          "path": "classes/class_object.md",
+          "symbol": "Object.emit_signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6451612903225806,
+          "path": "classes/class_object.md",
+          "symbol": "Object.set_block_signals",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 9,
+          "score": 0.6349206349206349,
+          "path": "tutorials/scripting/instancing_with_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Shooting example"
+        },
+        {
+          "rank": 10,
+          "score": 0.6349206349206349,
+          "path": "tutorials/scripting/c_sharp/c_sharp_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signal emission"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_object.md",
+            "symbol": "Object.emit_signal",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
+        "best_rank": 7,
+        "best_rank_no_graph": 7,
         "diagnostic_window": 50
       }
     },
@@ -454,9 +734,9 @@
       "query": "child node attach",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 8,
       "passed": false,
-      "failure_classification": "query_normalization",
+      "failure_classification": "low_ranking",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -467,174 +747,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "tutorials/3d/particles/collision.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Sphere collision"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "tutorials/performance/thread_safe_apis.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Unsafe:"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "tutorials/3d/particles/collision.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Box collision"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first scene"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "tutorials/3d/particles/attractors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Box attractors"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        },
+        {
+          "rank": 7,
+          "score": 0.6349206349206349,
+          "path": "tutorials/3d/particles/attractors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Sphere attractors"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "classes/class_node.md",
+          "symbol": "Node.add_child",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "tutorials/performance/pipeline_compilations.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Pipeline precompilation instancing"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "classes/class_scenetree.md",
+          "symbol": "SceneTree.node_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "start-countdown-timer",
-      "query": "start countdown timer",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.start"
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.add_child",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
         ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "stop-countdown-timer",
-      "query": "stop countdown timer",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.stop"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "how-to-use-scene-tree-nodes",
-      "query": "how to use scene tree nodes",
-      "category": "tutorial",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
-        ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "how-to-change-scenes",
-      "query": "how to change scenes manually",
-      "category": "tutorial",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
-        ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "script-signals-tutorial",
-      "query": "signals in gdscript tutorial",
-      "category": "tutorial",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
-        ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "physics-server-engine",
-      "query": "PhysicsServer3D engine details",
-      "category": "engine",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "class"
-        ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "best_rank": 8,
+        "best_rank_no_graph": 8,
         "diagnostic_window": 50
       }
     },
@@ -656,64 +873,172 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 37.78056012819217,
+          "path": "classes/class_editorscript.md",
+          "symbol": "EditorScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "EditorScript"
+        },
+        {
+          "rank": 2,
+          "score": 37.779829586792694,
+          "path": "classes/class_physicalbone2d.md",
+          "symbol": "PhysicalBone2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "PhysicalBone2D"
+        },
+        {
+          "rank": 3,
+          "score": 37.775532606854924,
+          "path": "classes/class_xranchor3d.md",
+          "symbol": "XRAnchor3D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "XRAnchor3D"
+        },
+        {
+          "rank": 4,
+          "score": 37.773436012454226,
+          "path": "getting_started/step_by_step/scripting_first_script.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating a new script"
+        },
+        {
+          "rank": 5,
+          "score": 37.75802795887432,
+          "path": "classes/class_worldenvironment.md",
+          "symbol": "WorldEnvironment",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "WorldEnvironment"
+        },
+        {
+          "rank": 6,
+          "score": 37.75202581672704,
+          "path": "classes/class_collisionshape2d.md",
+          "symbol": "CollisionShape2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CollisionShape2D"
+        },
+        {
+          "rank": 7,
+          "score": 37.7491656320064,
+          "path": "classes/class_animationnodetimeseek.md",
+          "symbol": "AnimationNodeTimeSeek",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "AnimationNodeTimeSeek"
+        },
+        {
+          "rank": 8,
+          "score": 37.748002515233686,
+          "path": "classes/class_groovejoint2d.md",
+          "symbol": "GrooveJoint2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GrooveJoint2D"
+        },
+        {
+          "rank": 9,
+          "score": 37.74445160009481,
+          "path": "classes/class_visualshadernodeframe.md",
+          "symbol": "VisualShaderNodeFrame",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "VisualShaderNodeFrame"
+        },
+        {
+          "rank": 10,
+          "score": 37.73618732222413,
+          "path": "classes/class_directionallight2d.md",
+          "symbol": "DirectionalLight2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "DirectionalLight2D"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "timer-related-methods",
-      "query": "Timer start stop paused wait time",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [
-          "classes/class_timer.md"
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Node"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.AutoTranslateMode",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.DuplicateFlags",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Enumerations"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.InternalMode",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Enumerations"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_ACCESSIBILITY_INVALIDATE",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Property Descriptions"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_ACCESSIBILITY_UPDATE",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_FOCUS_IN",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_FOCUS_OUT",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_PAUSED",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_PIP_MODE_ENTERED",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          }
         ],
-        "symbols": [],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "object-signal-methods",
-      "query": "Object signal methods emit add user signal",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [
-          "classes/class_object.md"
-        ],
-        "symbols": [],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
         "best_rank": null,
         "best_rank_no_graph": null,
         "diagnostic_window": 50
@@ -726,7 +1051,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -737,7 +1062,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "getting_started/introduction/first_look_at_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The Project Manager"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "engine_details/engine_api/custom_godot_servers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What for?"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_filedialog.md",
+          "symbol": "FileDialog.menu_show_in_file_manager",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Theme Property Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "tutorials/editor/project_manager.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using the Project Manager"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_richtextlabel.md",
+          "symbol": "RichTextLabel.get_menu",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.add_scene_post_import_plugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_textedit.md",
+          "symbol": "TextEdit.get_menu",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/audio/text_to_speech.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Basic Usage"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "tutorials/xr/xr_action_map.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Binding modifiers on an interaction profile"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/plugins/editor/making_plugins.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The main plugin is located at res://addons/my_plugin/"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -753,7 +1169,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -764,7 +1180,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_camerafeed.md",
+          "symbol": "CameraFeed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CameraFeed"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CameraServer"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "tutorials/3d/introduction_to_3d.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Cameras"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "getting_started/first_3d_game/03.player_movement_code.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Adding a camera"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "tutorials/editor/game_embedding.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera override"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "tutorials/3d/environment_and_post_processing.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera attributes"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "tutorials/3d/spring_arm.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Introduction"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer.camera_feed_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer.is_monitoring_feeds",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/editor/game_embedding.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera override options"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -780,7 +1287,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -791,7 +1298,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.add_inspector_plugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "classes/class_tree.md",
+          "symbol": "Tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Tree"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Overridable functions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6451612903225806,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "ready vs. enter_tree vs. NOTIFICATION_PARENTED"
+        },
+        {
+          "rank": 5,
+          "score": 0.6349206349206349,
+          "path": "classes/class_animationtree.md",
+          "symbol": "AnimationTree.tree_root",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.625,
+          "path": "classes/class_animationtree.md",
+          "symbol": "AnimationTree.get_tree_root",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6153846153846154,
+          "path": "classes/class_node.md",
+          "symbol": "Node.child_entered_tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 8,
+          "score": 0.6060606060606061,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 9,
+          "score": 0.5970149253731343,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Called every time the node enters the scene tree."
+        },
+        {
+          "rank": 10,
+          "score": 0.5882352941176471,
+          "path": "tutorials/scripting/scene_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Scene tree"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -805,9 +1403,9 @@
       "query": "semantic search vector fallback",
       "category": "engine",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 8,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "low_ranking",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -818,39 +1416,174 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.cross",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.project",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_vector2.md",
+          "symbol": "Vector2.project",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "classes/class_themedb.md",
+          "symbol": "ThemeDB.get_fallback_icon",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.BACK",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_vector3i.md",
+          "symbol": "Vector3i.BACK",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_themedb.md",
+          "symbol": "ThemeDB.fallback_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/scripting/gdscript/gdscript_exports.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Linking vector values together"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.ONE",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.Vector3",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constructor Descriptions"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
-    },
-    {
-      "id": "editor-plugin-running-code",
-      "query": "running code in the editor plugin",
-      "category": "tutorial",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [],
-        "doc_types": [
-          "tutorial"
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "2D coordinate systems and 2D transforms"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Introduction"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Godot 2D coordinate systems"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Node transforms"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Common engine methods and macros"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Print text"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Format a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Convert an integer or float to a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Internationalize a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Clamp a value"
+          }
         ],
-        "addons": []
-      },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "best_rank": 8,
+        "best_rank_no_graph": 8,
         "diagnostic_window": 50
       }
     }
@@ -861,9 +1594,9 @@
       "query": "Node.add_child",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -874,23 +1607,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.add_child",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_tree.md",
+          "symbol": "Tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Tree"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_colorpicker.md",
+          "symbol": "ColorPicker",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "ColorPicker"
+        },
+        {
+          "rank": 4,
+          "score": 1.2916666666666665,
+          "path": "tutorials/performance/thread_safe_apis.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Unsafe:"
+        },
+        {
+          "rank": 5,
+          "score": 1.2036199095022624,
+          "path": "tutorials/networking/http_request_class.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Preparing the scene"
+        },
+        {
+          "rank": 6,
+          "score": 1.1784946236559142,
+          "path": "classes/class_node.md",
+          "symbol": "Node.child_entered_tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 7,
+          "score": 1.1579818031430935,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first scene"
+        },
+        {
+          "rank": 8,
+          "score": 1.1477411477411477,
+          "path": "classes/class_node.md",
+          "symbol": "Node.NOTIFICATION_PARENTED",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 9,
+          "score": 1.1267605633802817,
+          "path": "tutorials/best_practices/scenes_versus_scripts.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "main.gd"
+        },
+        {
+          "rank": 10,
+          "score": 1.0955882352941178,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "timer-start-symbol",
       "query": "Timer.start",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -901,23 +1719,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_float.md",
+          "symbol": "float",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "float"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_tree.md",
+          "symbol": "Tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Tree"
+        },
+        {
+          "rank": 4,
+          "score": 1.282051282051282,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        },
+        {
+          "rank": 5,
+          "score": 1.261798310978639,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 1.2248714352501169,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.has_autostart",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 1.2231559290382819,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 1.189071038251366,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 1.1684434968017057,
+          "path": "tutorials/scripting/debug/custom_performance_monitors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating a custom performance monitor"
+        },
+        {
+          "rank": 10,
+          "score": 1.1069277108433735,
+          "path": "classes/class_scenetree.md",
+          "symbol": "SceneTree.create_timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "timer-stop-symbol",
       "query": "Timer.stop",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -928,23 +1831,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_signal.md",
+          "symbol": "Signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signal"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_tree.md",
+          "symbol": "Tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Tree"
+        },
+        {
+          "rank": 4,
+          "score": 1.3008989952406136,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 1.242176215695715,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 1.0250000000000001,
+          "path": "getting_started/first_3d_game/07.killing_player.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Ending the game"
+        },
+        {
+          "rank": 7,
+          "score": 0.8443447186902684,
+          "path": "classes/class_tween.md",
+          "symbol": "Tween.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6557377049180328,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 9,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "timer-is-stopped-symbol",
       "query": "Timer.is_stopped",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -955,23 +1943,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_stopped",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_bool.md",
+          "symbol": "bool",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "bool"
+        },
+        {
+          "rank": 3,
+          "score": 1.290658339838668,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.9191338930623066,
+          "path": "classes/class_tween.md",
+          "symbol": "Tween.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.6666666666666666,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6557377049180328,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6451612903225806,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "classes/class_inputeventmousemotion.md",
+          "symbol": "InputEventMouseMotion",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "InputEventMouseMotion"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "object-emit-signal-symbol",
       "query": "Object.emit_signal",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -982,23 +2055,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.emit_signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Object"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_stringname.md",
+          "symbol": "StringName",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "StringName"
+        },
+        {
+          "rank": 4,
+          "score": 25.0,
+          "path": "classes/class_gdscript.md",
+          "symbol": "GDScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDScript"
+        },
+        {
+          "rank": 5,
+          "score": 1.3015873015873014,
+          "path": "classes/class_object.md",
+          "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 6,
+          "score": 1.3008989952406136,
+          "path": "classes/class_object.md",
+          "symbol": "Object.set_block_signals",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 7,
+          "score": 1.0946907498631635,
+          "path": "tutorials/scripting/cpp/gdextension_cpp_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 8,
+          "score": 1.067603160667252,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 9,
+          "score": 1.039570757880617,
+          "path": "classes/class_signal.md",
+          "symbol": "Signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signal"
+        },
+        {
+          "rank": 10,
+          "score": 0.8781609195402298,
+          "path": "getting_started/step_by_step/signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using signals"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "node-class",
       "query": "Node",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1009,23 +2167,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 2,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.get_node_or_null",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 3,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.replacing_by",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 4,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.get_parent",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 5,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.replace_by",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 6,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.has_node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 7,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.editor_description_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 8,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.is_greater_than",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 9,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.get_node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        },
+        {
+          "rank": 10,
+          "score": 40.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.is_ancestor_of",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "timer-class",
       "query": "Timer",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1036,23 +2279,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        },
+        {
+          "rank": 2,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_timer_process_callback",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.TimerProcessCallback",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.set_timer_process_callback",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.timeout",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Enumerations"
+        },
+        {
+          "rank": 8,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.has_autostart",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 40.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "object-class",
       "query": "Object",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1063,23 +2391,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 100.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Object"
+        },
+        {
+          "rank": 2,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.to_string",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 3,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.get_instance_id",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 5,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.NOTIFICATION_PREDELETE",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 6,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.remove_user_signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 7,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.NOTIFICATION_POSTINITIALIZE",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 8,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.set_message_translation",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 9,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.notification",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 10,
+          "score": 40.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.set_script",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "scene-tree-tutorial",
       "query": "scene tree tutorial",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1090,24 +2503,109 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.1452981444784724,
+          "path": "tutorials/scripting/singletons_autoload.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Custom scene switcher"
+        },
+        {
+          "rank": 2,
+          "score": 1.1054988083077972,
+          "path": "getting_started/step_by_step/instancing.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating instances"
+        },
+        {
+          "rank": 3,
+          "score": 1.0894660894660895,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 4,
+          "score": 1.0366666666666666,
+          "path": "tutorials/3d/using_multi_mesh_instance.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Setting up the nodes"
+        },
+        {
+          "rank": 5,
+          "score": 1.0289823008849557,
+          "path": "getting_started/first_2d_game/02.player_scene.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Node structure"
+        },
+        {
+          "rank": 6,
+          "score": 0.9302060970373551,
+          "path": "getting_started/first_3d_game/02.player_input.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Player scene and input actions"
+        },
+        {
+          "rank": 7,
+          "score": 0.7166666666666667,
+          "path": "getting_started/introduction/key_concepts_overview.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The scene tree"
+        },
+        {
+          "rank": 8,
+          "score": 0.7057377049180329,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Nodes and Scenes"
+        },
+        {
+          "rank": 9,
+          "score": 0.6951612903225807,
+          "path": "tutorials/3d/lights_and_shadows.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Introduction"
+        },
+        {
+          "rank": 10,
+          "score": 0.6951612903225807,
+          "path": "tutorials/scripting/scene_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using SceneTree"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "nodes-and-scenes-tutorial",
       "query": "nodes and scenes",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 7,
       "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
+      "failure_classification": "low_ranking",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1117,12 +2615,174 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 39.479291078597186,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 39.314800682246016,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.AfterGUIInput",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 3,
+          "score": 39.31471144383528,
+          "path": "classes/class_environment.md",
+          "symbol": "Environment",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Environment"
+        },
+        {
+          "rank": 4,
+          "score": 39.080779780723226,
+          "path": "classes/class_editorsettings.md",
+          "symbol": "EditorSettings.NOTIFICATION_EDITOR_SETTINGS_CHANGED",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 39.07596551771592,
+          "path": "classes/class_camera2d.md",
+          "symbol": "Camera2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Camera2D"
+        },
+        {
+          "rank": 6,
+          "score": 38.94494177149152,
+          "path": "classes/class_lightmapgi.md",
+          "symbol": "LightmapGI",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "LightmapGI"
+        },
+        {
+          "rank": 7,
+          "score": 38.94146211771565,
+          "path": "tutorials/best_practices/godot_interfaces.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Accessing data or logic from an object"
+        },
+        {
+          "rank": 8,
+          "score": 38.94125141030556,
+          "path": "classes/class_editorscenepostimportplugin.md",
+          "symbol": "EditorScenePostImportPlugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "EditorScenePostImportPlugin"
+        },
+        {
+          "rank": 9,
+          "score": 38.85131435560437,
+          "path": "classes/class_gltfdocument.md",
+          "symbol": "GLTFDocument",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GLTFDocument"
+        },
+        {
+          "rank": 10,
+          "score": 19.739645539298593,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "ProjectSettings"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "2D coordinate systems and 2D transforms"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Introduction"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Godot 2D coordinate systems"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Node transforms"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Common engine methods and macros"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Print text"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Format a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Convert an integer or float to a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Internationalize a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Clamp a value"
+          }
+        ],
+        "best_rank": 7,
+        "best_rank_no_graph": 7,
         "diagnostic_window": 50
       }
     },
@@ -1131,9 +2791,9 @@
       "query": "GDExtension C example",
       "category": "engine",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1144,14 +2804,99 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.3333333333333333,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "GDExtension C example"
+        },
+        {
+          "rank": 2,
+          "score": 1.290658339838668,
+          "path": "classes/class_gdextensionmanager.md",
+          "symbol": "GDExtensionManager",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDExtensionManager"
+        },
+        {
+          "rank": 3,
+          "score": 1.2333965844402277,
+          "path": "engine_details/engine_api/gdextension/gdextension_file.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Introduction"
+        },
+        {
+          "rank": 4,
+          "score": 1.05982905982906,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Introduction"
+        },
+        {
+          "rank": 5,
+          "score": 1.0572074421839681,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Initializing the extension"
+        },
+        {
+          "rank": 6,
+          "score": 1.0167310167310166,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "A wrapper API"
+        },
+        {
+          "rank": 7,
+          "score": 1.003921568627451,
+          "path": "classes/class_gdextension.md",
+          "symbol": "GDExtension",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDExtension"
+        },
+        {
+          "rank": 8,
+          "score": 1.0006253908692933,
+          "path": "tutorials/scripting/cpp/gdextension_cpp_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating a simple plugin"
+        },
+        {
+          "rank": 9,
+          "score": 0.952921157118548,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "A basic class"
+        },
+        {
+          "rank": 10,
+          "score": 0.9318516535011381,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Custom properties"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "state-machine-addon",
@@ -1160,8 +2905,8 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": false,
+      "failure_classification": "filter_mismatch",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1171,7 +2916,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "engine_details/engine_api/custom_godot_servers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What for?"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_animationnodestatemachine.md",
+          "symbol": "AnimationNodeStateMachine",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "AnimationNodeStateMachine"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "tutorials/scripting/gdscript/gdscript_styleguide.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Methods and static functions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "tutorials/animation/animation_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "StateMachine travel"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "tutorials/3d/csg_tools.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Making an existing mesh manifold with Blender"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "tutorials/3d/procedural_geometry/surfacetool.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "add_index() can be called before or after add_vertex()"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "tutorials/xr/xr_action_map.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Binding modifiers on individual bindings"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/export/one-click_deploy.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What is one-click deploy?"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "tutorials/editor/using_engine_compilation_configuration_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using the engine compilation configuration editor"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/xr/deploying_to_android.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating the export presets"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -1188,7 +3024,7 @@
       "matched_rank": null,
       "passed": false,
       "failure_classification": "query_normalization",
-      "report_only": false,
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1198,10 +3034,109 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.8685036623648413,
+          "path": "tutorials/physics/soft_body.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Cloak simulation"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "tutorials/scripting/change_scenes_manually.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Change scenes manually"
+        },
+        {
+          "rank": 3,
+          "score": 0.6666666666666666,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first scene"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "tutorials/scripting/groups.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using code"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "classes/class_scenetree.md",
+          "symbol": "SceneTree.node_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 7,
+          "score": 0.6349206349206349,
+          "path": "getting_started/first_3d_game/08.score_and_replay.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Adding music"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "tutorials/performance/cpu_optimization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "SceneTree"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "tutorials/ui/creating_applications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating an icon in the system tray"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Overridable functions"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.add_child",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
         "best_rank": null,
         "best_rank_no_graph": null,
         "diagnostic_window": 50
@@ -1215,7 +3150,7 @@
       "matched_rank": null,
       "passed": false,
       "failure_classification": "query_normalization",
-      "report_only": false,
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1225,12 +3160,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_inputeventmousemotion.md",
+          "symbol": "InputEventMouseMotion",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "InputEventMouseMotion"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6153846153846154,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.6060606060606061,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 10,
+          "score": 0.5970149253731343,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_timer.md",
+            "symbol": "Timer.is_stopped",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
+        "best_rank": 12,
+        "best_rank_no_graph": 12,
         "diagnostic_window": 50
       }
     },
@@ -1239,10 +3273,10 @@
       "query": "emit a signal from code",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 7,
       "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
+      "failure_classification": "low_ranking",
+      "report_only": true,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1252,12 +3286,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.1685582177385456,
+          "path": "getting_started/first_2d_game/03.coding_the_player.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Preparing for collisions"
+        },
+        {
+          "rank": 2,
+          "score": 1.0618279569892473,
+          "path": "classes/class_signal.md",
+          "symbol": "Signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signal"
+        },
+        {
+          "rank": 3,
+          "score": 0.9651741293532339,
+          "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Registering and emitting a signal"
+        },
+        {
+          "rank": 4,
+          "score": 0.9459631277813096,
+          "path": "getting_started/step_by_step/signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using signals"
+        },
+        {
+          "rank": 5,
+          "score": 0.8551165146909828,
+          "path": "getting_started/first_3d_game/05.spawning_mobs.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Spawning monsters randomly"
+        },
+        {
+          "rank": 6,
+          "score": 0.6666666666666666,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "`Signal `"
+        },
+        {
+          "rank": 7,
+          "score": 0.6557377049180328,
+          "path": "classes/class_object.md",
+          "symbol": "Object.emit_signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6451612903225806,
+          "path": "classes/class_object.md",
+          "symbol": "Object.set_block_signals",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
+        },
+        {
+          "rank": 9,
+          "score": 0.6349206349206349,
+          "path": "tutorials/scripting/instancing_with_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Shooting example"
+        },
+        {
+          "rank": 10,
+          "score": 0.6349206349206349,
+          "path": "tutorials/scripting/c_sharp/c_sharp_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signal emission"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_object.md",
+            "symbol": "Object.emit_signal",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
+        "best_rank": 7,
+        "best_rank_no_graph": 7,
         "diagnostic_window": 50
       }
     },
@@ -1266,9 +3399,9 @@
       "query": "child node attach",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 8,
       "passed": false,
-      "failure_classification": "query_normalization",
+      "failure_classification": "low_ranking",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1279,12 +3412,111 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "tutorials/3d/particles/collision.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Sphere collision"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "tutorials/performance/thread_safe_apis.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Unsafe:"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "tutorials/3d/particles/collision.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Box collision"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first scene"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "tutorials/3d/particles/attractors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Box attractors"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        },
+        {
+          "rank": 7,
+          "score": 0.6349206349206349,
+          "path": "tutorials/3d/particles/attractors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Sphere attractors"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "classes/class_node.md",
+          "symbol": "Node.add_child",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "tutorials/performance/pipeline_compilations.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Pipeline precompilation instancing"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "classes/class_scenetree.md",
+          "symbol": "SceneTree.node_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.add_child",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Method Descriptions"
+          }
+        ],
+        "best_rank": 8,
+        "best_rank_no_graph": 8,
         "diagnostic_window": 50
       }
     },
@@ -1293,9 +3525,9 @@
       "query": "start countdown timer",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 4,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1306,24 +3538,109 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.3333333333333333,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_scenetreetimer.md",
+          "symbol": "SceneTreeTimer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "SceneTreeTimer"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "tutorials/scripting/debug/custom_performance_monitors.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating a custom performance monitor"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_timer_process_callback",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "stop-countdown-timer",
       "query": "stop countdown timer",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
-      "report_only": true,
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
+      "report_only": false,
       "graph_changed": false,
       "expected": {
         "paths": [],
@@ -1333,23 +3650,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_scenetreetimer.md",
+          "symbol": "SceneTreeTimer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "SceneTreeTimer"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.timeout",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Enumerations"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_timer_process_callback",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "how-to-use-scene-tree-nodes",
       "query": "how to use scene tree nodes",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1360,23 +3762,108 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.2771662763466043,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instancing scenes"
+        },
+        {
+          "rank": 2,
+          "score": 0.9926129426129426,
+          "path": "tutorials/animation/animation_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Controlling from code"
+        },
+        {
+          "rank": 3,
+          "score": 0.9483258472846059,
+          "path": "tutorials/scripting/change_scenes_manually.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Change scenes manually"
+        },
+        {
+          "rank": 4,
+          "score": 0.8521390374331551,
+          "path": "tutorials/best_practices/scene_organization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Choosing a node tree structure"
+        },
+        {
+          "rank": 5,
+          "score": 0.7166666666666667,
+          "path": "getting_started/introduction/key_concepts_overview.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The scene tree"
+        },
+        {
+          "rank": 6,
+          "score": 0.7057377049180329,
+          "path": "getting_started/step_by_step/nodes_and_scenes.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Nodes and Scenes"
+        },
+        {
+          "rank": 7,
+          "score": 0.6951612903225807,
+          "path": "getting_started/introduction/key_concepts_overview.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Summary"
+        },
+        {
+          "rank": 8,
+          "score": 0.6849206349206349,
+          "path": "getting_started/introduction/key_concepts_overview.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Nodes"
+        },
+        {
+          "rank": 9,
+          "score": 0.675,
+          "path": "tutorials/best_practices/node_alternatives.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "When and how to avoid using nodes for everything"
+        },
+        {
+          "rank": 10,
+          "score": 0.675,
+          "path": "tutorials/performance/cpu_optimization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "SceneTree"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "how-to-change-scenes",
       "query": "how to change scenes manually",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1387,23 +3874,108 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.3416666666666666,
+          "path": "tutorials/scripting/change_scenes_manually.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Change scenes manually"
+        },
+        {
+          "rank": 2,
+          "score": 1.0429873772791023,
+          "path": "tutorials/best_practices/scene_organization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Choosing a node tree structure"
+        },
+        {
+          "rank": 3,
+          "score": 0.7166666666666667,
+          "path": "tutorials/assets_pipeline/importing_3d_scenes/import_configuration.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Scene inheritance"
+        },
+        {
+          "rank": 4,
+          "score": 0.7057377049180329,
+          "path": "tutorials/3d/particles/properties.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Time properties"
+        },
+        {
+          "rank": 5,
+          "score": 0.7057377049180329,
+          "path": "tutorials/scripting/debug/overview_of_debugging_tools.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Synchronize Scene Changes"
+        },
+        {
+          "rank": 6,
+          "score": 0.6951612903225807,
+          "path": "tutorials/scripting/singletons_autoload.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Custom scene switcher"
+        },
+        {
+          "rank": 7,
+          "score": 0.6849206349206349,
+          "path": "tutorials/navigation/navigation_introduction_2d.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "2D navigation overview"
+        },
+        {
+          "rank": 8,
+          "score": 0.6849206349206349,
+          "path": "tutorials/animation/creating_movies.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Enabling Movie Maker mode"
+        },
+        {
+          "rank": 9,
+          "score": 0.6653846153846155,
+          "path": "tutorials/animation/introduction.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using RESET tracks"
+        },
+        {
+          "rank": 10,
+          "score": 0.6470149253731343,
+          "path": "tutorials/scripting/singletons_autoload.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Add to 'scene_2.gd'."
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "script-signals-tutorial",
       "query": "signals in gdscript tutorial",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1414,23 +3986,108 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.0005048017729623,
+          "path": "getting_started/first_2d_game/03.coding_the_player.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Coding the player"
+        },
+        {
+          "rank": 2,
+          "score": 0.9576305220883535,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 3,
+          "score": 0.7166666666666667,
+          "path": "tutorials/scripting/cross_language_scripting.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Connecting to GDScript signals from C#"
+        },
+        {
+          "rank": 4,
+          "score": 0.7057377049180329,
+          "path": "getting_started/first_2d_game/02.player_scene.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Node structure"
+        },
+        {
+          "rank": 5,
+          "score": 0.6951612903225807,
+          "path": "tutorials/scripting/cross_language_scripting.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Accessing GDScript fields from C#"
+        },
+        {
+          "rank": 6,
+          "score": 0.6849206349206349,
+          "path": "tutorials/scripting/gdscript/gdscript_advanced.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "GDScript: An introduction to dynamic languages"
+        },
+        {
+          "rank": 7,
+          "score": 0.675,
+          "path": "tutorials/scripting/cross_language_scripting.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Instantiating GDScript nodes from C#"
+        },
+        {
+          "rank": 8,
+          "score": 0.6653846153846155,
+          "path": "tutorials/scripting/cross_language_scripting.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Connecting to C# signals from GDScript"
+        },
+        {
+          "rank": 9,
+          "score": 0.6560606060606061,
+          "path": "getting_started/step_by_step/scripting_first_script.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating your first script"
+        },
+        {
+          "rank": 10,
+          "score": 0.6557377049180328,
+          "path": "classes/class_@gdscript.md",
+          "symbol": "@GDScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "@GDScript"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "physics-server-engine",
       "query": "PhysicsServer3D engine details",
       "category": "engine",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1441,14 +4098,99 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "classes/class_@globalscope.md",
+          "symbol": "@GlobalScope.PhysicsServer3D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "classes/class_@globalscope.md",
+          "symbol": "@GlobalScope.PhysicsServer3DManager",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6451612903225806,
+          "path": "classes/class_@globalscope.md",
+          "symbol": "@GlobalScope.NavigationServer3D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.6349206349206349,
+          "path": "classes/class_@globalscope.md",
+          "symbol": "@GlobalScope.PhysicsServer2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.625,
+          "path": "tutorials/navigation/navigation_using_navigationservers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using NavigationServer"
+        },
+        {
+          "rank": 7,
+          "score": 0.6153846153846154,
+          "path": "classes/class_@globalscope.md",
+          "symbol": "@GlobalScope.RenderingServer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6060606060606061,
+          "path": "tutorials/physics/ray-casting.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Space"
+        },
+        {
+          "rank": 9,
+          "score": 0.5970149253731343,
+          "path": "tutorials/performance/using_servers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Servers"
+        },
+        {
+          "rank": 10,
+          "score": 0.5882352941176471,
+          "path": "classes/class_physicsserver3dmanager.md",
+          "symbol": "PhysicsServer3DManager",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "PhysicsServer3DManager"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "class-inheritance-node-object",
@@ -1468,10 +4210,172 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 37.78056012819217,
+          "path": "classes/class_editorscript.md",
+          "symbol": "EditorScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "EditorScript"
+        },
+        {
+          "rank": 2,
+          "score": 37.779829586792694,
+          "path": "classes/class_physicalbone2d.md",
+          "symbol": "PhysicalBone2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "PhysicalBone2D"
+        },
+        {
+          "rank": 3,
+          "score": 37.775532606854924,
+          "path": "classes/class_xranchor3d.md",
+          "symbol": "XRAnchor3D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "XRAnchor3D"
+        },
+        {
+          "rank": 4,
+          "score": 37.773436012454226,
+          "path": "getting_started/step_by_step/scripting_first_script.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating a new script"
+        },
+        {
+          "rank": 5,
+          "score": 37.75802795887432,
+          "path": "classes/class_worldenvironment.md",
+          "symbol": "WorldEnvironment",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "WorldEnvironment"
+        },
+        {
+          "rank": 6,
+          "score": 37.75202581672704,
+          "path": "classes/class_collisionshape2d.md",
+          "symbol": "CollisionShape2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CollisionShape2D"
+        },
+        {
+          "rank": 7,
+          "score": 37.7491656320064,
+          "path": "classes/class_animationnodetimeseek.md",
+          "symbol": "AnimationNodeTimeSeek",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "AnimationNodeTimeSeek"
+        },
+        {
+          "rank": 8,
+          "score": 37.748002515233686,
+          "path": "classes/class_groovejoint2d.md",
+          "symbol": "GrooveJoint2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GrooveJoint2D"
+        },
+        {
+          "rank": 9,
+          "score": 37.74445160009481,
+          "path": "classes/class_visualshadernodeframe.md",
+          "symbol": "VisualShaderNodeFrame",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "VisualShaderNodeFrame"
+        },
+        {
+          "rank": 10,
+          "score": 37.73618732222413,
+          "path": "classes/class_directionallight2d.md",
+          "symbol": "DirectionalLight2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "DirectionalLight2D"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Node"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.AutoTranslateMode",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.DuplicateFlags",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Enumerations"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.InternalMode",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Enumerations"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_ACCESSIBILITY_INVALIDATE",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Property Descriptions"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_ACCESSIBILITY_UPDATE",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_FOCUS_IN",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_FOCUS_OUT",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_PAUSED",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          },
+          {
+            "path": "classes/class_node.md",
+            "symbol": "Node.NOTIFICATION_APPLICATION_PIP_MODE_ENTERED",
+            "doc_type": "class",
+            "addon": "",
+            "heading": "Constants"
+          }
+        ],
         "best_rank": null,
         "best_rank_no_graph": null,
         "diagnostic_window": 50
@@ -1482,9 +4386,9 @@
       "query": "Timer start stop paused wait time",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1495,23 +4399,108 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "tutorials/scripting/pausing_games.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Pausing games and process mode"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_paused",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_wait_time",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.is_one_shot",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "every frame (or even every fixed frame)."
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/editor/game_embedding.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Pause (F9)"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.get_time_left",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Timer"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "object-signal-methods",
       "query": "Object signal methods emit add user signal",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 4,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1522,14 +4511,99 @@
         "doc_types": [],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.1929824561403508,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "tutorials/scripting/gdscript/gdscript_basics.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "`Signal `"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "tutorials/best_practices/scene_organization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "How to build relationships effectively"
+        },
+        {
+          "rank": 4,
+          "score": 0.6557377049180328,
+          "path": "classes/class_object.md",
+          "symbol": "Object.emit_signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.6451612903225806,
+          "path": "classes/class_upnp.md",
+          "symbol": "UPNP",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "UPNP"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "engine_details/architecture/unit_testing.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Testing signals"
+        },
+        {
+          "rank": 7,
+          "score": 0.6349206349206349,
+          "path": "classes/class_projectsettings.md",
+          "symbol": "ProjectSettings.settings_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "tutorials/scripting/c_sharp/c_sharp_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "C# signals"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "tutorials/scripting/c_sharp/c_sharp_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signal creation at runtime"
+        },
+        {
+          "rank": 10,
+          "score": 0.6153846153846154,
+          "path": "tutorials/scripting/c_sharp/c_sharp_signals.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Signal emission"
+        }
+      ],
+      "diagnostics": null
     },
     {
       "id": "addon-dialogue-manager",
@@ -1538,7 +4612,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1549,7 +4623,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "getting_started/introduction/first_look_at_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The Project Manager"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "engine_details/engine_api/custom_godot_servers.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "What for?"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_filedialog.md",
+          "symbol": "FileDialog.menu_show_in_file_manager",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Theme Property Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "tutorials/editor/project_manager.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Using the Project Manager"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_richtextlabel.md",
+          "symbol": "RichTextLabel.get_menu",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.add_scene_post_import_plugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_textedit.md",
+          "symbol": "TextEdit.get_menu",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/audio/text_to_speech.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Basic Usage"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "tutorials/xr/xr_action_map.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Binding modifiers on an interaction profile"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/plugins/editor/making_plugins.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "The main plugin is located at res://addons/my_plugin/"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -1565,7 +4730,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1576,7 +4741,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_camerafeed.md",
+          "symbol": "CameraFeed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CameraFeed"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CameraServer"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "tutorials/3d/introduction_to_3d.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Cameras"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "getting_started/first_3d_game/03.player_movement_code.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Adding a camera"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "tutorials/editor/game_embedding.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera override"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "tutorials/3d/environment_and_post_processing.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera attributes"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "tutorials/3d/spring_arm.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Introduction"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer.camera_feed_added",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_cameraserver.md",
+          "symbol": "CameraServer.is_monitoring_feeds",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "tutorials/editor/game_embedding.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Camera override options"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -1592,7 +4848,7 @@
       "required_at": 5,
       "matched_rank": null,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "filter_mismatch",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1603,7 +4859,98 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.add_inspector_plugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 2,
+          "score": 0.6666666666666666,
+          "path": "classes/class_tree.md",
+          "symbol": "Tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Tree"
+        },
+        {
+          "rank": 3,
+          "score": 0.6557377049180328,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Overridable functions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6451612903225806,
+          "path": "tutorials/best_practices/godot_notifications.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "ready vs. enter_tree vs. NOTIFICATION_PARENTED"
+        },
+        {
+          "rank": 5,
+          "score": 0.6349206349206349,
+          "path": "classes/class_animationtree.md",
+          "symbol": "AnimationTree.tree_root",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 6,
+          "score": 0.625,
+          "path": "classes/class_animationtree.md",
+          "symbol": "AnimationTree.get_tree_root",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6153846153846154,
+          "path": "classes/class_node.md",
+          "symbol": "Node.child_entered_tree",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 8,
+          "score": 0.6060606060606061,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 9,
+          "score": 0.5970149253731343,
+          "path": "tutorials/scripting/overridable_functions.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Called every time the node enters the scene tree."
+        },
+        {
+          "rank": 10,
+          "score": 0.5882352941176471,
+          "path": "tutorials/scripting/scene_tree.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Scene tree"
+        }
+      ],
       "diagnostics": {
         "expected_present": false,
         "expected_rows": [],
@@ -1617,9 +4964,9 @@
       "query": "semantic search vector fallback",
       "category": "engine",
       "required_at": 5,
-      "matched_rank": null,
+      "matched_rank": 8,
       "passed": false,
-      "failure_classification": "missing_recall",
+      "failure_classification": "low_ranking",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1630,12 +4977,174 @@
         ],
         "addons": []
       },
-      "observed": [],
+      "observed": [
+        {
+          "rank": 1,
+          "score": 0.6666666666666666,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.cross",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 0.6557377049180328,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.project",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 3,
+          "score": 0.6451612903225806,
+          "path": "classes/class_vector2.md",
+          "symbol": "Vector2.project",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 4,
+          "score": 0.6349206349206349,
+          "path": "classes/class_themedb.md",
+          "symbol": "ThemeDB.get_fallback_icon",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 5,
+          "score": 0.625,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.BACK",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 6,
+          "score": 0.6153846153846154,
+          "path": "classes/class_vector3i.md",
+          "symbol": "Vector3i.BACK",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 7,
+          "score": 0.6060606060606061,
+          "path": "classes/class_themedb.md",
+          "symbol": "ThemeDB.fallback_changed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
+        },
+        {
+          "rank": 8,
+          "score": 0.5970149253731343,
+          "path": "tutorials/scripting/gdscript/gdscript_exports.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Linking vector values together"
+        },
+        {
+          "rank": 9,
+          "score": 0.5882352941176471,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.ONE",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constants"
+        },
+        {
+          "rank": 10,
+          "score": 0.5797101449275363,
+          "path": "classes/class_vector3.md",
+          "symbol": "Vector3.Vector3",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Constructor Descriptions"
+        }
+      ],
       "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
+        "expected_present": true,
+        "expected_rows": [
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "2D coordinate systems and 2D transforms"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Introduction"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Godot 2D coordinate systems"
+          },
+          {
+            "path": "engine_details/architecture/2d_coordinate_systems.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Node transforms"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Common engine methods and macros"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Print text"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Format a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Convert an integer or float to a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Internationalize a string"
+          },
+          {
+            "path": "engine_details/architecture/common_engine_methods_and_macros.md",
+            "symbol": "",
+            "doc_type": "tutorial",
+            "addon": "",
+            "heading": "Clamp a value"
+          }
+        ],
+        "best_rank": 8,
+        "best_rank_no_graph": 8,
         "diagnostic_window": 50
       }
     },
@@ -1644,9 +5153,9 @@
       "query": "running code in the editor plugin",
       "category": "tutorial",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "missing_recall",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": true,
       "graph_changed": false,
       "expected": {
@@ -1657,14 +5166,99 @@
         ],
         "addons": []
       },
-      "observed": [],
-      "diagnostics": {
-        "expected_present": false,
-        "expected_rows": [],
-        "best_rank": null,
-        "best_rank_no_graph": null,
-        "diagnostic_window": 50
-      }
+      "observed": [
+        {
+          "rank": 1,
+          "score": 1.2727272727272725,
+          "path": "tutorials/plugins/editor/installing_plugins.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Finding plugins"
+        },
+        {
+          "rank": 2,
+          "score": 1.1376654157614063,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Running one-off scripts using EditorScript"
+        },
+        {
+          "rank": 3,
+          "score": 0.933428097607202,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.AfterGUIInput",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        },
+        {
+          "rank": 4,
+          "score": 0.6666666666666666,
+          "path": "tutorials/plugins/running_code_in_the_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Running code in the editor"
+        },
+        {
+          "rank": 5,
+          "score": 0.6557377049180328,
+          "path": "tutorials/platform/android/android_plugin.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Packaging a v2 Android plugin"
+        },
+        {
+          "rank": 6,
+          "score": 0.6451612903225806,
+          "path": "tutorials/editor/external_editor.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "LSP/DAP support"
+        },
+        {
+          "rank": 7,
+          "score": 0.6451612903225806,
+          "path": "engine_details/engine_api/vendor_runtime_module.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Creating the wrapper editor plugin"
+        },
+        {
+          "rank": 8,
+          "score": 0.6349206349206349,
+          "path": "tutorials/plugins/editor/installing_plugins.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Installing plugins"
+        },
+        {
+          "rank": 9,
+          "score": 0.625,
+          "path": "classes/class_resourcesaver.md",
+          "symbol": "ResourceSaver",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "ResourceSaver"
+        },
+        {
+          "rank": 10,
+          "score": 0.625,
+          "path": "classes/class_editorplugin.md",
+          "symbol": "EditorPlugin.add_export_plugin",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Consumes InputEventMouseMotion and forwards other InputEvent types."
+        }
+      ],
+      "diagnostics": null
     }
   ],
   "graph_changes": [],

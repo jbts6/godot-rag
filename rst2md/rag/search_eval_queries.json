@@ -16,7 +16,7 @@
   {"id": "signal-emit-natural", "query": "emit a signal from code", "category": "class", "required_at": 5, "expected_symbols": ["Object.emit_signal"], "tags": ["normalization", "alias"], "report_only": true},
   {"id": "child-node-attach", "query": "child node attach", "category": "class", "required_at": 5, "expected_symbols": ["Node.add_child"], "tags": ["normalization", "alias"], "report_only": true},
   {"id": "start-countdown-timer", "query": "start countdown timer", "category": "class", "required_at": 5, "expected_symbols": ["Timer.start"], "tags": ["alias"], "report_only": true},
-  {"id": "stop-countdown-timer", "query": "stop countdown timer", "category": "class", "required_at": 5, "expected_symbols": ["Timer.stop"], "tags": ["alias"], "report_only": true},
+  {"id": "stop-countdown-timer", "query": "stop countdown timer", "category": "class", "required_at": 5, "expected_symbols": ["Timer.stop"], "tags": ["alias"]},
   {"id": "how-to-use-scene-tree-nodes", "query": "how to use scene tree nodes", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"]},
   {"id": "how-to-change-scenes", "query": "how to change scenes manually", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true},
   {"id": "script-signals-tutorial", "query": "signals in gdscript tutorial", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true},
