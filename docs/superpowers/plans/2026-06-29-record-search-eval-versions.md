@@ -2,6 +2,7 @@
 change: record-search-eval-versions
 design-doc: docs/superpowers/specs/2026-06-29-record-search-eval-versions-design.md
 base-ref: f926b125cef77dff592b027c753768073814f5d9
+archived-with: 2026-06-29-record-search-eval-versions
 ---
 
 # Record Search Evaluation Versions Implementation Plan
@@ -24,6 +25,7 @@ base-ref: f926b125cef77dff592b027c753768073814f5d9
 - 每个 task 验收后：勾选 `openspec/changes/record-search-eval-versions/tasks.md` 对应项 → `git commit`，commit message 体现设计意图，结尾带 `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`。
 - `metadata` 仅在 `report.database` 存在时写入（`report_to_dict` 现有 gating），`versions` 作为 `metadata` 的同级键，与 `query_suite_hash`/`database` 一起序列化。
 
+archived-with: 2026-06-29-record-search-eval-versions
 ---
 
 ## Task 1: 版本元数据 helper 与 report_to_dict 序列化（TDD）
@@ -184,6 +186,7 @@ search behavior.
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
+archived-with: 2026-06-29-record-search-eval-versions
 ---
 
 ## Task 2: 刷新 checked-in baseline 含版本元数据
@@ -221,6 +224,7 @@ checked-in artifact carries metadata.versions (evaluator/search).
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
+archived-with: 2026-06-29-record-search-eval-versions
 ---
 
 ## Task 3: 验证（聚焦测试 + 全量 + 构建 + baseline 比较 + OpenSpec）
@@ -269,6 +273,7 @@ validation all pass.
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
+archived-with: 2026-06-29-record-search-eval-versions
 ---
 
 ## Self-Review

@@ -2,6 +2,8 @@
 comet_change: record-search-eval-versions
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-29-record-search-eval-versions
+status: final
 ---
 
 # Record Search Evaluation Versions - Technical Design

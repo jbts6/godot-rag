@@ -137,7 +137,7 @@ The `godot-rag` project script SHALL point to `rag.cli:main` and the wheel SHALL
 - **THEN** `[tool.hatch.build.targets.wheel]` `packages` SHALL include `"rst2md/rag"`
 
 ### Requirement: Baseline artifacts identify their evaluation inputs
-Search quality baselines SHALL record enough metadata to prove which database and query suite produced the metrics.
+Search quality baselines SHALL record enough metadata to prove which database, query suite, and evaluator/search version produced the metrics.
 
 #### Scenario: baseline includes database fingerprint
 - **WHEN** a baseline is written from a populated evaluation database
@@ -148,6 +148,12 @@ Search quality baselines SHALL record enough metadata to prove which database an
 - **WHEN** a baseline is written
 - **THEN** the baseline JSON MUST include a deterministic hash of the loaded query definitions
 - **AND** a later comparison MUST report when the current query-suite hash differs from the baseline hash
+
+#### Scenario: baseline includes evaluator and search versions
+- **WHEN** a baseline is written
+- **THEN** the baseline JSON MUST include evaluator version metadata
+- **AND** it MUST include search version metadata
+- **AND** those values MUST be non-empty strings
 
 ### Requirement: Invalid evaluation databases cannot create baselines
 Real-database search quality evaluation SHALL reject empty or incomplete databases before writing a baseline.

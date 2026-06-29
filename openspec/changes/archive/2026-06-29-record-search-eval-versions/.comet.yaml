@@ -1,5 +1,5 @@
 workflow: full
-phase: verify
+phase: archive
 context_compression: off
 build_mode: executing-plans
 build_pause: null
@@ -12,11 +12,11 @@ auto_transition: true
 base_ref: c8b45ff27b661c7c2e6eed9c0a6fe58ea81daa1a
 design_doc: docs/superpowers/specs/2026-06-29-record-search-eval-versions-design.md
 plan: docs/superpowers/plans/2026-06-29-record-search-eval-versions.md
-verify_result: pending
+verify_result: pass
 verification_report: docs/superpowers/reports/2026-06-29-record-search-eval-versions-verify.md
-branch_status: pending
+branch_status: handled
 created_at: 2026-06-29
-verified_at: null
-archived: false
+verified_at: 2026-06-29
+archived: true
 handoff_context: openspec/changes/record-search-eval-versions/.comet/handoff/design-context.json
 handoff_hash: 33af56f901d014f940afa404bafa88b026ee143c144b4bf23ae19640a058627c
