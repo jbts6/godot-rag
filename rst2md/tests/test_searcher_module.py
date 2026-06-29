@@ -101,5 +101,36 @@ def test_doc_type_boost_does_not_boost_symbol_query():
     assert doc_type_boost("Node.add_child", "class") == 0
 
 
+def test_query_plan_exposes_alias_symbol_candidate():
+    from rag.query_plan import build_query_plan
+
+    plan = build_query_plan("attach node to scene tree")
+
+    assert plan.original == "attach node to scene tree"
+    assert "attach node to scene tree" in plan.fts_variants
+    assert "Node.add_child" in plan.alias_symbol_candidates
+    assert "Node.add_child" in plan.symbol_candidates
+
+
+def test_query_plan_deduplicates_exact_symbol_query():
+    from rag.query_plan import build_query_plan
+
+    plan = build_query_plan("Node.add_child")
+
+    assert plan.symbol_candidates == ("Node.add_child",)
+    assert plan.alias_symbol_candidates == ()
+    assert plan.fts_variants == ("Node.add_child",)
+
+
+def test_query_plan_detects_tutorial_and_addon_intent():
+    from rag.query_plan import build_query_plan
+
+    tutorial = build_query_plan("how to use scene tree nodes")
+    addon = build_query_plan("dialogue manager addon")
+
+    assert tutorial.doc_type_intent == "tutorial"
+    assert addon.addon_intent == "addon"
+
+
 if __name__ == "__main__":
     unittest.main()
