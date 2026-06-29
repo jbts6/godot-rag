@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from rag.db import clean_chunk_text, get_connection
 from rag.models import SearchMetadata, SearchResponse, SearchResult
+from rag.query_rewrite import expand_query_variants
 from rag.symbols import normalize_symbol
 
 
@@ -207,6 +208,32 @@ def search_database(
     ).results
 
 
+def _run_fts_query(
+    conn, query: str, limit: int,
+    fts_type_filter: str, fts_type_params: list,
+    fts_addon_filter: str, fts_addon_params: list,
+    fused_exclude: str = "", fused_exclude_params: list | None = None,
+) -> list[dict]:
+    if fused_exclude_params is None:
+        fused_exclude_params = []
+    escaped_query = _smart_tokenize(normalize_symbol(query))
+    rows = conn.execute(
+        f"""
+        SELECT c.*, bm25(chunks_fts) as score
+        FROM chunks_fts
+        JOIN chunks c ON chunks_fts.rowid = c.id
+        WHERE chunks_fts MATCH ?
+        {fts_type_filter}
+        {fts_addon_filter}
+        {fused_exclude}
+        ORDER BY score
+        LIMIT ?
+        """,
+        [escaped_query] + fts_type_params + fts_addon_params + fused_exclude_params + [limit * 3],
+    ).fetchall()
+    return [{"id": row["id"], "score": row["score"], "row": row} for row in rows]
+
+
 def _search_database_impl(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
@@ -348,7 +375,6 @@ def _search_database_impl(
 
         # 4. FTS5 search (bm25 → 0-40 score, skip chunks already in fused results)
         try:
-            escaped_query = _smart_tokenize(query)
             fts_type_filter = ""
             fts_type_params: list = []
             if doc_types:
@@ -370,18 +396,27 @@ def _search_database_impl(
                 fused_exclude = f" AND c.id NOT IN ({placeholders})"
                 fused_exclude_params = list(fused_ids)
 
-            fts_rows = conn.execute(
-                "SELECT c.*, bm25(chunks_fts) as rank FROM chunks_fts fts JOIN chunks c ON fts.rowid = c.id WHERE chunks_fts MATCH ?"
-                + fts_type_filter + fts_addon_filter + fused_exclude
-                + " ORDER BY rank LIMIT ?",
-                [escaped_query] + fts_type_params + fts_addon_params + fused_exclude_params + [limit * 3],
-            ).fetchall()
-            for row in fts_rows:
-                cid = row["id"]
-                bm25 = abs(row["rank"])
+            fts_results_by_id: dict = {}
+            for variant in expand_query_variants(query):
+                for row in _run_fts_query(
+                    conn,
+                    variant,
+                    limit,
+                    fts_type_filter,
+                    fts_type_params,
+                    fts_addon_filter,
+                    fts_addon_params,
+                    fused_exclude,
+                    fused_exclude_params,
+                ):
+                    current = fts_results_by_id.get(row["id"])
+                    if current is None or row["score"] < current["score"]:
+                        fts_results_by_id[row["id"]] = row
+            for cid, row in fts_results_by_id.items():
+                bm25 = abs(row["score"])
                 fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
                 if cid not in results or results[cid]["score"] < fts_score:
-                    results[cid] = _make_result(row, fts_score)
+                    results[cid] = _make_result(row["row"], fts_score)
         except sqlite3.OperationalError:
             # FTS match syntax error, skip
             pass

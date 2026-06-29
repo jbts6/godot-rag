@@ -60,5 +60,33 @@ class SearcherModuleImportTests(unittest.TestCase):
         self.assertIn('rrf_score', fused[0])
 
 
+from rag.query_rewrite import expand_query_variants
+
+
+def test_expand_query_variants_adds_node_add_child_alias():
+    assert expand_query_variants("attach node to scene tree") == [
+        "attach node to scene tree",
+        "Node.add_child",
+    ]
+
+
+def test_expand_query_variants_adds_timer_is_stopped_alias():
+    assert expand_query_variants("check if timer is stopped") == [
+        "check if timer is stopped",
+        "Timer.is_stopped",
+    ]
+
+
+def test_expand_query_variants_adds_object_emit_signal_alias():
+    assert expand_query_variants("emit a signal from code") == [
+        "emit a signal from code",
+        "Object.emit_signal",
+    ]
+
+
+def test_expand_query_variants_deduplicates_exact_symbol_query():
+    assert expand_query_variants("Node.add_child") == ["Node.add_child"]
+
+
 if __name__ == "__main__":
     unittest.main()

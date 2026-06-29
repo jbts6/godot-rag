@@ -38,6 +38,26 @@ class SearchTests(unittest.TestCase):
             self.assertEqual(results[0].symbol, "StringName.is_valid_filename")
             self.assertEqual(results[0].path, "classes/class_stringname.md")
 
+    def test_natural_language_alias_returns_expected_symbol(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_node.md").write_text(
+                "# Node\n\n"
+                "## Methods\n\n"
+                "`void` **add_child**(`Node` node)\n\n"
+                "Adds a child node to the scene tree.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "godot_docs.sqlite"
+            build_database(docs, db_path)
+
+            results = search_database(db_path, "attach node to scene tree", limit=3, expand_graph=False)
+
+            self.assertTrue(results)
+            self.assertEqual(results[0].symbol, "Node.add_child")
+
 
 class FtsScoreTests(unittest.TestCase):
     """BM25 score mapping should produce reasonable distribution."""
