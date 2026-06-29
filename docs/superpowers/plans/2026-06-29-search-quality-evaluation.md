@@ -1022,7 +1022,7 @@ rtk git commit -m "feat: add search quality evaluation CLI"
   - Package tree includes `godot_rag/rag/search_eval_queries.json`.
   - README documents evaluation and baseline workflow.
 
-- [ ] **Step 1: Write failing package-tree test for RAG JSON data**
+- [x] **Step 1: Write failing package-tree test for RAG JSON data**
 
 Modify `write_minimal_build_tree` in `rst2md/tests/test_build_release_orchestrator.py` to add:
 
@@ -1041,7 +1041,7 @@ Run: `rtk uv run pytest -q rst2md/tests/test_build_release_orchestrator.py::test
 
 Expected: FAIL because package tree currently copies only top-level `*.py` and `addon_configs`.
 
-- [ ] **Step 2: Copy top-level RAG JSON files into package tree**
+- [x] **Step 2: Copy top-level RAG JSON files into package tree**
 
 Modify `assemble_package_tree` in `godot_rag_build/orchestrator.py`:
 
@@ -1053,13 +1053,13 @@ Modify `assemble_package_tree` in `godot_rag_build/orchestrator.py`:
 
 Place this after the existing `*.py` copy loop and before `addon_configs`.
 
-- [ ] **Step 3: Run package-tree tests**
+- [x] **Step 3: Run package-tree tests**
 
 Run: `rtk uv run pytest -q rst2md/tests/test_build_release_orchestrator.py`
 
 Expected: PASS.
 
-- [ ] **Step 4: Document evaluation workflow in README**
+- [x] **Step 4: Document evaluation workflow in README**
 
 Add a compact section near the existing diagnostics/debug search documentation:
 
@@ -1100,7 +1100,7 @@ Use `--json` for machine-readable reports.
 ```
 ```
 
-- [ ] **Step 5: Run focused and relevant verification**
+- [x] **Step 5: Run focused and relevant verification**
 
 Run:
 
@@ -1113,11 +1113,11 @@ rtk uv run openspec validate search-quality-evaluation --strict
 
 Expected: all pass.
 
-- [ ] **Step 6: Mark OpenSpec tasks complete after verification**
+- [x] **Step 6: Mark OpenSpec tasks complete after verification**
 
 Update `openspec/changes/search-quality-evaluation/tasks.md` only after the implementation and tests pass. Check off each completed task.
 
-- [ ] **Step 7: Commit Task 4**
+- [x] **Step 7: Commit Task 4**
 
 ```bash
 rtk git add godot_rag_build/orchestrator.py rst2md/tests/test_build_release_orchestrator.py README.md openspec/changes/search-quality-evaluation/tasks.md
