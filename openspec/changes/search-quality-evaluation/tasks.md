@@ -14,11 +14,11 @@
 
 ## 3. Real Database Evaluation And Regression Gate
 
-- [ ] 3.1 Add an explicit manual evaluation entry point that accepts a database path and runs the real-database golden query set.
-- [ ] 3.2 Add human-readable and JSON report output with overall metrics, category metrics, failed queries, and graph expansion comparison details.
-- [ ] 3.3 Add baseline read/write support for real-database evaluation.
-- [ ] 3.4 Add regression-gate behavior that fails only when `hit@5` or `MRR@5` drops beyond configured thresholds.
-- [ ] 3.5 Ensure report-only or newly introduced queries appear in reports without failing the regression gate.
+- [x] 3.1 Add an explicit manual evaluation entry point that accepts a database path and runs the real-database golden query set.
+- [x] 3.2 Add human-readable and JSON report output with overall metrics, category metrics, failed queries, and graph expansion comparison details.
+- [x] 3.3 Add baseline read/write support for real-database evaluation.
+- [x] 3.4 Add regression-gate behavior that fails only when `hit@5` or `MRR@5` drops beyond configured thresholds.
+- [x] 3.5 Ensure report-only or newly introduced queries appear in reports without failing the regression gate.
 
 ## 4. Documentation And Verification
 

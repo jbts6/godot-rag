@@ -655,7 +655,7 @@ rtk git commit -m "test: add deterministic search quality evaluation"
   - `format_text_report(report: EvaluationReport) -> str`
   - CLI command: `godot-rag eval-search --db PATH [--queries PATH] [--baseline PATH] [--write-baseline] [--json] [--compare-graph]`
 
-- [ ] **Step 1: Write failing tests for baseline creation and regression failure**
+- [x] **Step 1: Write failing tests for baseline creation and regression failure**
 
 Append to `rst2md/tests/test_search_eval.py`:
 
@@ -703,7 +703,7 @@ Run: `rtk uv run pytest -q rst2md/tests/test_search_eval.py::test_apply_baseline
 
 Expected: FAIL because `apply_baseline` is missing.
 
-- [ ] **Step 2: Implement baseline read/write and text report**
+- [x] **Step 2: Implement baseline read/write and text report**
 
 Add to `rst2md/rag/search_eval.py`:
 
@@ -785,7 +785,7 @@ def format_text_report(report: EvaluationReport) -> str:
     return "\n".join(lines)
 ```
 
-- [ ] **Step 3: Add packaged default real-database queries**
+- [x] **Step 3: Add packaged default real-database queries**
 
 Create `rst2md/rag/search_eval_queries.json`:
 
@@ -833,7 +833,7 @@ Create `rst2md/rag/search_eval_queries.json`:
 
 The first version can start with this small packaged set, then expand toward 30-50 entries before marking the change complete.
 
-- [ ] **Step 4: Write failing CLI tests**
+- [x] **Step 4: Write failing CLI tests**
 
 Create `rst2md/tests/test_search_eval_cli.py`:
 
@@ -934,7 +934,7 @@ Run: `rtk uv run pytest -q rst2md/tests/test_search_eval_cli.py`
 
 Expected: FAIL because `cmd_eval_search` and CLI imports are missing.
 
-- [ ] **Step 5: Wire `eval-search` into `rst2md/rag/cli.py`**
+- [x] **Step 5: Wire `eval-search` into `rst2md/rag/cli.py`**
 
 Modify imports in `rst2md/rag/cli.py`:
 
@@ -993,13 +993,13 @@ Add parser in `main()` before diagnostics or after stats:
     eval_parser.set_defaults(func=cmd_eval_search)
 ```
 
-- [ ] **Step 6: Run CLI tests**
+- [x] **Step 6: Run CLI tests**
 
 Run: `rtk uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py`
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit Task 3**
+- [x] **Step 7: Commit Task 3**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/rag/cli.py rst2md/rag/search_eval_queries.json rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py
