@@ -127,7 +127,7 @@ def test_text_report_includes_failed_query_diagnostic_detail():
 
 from rag.indexer import build_database
 from rag.db import get_connection
-from rag.search_eval import evaluate_database, report_to_dict
+from rag.search_eval import evaluate_database, report_to_dict, database_fingerprint, DatabaseFingerprint
 
 
 def _build_eval_db(tmp_path, monkeypatch):
@@ -433,3 +433,16 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert {"class", "symbol", "tutorial", "engine", "addon"}.issubset(categories)
     assert any("normalization" in query.tags for query in queries)
     assert any("graph" in query.tags for query in queries)
+
+
+def test_database_fingerprint_returns_nonzero_counts(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+
+    fp = database_fingerprint(str(db_path))
+
+    assert isinstance(fp, DatabaseFingerprint)
+    assert fp.path == str(db_path)
+    assert fp.size_bytes > 0
+    assert fp.documents > 0
+    assert fp.chunks > 0
+    assert fp.symbols > 0

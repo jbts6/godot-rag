@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import sqlite3
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
@@ -31,6 +33,29 @@ class DatabaseFingerprint:
     chunks: int
     symbols: int
     vectors: int | None
+
+
+def database_fingerprint(db_path: str) -> DatabaseFingerprint:
+    conn = sqlite3.connect(db_path)
+    try:
+        documents = conn.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+        chunks = conn.execute("SELECT COUNT(*) FROM chunks").fetchone()[0]
+        symbols = conn.execute("SELECT COUNT(*) FROM symbols").fetchone()[0]
+        try:
+            vectors = conn.execute("SELECT COUNT(*) FROM vec_chunks").fetchone()[0]
+        except sqlite3.OperationalError:
+            vectors = None
+    finally:
+        conn.close()
+    size_bytes = os.path.getsize(db_path)
+    return DatabaseFingerprint(
+        path=db_path,
+        size_bytes=size_bytes,
+        documents=documents,
+        chunks=chunks,
+        symbols=symbols,
+        vectors=vectors,
+    )
 
 
 def query_suite_hash(queries: Sequence[GoldenQuery]) -> str:
