@@ -1,8 +1,8 @@
 ## 1. Evaluation Stability
 
 - [x] 1.1 Add baseline metadata for database fingerprint, query-suite hash, and relevant search/evaluation versions.
-- [ ] 1.2 Reject baseline writes for empty or incomplete real-database inputs with actionable diagnostics.
-- [ ] 1.3 Report required category coverage warnings when gating metrics contain zero queries for an expected category.
+- [x] 1.2 Reject baseline writes for empty or incomplete real-database inputs with actionable diagnostics.
+- [x] 1.3 Report required category coverage warnings when gating metrics contain zero queries for an expected category.
 
 ## 2. Query Planning and Ranking
 

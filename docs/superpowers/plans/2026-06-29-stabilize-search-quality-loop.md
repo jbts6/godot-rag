@@ -191,7 +191,7 @@ rtk git commit -m "feat: add search baseline input metadata"
 - Consumes: Task 1 metadata helpers.
 - Produces: report metadata in `report_to_dict()`, baseline validation failure behavior, category coverage warnings.
 
-- [ ] **Step 1: Write failing tests for baseline metadata and validation**
+- [x] **Step 1: Write failing tests for baseline metadata and validation**
 
 Add tests:
 
@@ -240,17 +240,17 @@ def test_baseline_write_rejects_invalid_database(tmp_path):
         apply_baseline(report, tmp_path / "baseline.json", write_baseline=True)
 ```
 
-- [ ] **Step 2: Write failing tests for category coverage warning**
+- [x] **Step 2: Write failing tests for category coverage warning**
 
 Add a test that creates an `EvaluationReport` with no gating addon queries and asserts `report_to_dict(report)["category_warnings"]` contains `"addon"`.
 
-- [ ] **Step 3: Run focused tests and verify they fail**
+- [x] **Step 3: Run focused tests and verify they fail**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py -q
 ```
 
-- [ ] **Step 4: Implement report metadata and warning output**
+- [x] **Step 4: Implement report metadata and warning output**
 
 Add fields to `EvaluationReport`:
 
@@ -263,11 +263,11 @@ baseline_warnings: tuple[str, ...] = ()
 
 In `evaluate_database()`, compute `database_fingerprint(db_path)`, `query_suite_hash(queries)`, and category warnings. In `apply_baseline()`, reject invalid baseline writes before writing. In baseline compare, compare `baseline["metadata"]["query_suite_hash"]` with the current hash and append a baseline warning without setting `regression_failed`.
 
-- [ ] **Step 5: Update CLI error behavior**
+- [x] **Step 5: Update CLI error behavior**
 
 In `rst2md/rag/cli.py`, let `ValueError` from baseline writing surface as a non-zero command with a clear message. If there is an existing CLI error pattern in the file, use it; otherwise print to stderr and raise `SystemExit(1)`.
 
-- [ ] **Step 6: Run tests and commit**
+- [x] **Step 6: Run tests and commit**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py -q
