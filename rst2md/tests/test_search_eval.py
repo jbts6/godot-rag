@@ -356,3 +356,19 @@ def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch)
     assert "diagnostics:" in text
     assert "expected_present=True" in text
     assert "best_rank=" in text
+
+
+def test_packaged_eval_queries_are_broad_and_tiered():
+    queries = load_queries(Path("rst2md/rag/search_eval_queries.json"))
+    ids = [query.id for query in queries]
+    categories = {query.category for query in queries}
+    gating = [query for query in queries if not query.report_only]
+    report_only = [query for query in queries if query.report_only]
+
+    assert len(queries) >= 30
+    assert len(ids) == len(set(ids))
+    assert len(gating) >= 12
+    assert len(report_only) >= 8
+    assert {"class", "symbol", "tutorial", "engine", "addon"}.issubset(categories)
+    assert any("normalization" in query.tags for query in queries)
+    assert any("graph" in query.tags for query in queries)

@@ -1,39 +1,32 @@
 [
-  {
-    "id": "node-add-child",
-    "query": "attach node to scene tree",
-    "category": "class",
-    "required_at": 5,
-    "expected_symbols": ["Node.add_child"],
-    "tags": ["symbol_variant"]
-  },
-  {
-    "id": "timer-stopped",
-    "query": "check if timer is stopped",
-    "category": "class",
-    "required_at": 5,
-    "expected_symbols": ["Timer.is_stopped"]
-  },
-  {
-    "id": "signal-emit",
-    "query": "emit a signal from code",
-    "category": "class",
-    "required_at": 5,
-    "expected_symbols": ["Signal.emit"]
-  },
-  {
-    "id": "scene-tree-tutorial",
-    "query": "how to use scene tree nodes",
-    "category": "tutorial",
-    "required_at": 5,
-    "expected_doc_types": ["tutorial"]
-  },
-  {
-    "id": "addon-state-machine",
-    "query": "state machine addon",
-    "category": "addon",
-    "required_at": 5,
-    "expected_doc_types": ["addon"],
-    "report_only": true
-  }
+  {"id": "node-add-child-symbol", "query": "Node.add_child", "category": "symbol", "required_at": 3, "expected_symbols": ["Node.add_child"], "tags": ["normalization"]},
+  {"id": "timer-start-symbol", "query": "Timer.start", "category": "symbol", "required_at": 3, "expected_symbols": ["Timer.start"], "tags": ["normalization"]},
+  {"id": "timer-stop-symbol", "query": "Timer.stop", "category": "symbol", "required_at": 3, "expected_symbols": ["Timer.stop"], "tags": ["normalization"]},
+  {"id": "timer-is-stopped-symbol", "query": "Timer.is_stopped", "category": "symbol", "required_at": 3, "expected_symbols": ["Timer.is_stopped"], "tags": ["normalization"]},
+  {"id": "object-emit-signal-symbol", "query": "Object.emit_signal", "category": "symbol", "required_at": 3, "expected_symbols": ["Object.emit_signal"], "tags": ["normalization"]},
+  {"id": "node-class", "query": "Node", "category": "class", "required_at": 5, "expected_paths": ["classes/class_node.md"]},
+  {"id": "timer-class", "query": "Timer", "category": "class", "required_at": 5, "expected_paths": ["classes/class_timer.md"]},
+  {"id": "object-class", "query": "Object", "category": "class", "required_at": 5, "expected_paths": ["classes/class_object.md"]},
+  {"id": "scene-tree-tutorial", "query": "scene tree tutorial", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"]},
+  {"id": "nodes-and-scenes-tutorial", "query": "nodes and scenes", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"]},
+  {"id": "gdextension-engine", "query": "GDExtension C example", "category": "engine", "required_at": 5, "expected_doc_types": ["tutorial"]},
+  {"id": "state-machine-addon", "query": "state machine addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"]},
+  {"id": "node-add-child-natural", "query": "attach node to scene tree", "category": "class", "required_at": 5, "expected_symbols": ["Node.add_child"], "tags": ["normalization", "alias"], "report_only": true},
+  {"id": "timer-stopped-natural", "query": "check if timer is stopped", "category": "class", "required_at": 5, "expected_symbols": ["Timer.is_stopped"], "tags": ["normalization", "alias"], "report_only": true},
+  {"id": "signal-emit-natural", "query": "emit a signal from code", "category": "class", "required_at": 5, "expected_symbols": ["Object.emit_signal"], "tags": ["normalization", "alias"], "report_only": true},
+  {"id": "child-node-attach", "query": "child node attach", "category": "class", "required_at": 5, "expected_symbols": ["Node.add_child"], "tags": ["normalization", "alias"], "report_only": true},
+  {"id": "start-countdown-timer", "query": "start countdown timer", "category": "class", "required_at": 5, "expected_symbols": ["Timer.start"], "tags": ["alias"], "report_only": true},
+  {"id": "stop-countdown-timer", "query": "stop countdown timer", "category": "class", "required_at": 5, "expected_symbols": ["Timer.stop"], "tags": ["alias"], "report_only": true},
+  {"id": "how-to-use-scene-tree-nodes", "query": "how to use scene tree nodes", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true},
+  {"id": "how-to-change-scenes", "query": "how to change scenes manually", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true},
+  {"id": "script-signals-tutorial", "query": "signals in gdscript tutorial", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true},
+  {"id": "physics-server-engine", "query": "PhysicsServer3D engine details", "category": "engine", "required_at": 5, "expected_doc_types": ["class"], "report_only": true},
+  {"id": "class-inheritance-node-object", "query": "Node inherits Object", "category": "class", "required_at": 5, "expected_paths": ["classes/class_node.md"], "tags": ["graph"], "report_only": true},
+  {"id": "timer-related-methods", "query": "Timer start stop paused wait time", "category": "class", "required_at": 5, "expected_paths": ["classes/class_timer.md"], "tags": ["graph"], "report_only": true},
+  {"id": "object-signal-methods", "query": "Object signal methods emit add user signal", "category": "class", "required_at": 5, "expected_paths": ["classes/class_object.md"], "tags": ["graph"], "report_only": true},
+  {"id": "addon-dialogue-manager", "query": "dialogue manager addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"], "report_only": true},
+  {"id": "addon-phantom-camera", "query": "phantom camera addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"], "report_only": true},
+  {"id": "addon-limboai-behavior-tree", "query": "behavior tree addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"], "report_only": true},
+  {"id": "vector-fallback-metadata", "query": "semantic search vector fallback", "category": "engine", "required_at": 5, "expected_doc_types": ["tutorial"], "report_only": true},
+  {"id": "editor-plugin-running-code", "query": "running code in the editor plugin", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "report_only": true}
 ]
