@@ -38,7 +38,7 @@ base-ref: f926b125cef77dff592b027c753768073814f5d9
 
 **对应 OpenSpec tasks：** 1.1（写聚焦失败测试）、1.2（实现版本元数据序列化）
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `rst2md/tests/test_search_eval.py` 末尾的 `test_apply_baseline_writes_metadata`（约 line 549-567）之后追加：
 
@@ -85,12 +85,12 @@ def test_apply_baseline_write_includes_version_metadata(tmp_path):
 
 依赖的符号在文件已有 import 段中可用：`EvaluationReport`、`apply_baseline`（line 236 段），`report_to_dict`、`DatabaseFingerprint`（line 132 段），`json`（line 234 段）。
 
-- [ ] **Step 2: 运行测试，确认失败**
+- [x] **Step 2: 运行测试，确认失败**
 
 Run: `uv run pytest -q rst2md/tests/test_search_eval.py::test_report_to_dict_includes_version_metadata rst2md/tests/test_search_eval.py::test_apply_baseline_write_includes_version_metadata`
 Expected: FAIL — `KeyError: 'versions'`（`metadata` 当前只有 `query_suite_hash` 和 `database`）
 
-- [ ] **Step 3: 实现 helper 并在 report_to_dict 加 versions**
+- [x] **Step 3: 实现 helper 并在 report_to_dict 加 versions**
 
 在 `rst2md/rag/search_eval.py` 的 `_query_result_to_dict` 函数之后、`report_to_dict` 之前（约 line 622）插入两个 helper：
 
@@ -158,17 +158,17 @@ def _evaluation_versions() -> dict[str, str]:
     return result
 ```
 
-- [ ] **Step 4: 运行测试，确认通过**
+- [x] **Step 4: 运行测试，确认通过**
 
 Run: `uv run pytest -q rst2md/tests/test_search_eval.py::test_report_to_dict_includes_version_metadata rst2md/tests/test_search_eval.py::test_apply_baseline_write_includes_version_metadata`
 Expected: PASS — 2 passed
 
-- [ ] **Step 5: 运行整个 search_eval 测试文件，确认无回归**
+- [x] **Step 5: 运行整个 search_eval 测试文件，确认无回归**
 
 Run: `uv run pytest -q rst2md/tests/test_search_eval.py`
 Expected: PASS — 所有现有测试 + 2 个新测试全通过（`test_apply_baseline_writes_metadata` 等仍通过，因为 `versions` 是新增键，不破坏现有 `query_suite_hash`/`database` 断言）
 
-- [ ] **Step 6: 勾选 tasks.md 1.1 与 1.2，提交**
+- [x] **Step 6: 勾选 tasks.md 1.1 与 1.2，提交**
 
 把 `openspec/changes/record-search-eval-versions/tasks.md` 中 `- [ ] 1.1` 与 `- [ ] 1.2` 改为 `- [x]`。
 
@@ -197,17 +197,17 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **对应 OpenSpec tasks：** 1.3（用真实数据库 baseline 刷新 checked-in baseline，含版本元数据）
 
-- [ ] **Step 1: 用真实 evaluator 对 godot_rag.db 重写 baseline**
+- [x] **Step 1: 用真实 evaluator 对 godot_rag.db 重写 baseline**
 
 Run: `uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --write-baseline --compare-graph`
 Expected: 命令成功退出（`--write-baseline` 走 `apply_baseline(write_baseline=True)`，写入 `report_to_dict` 输出，含 `metadata.versions`；`--compare-graph` 让 `evaluate_database(compare_graph=True)` 产出与 baseline 一致的 graph_changes）
 
-- [ ] **Step 2: 验证 baseline 含 versions 且为非空字符串**
+- [x] **Step 2: 验证 baseline 含 versions 且为非空字符串**
 
 Run: `uv run python -c "import json; d=json.load(open('docs/search-quality/baseline.json')); v=d['metadata']['versions']; print(v); assert v['evaluator'] and v['search'], 'missing versions'; assert v['evaluator']==v['search']"`
 Expected: 打印 `{'evaluator': '4.7.0.post10', 'search': '4.7.0.post10'}`（或源码树解析得到的当前 package version），无 AssertionError
 
-- [ ] **Step 3: 勾选 tasks.md 1.3，提交**
+- [x] **Step 3: 勾选 tasks.md 1.3，提交**
 
 把 `tasks.md` 中 `- [ ] 1.3` 改为 `- [x]`。
 
@@ -230,32 +230,32 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **对应 OpenSpec tasks：** 2.1（运行聚焦搜索评估测试）、2.2（运行全量测试、构建、search quality baseline 比较、OpenSpec 验证）
 
-- [ ] **Step 1: 聚焦搜索评估测试（2.1）**
+- [x] **Step 1: 聚焦搜索评估测试（2.1）**
 
 Run: `uv run pytest -q rst2md/tests/test_search_eval.py`
 Expected: PASS — 全部通过
 
-- [ ] **Step 2: 全量测试（2.2a）**
+- [x] **Step 2: 全量测试（2.2a）**
 
 Run: `uv run pytest -q`
 Expected: PASS — 全仓库测试通过，无回归
 
-- [ ] **Step 3: 构建（2.2b）**
+- [x] **Step 3: 构建（2.2b）**
 
 Run: `uv build`
 Expected: wheel 构建成功（`dist/godot_rag-4.7.0.post10-*.whl` 生成）
 
-- [ ] **Step 4: search quality baseline 比较（2.2c）**
+- [x] **Step 4: search quality baseline 比较（2.2c）**
 
 Run: `uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph`
 Expected: 退出码 0（`report.regression_failed` 为 False；当前 evaluator 与刚刷新的 baseline 指标一致，无 hit@5/mrr@5 回归）
 
-- [ ] **Step 5: OpenSpec 验证（2.2d）**
+- [x] **Step 5: OpenSpec 验证（2.2d）**
 
 Run: `npx openspec validate record-search-eval-versions --strict`
 Expected: PASS — delta spec 符合 OpenSpec 规则，`semantic-search-quality` 的 "baseline includes evaluator and search versions" scenario 可被校验
 
-- [ ] **Step 6: 勾选 tasks.md 2.1 与 2.2，提交**
+- [x] **Step 6: 勾选 tasks.md 2.1 与 2.2，提交**
 
 把 `tasks.md` 中 `- [ ] 2.1` 与 `- [ ] 2.2` 改为 `- [x]`。
 
