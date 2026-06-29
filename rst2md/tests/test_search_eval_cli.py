@@ -88,3 +88,21 @@ def test_eval_search_exits_nonzero_on_regression(tmp_path):
             cmd_eval_search(args)
 
     assert exc.value.code == 1
+
+
+def test_project_script_targets_importable_rag_cli():
+    import importlib
+    import re
+
+    pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+    script_match = re.search(r'^godot-rag = "([^"]+)"$', pyproject, re.MULTILINE)
+    assert script_match is not None
+    assert script_match.group(1) == "rag.cli:main"
+
+    package_match = re.search(r'^packages = \[(.+)\]$', pyproject, re.MULTILINE)
+    assert package_match is not None
+    assert '"rst2md/rag"' in package_match.group(1)
+
+    module_name, _, attr_name = script_match.group(1).partition(":")
+    module = importlib.import_module(module_name)
+    assert callable(getattr(module, attr_name))
