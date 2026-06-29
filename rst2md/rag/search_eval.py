@@ -170,3 +170,92 @@ def compare_with_baseline(
             )
 
     return bool(messages), messages
+
+
+@dataclass(frozen=True)
+class EvaluationReport:
+    overall: dict
+    categories: dict
+    failures: list[QueryResult]
+    query_results: list[QueryResult]
+    graph_changes: list[QueryResult]
+    regression_failed: bool = False
+    regression_messages: tuple[str, ...] = ()
+    baseline_written: bool = False
+    baseline_compared: bool = False
+
+
+def evaluate_database(
+    db_path: Path,
+    queries: Sequence[GoldenQuery],
+    *,
+    limit: int = 5,
+    compare_graph: bool = False,
+) -> EvaluationReport:
+    from rag.searcher import search_database
+
+    query_results = []
+    graph_changes = []
+    required_window = max(10, limit)
+    for query in queries:
+        results = search_database(db_path, query.query, limit=required_window, expand_graph=True)
+        evaluated = evaluate_results(query, results, required_window=required_window)
+        if compare_graph:
+            no_graph_results = search_database(db_path, query.query, limit=required_window, expand_graph=False)
+            no_graph = evaluate_results(query, no_graph_results, required_window=required_window)
+            if no_graph.passed != evaluated.passed:
+                evaluated = QueryResult(
+                    query=evaluated.query,
+                    matched_rank=evaluated.matched_rank,
+                    passed=evaluated.passed,
+                    failure_classification=evaluated.failure_classification,
+                    observed=evaluated.observed,
+                    graph_changed=True,
+                )
+                graph_changes.append(evaluated)
+        query_results.append(evaluated)
+
+    overall, categories = calculate_metrics(query_results)
+    failures = [result for result in query_results if not result.passed]
+    return EvaluationReport(
+        overall=overall,
+        categories=categories,
+        failures=failures,
+        query_results=query_results,
+        graph_changes=graph_changes,
+    )
+
+
+def _query_result_to_dict(result: QueryResult) -> dict:
+    return {
+        "id": result.query.id,
+        "query": result.query.query,
+        "category": result.query.category,
+        "required_at": result.query.required_at,
+        "matched_rank": result.matched_rank,
+        "passed": result.passed,
+        "failure_classification": result.failure_classification,
+        "report_only": result.query.report_only,
+        "graph_changed": result.graph_changed,
+        "expected": {
+            "paths": list(result.query.expected_paths),
+            "symbols": list(result.query.expected_symbols),
+            "doc_types": list(result.query.expected_doc_types),
+            "addons": list(result.query.expected_addons),
+        },
+        "observed": result.observed,
+    }
+
+
+def report_to_dict(report: EvaluationReport) -> dict:
+    return {
+        "overall": report.overall,
+        "categories": report.categories,
+        "failures": [_query_result_to_dict(result) for result in report.failures],
+        "queries": [_query_result_to_dict(result) for result in report.query_results],
+        "graph_changes": [_query_result_to_dict(result) for result in report.graph_changes],
+        "regression_failed": report.regression_failed,
+        "regression_messages": list(report.regression_messages),
+        "baseline_written": report.baseline_written,
+        "baseline_compared": report.baseline_compared,
+    }

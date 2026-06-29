@@ -89,3 +89,65 @@ def test_compare_with_baseline_reports_hit5_regression():
 
     assert failed is True
     assert any("hit@5" in message for message in messages)
+
+
+import tempfile
+
+from rag.indexer import build_database
+from rag.search_eval import evaluate_database, report_to_dict
+
+
+def _build_eval_db(tmp_path, monkeypatch):
+    from rag import embeddings
+
+    docs = tmp_path / "docs"
+    classes = docs / "classes"
+    tutorials = docs / "tutorials"
+    classes.mkdir(parents=True)
+    tutorials.mkdir(parents=True)
+
+    (classes / "class_node.md").write_text(
+        "# Node\n\n"
+        "Scene tree node.\n\n"
+        "## Methods\n\n"
+        "`void` **add_child**(`Node` node)\n\nAttach a child node to the scene tree.\n",
+        encoding="utf-8",
+    )
+    (classes / "class_timer.md").write_text(
+        "# Timer\n\n"
+        "Countdown timer node.\n\n"
+        "## Methods\n\n"
+        "`void` **start**()\n\nStarts the timer.\n\n"
+        "`bool` **is_stopped**()\n\nReturns true when the timer is stopped.\n",
+        encoding="utf-8",
+    )
+    (tutorials / "scene_tree.md").write_text(
+        "# Scene Tree\n\nUse add_child to attach nodes to the scene tree.\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(embeddings, "generate_embeddings", lambda texts: [[0.0] * 256 for _ in texts])
+    db_path = tmp_path / "eval.db"
+    build_database(docs, db_path)
+    return db_path
+
+
+def test_evaluate_database_returns_metrics_and_failures(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    queries = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))
+
+    report = evaluate_database(db_path, queries, limit=5)
+    data = report_to_dict(report)
+
+    assert data["overall"]["count"] >= 3
+    assert "hit@5" in data["overall"]
+    assert "class" in data["categories"]
+    assert isinstance(data["failures"], list)
+
+
+def test_graph_comparison_marks_changed_query_status(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    queries = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))
+
+    report = evaluate_database(db_path, queries, limit=5, compare_graph=True)
+
+    assert all(hasattr(result, "graph_changed") for result in report.query_results)
