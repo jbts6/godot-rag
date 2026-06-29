@@ -91,8 +91,6 @@ def test_compare_with_baseline_reports_hit5_regression():
     assert any("hit@5" in message for message in messages)
 
 
-import tempfile
-
 from rag.indexer import build_database
 from rag.search_eval import evaluate_database, report_to_dict
 

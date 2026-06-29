@@ -40,21 +40,24 @@ def _as_tuple(data: dict, key: str) -> tuple[str, ...]:
 def load_queries(path: Path) -> list[GoldenQuery]:
     raw = json.loads(path.read_text(encoding="utf-8"))
     queries = []
-    for item in raw:
-        queries.append(
-            GoldenQuery(
-                id=str(item["id"]),
-                query=str(item["query"]),
-                category=str(item["category"]),
-                required_at=int(item.get("required_at", 5)),
-                expected_paths=_as_tuple(item, "expected_paths"),
-                expected_symbols=_as_tuple(item, "expected_symbols"),
-                expected_doc_types=_as_tuple(item, "expected_doc_types"),
-                expected_addons=_as_tuple(item, "expected_addons"),
-                report_only=bool(item.get("report_only", False)),
-                tags=_as_tuple(item, "tags"),
+    for idx, item in enumerate(raw):
+        try:
+            queries.append(
+                GoldenQuery(
+                    id=str(item["id"]),
+                    query=str(item["query"]),
+                    category=str(item["category"]),
+                    required_at=int(item.get("required_at", 5)),
+                    expected_paths=_as_tuple(item, "expected_paths"),
+                    expected_symbols=_as_tuple(item, "expected_symbols"),
+                    expected_doc_types=_as_tuple(item, "expected_doc_types"),
+                    expected_addons=_as_tuple(item, "expected_addons"),
+                    report_only=bool(item.get("report_only", False)),
+                    tags=_as_tuple(item, "tags"),
+                )
             )
-        )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError(f"Malformed query entry at index {idx} in {path}: {exc}") from exc
     return queries
 
 
