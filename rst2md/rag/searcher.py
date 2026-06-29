@@ -116,6 +116,28 @@ def _apply_intent_boost(query: str, results: list[SearchResult]) -> list[SearchR
     return sorted(boosted, key=lambda result: result.score, reverse=True)
 
 
+def _rerank_bonus(plan, result: SearchResult) -> float:
+    from rag.query_plan import QueryPlan
+    bonus = 0.0
+    if result.symbol in plan.alias_symbol_candidates:
+        bonus += 5.0
+    elif result.symbol in plan.symbol_candidates:
+        bonus += 2.0
+    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent and not plan.symbol_candidates:
+        bonus += 0.05
+    if plan.addon_intent and result.doc_type == "addon":
+        bonus += 0.5
+    return bonus
+
+
+def rerank_results(plan, results: list[SearchResult]) -> list[SearchResult]:
+    boosted = [
+        replace(result, score=result.score + _rerank_bonus(plan, result))
+        for result in results
+    ]
+    return sorted(boosted, key=lambda result: result.score, reverse=True)
+
+
 def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
     """Extract a snippet from text around the first line containing query keywords."""
     lines = text.split('\n')
@@ -510,5 +532,5 @@ def _search_database_impl(
             )
             for r in sorted_results
         ]
-        search_results = _apply_intent_boost(query, search_results)
+        search_results = rerank_results(plan, search_results)
         return (search_results[:limit], metadata)

@@ -50,6 +50,10 @@ class SearcherModuleImportTests(unittest.TestCase):
         from rag.searcher import _search_database_impl
         self.assertTrue(callable(_search_database_impl))
 
+    def test_import_rerank_results(self):
+        from rag.searcher import rerank_results
+        self.assertTrue(callable(rerank_results))
+
     def test_rrf_fusion_basic(self):
         from rag.searcher import rrf_fusion
         fts = [{'id': 1}, {'id': 2}]
@@ -130,6 +134,86 @@ def test_query_plan_detects_tutorial_and_addon_intent():
 
     assert tutorial.doc_type_intent == "tutorial"
     assert addon.addon_intent == "addon"
+
+
+def test_rerank_promotes_alias_symbol_match():
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.searcher import rerank_results
+
+    plan = build_query_plan("attach node to scene tree")
+    weak_alias = SearchResult(
+        score=1.0,
+        path="classes/class_node.md",
+        start_line=1,
+        end_line=2,
+        doc_type="class",
+        chunk_type="method",
+        addon="",
+        addon_name="",
+        symbol="Node.add_child",
+        heading="add_child",
+        breadcrumb="Node",
+        text="Adds a child node.",
+    )
+    lexical = SearchResult(
+        score=2.0,
+        path="tutorials/scripting/change_scenes_manually.md",
+        start_line=1,
+        end_line=2,
+        doc_type="tutorial",
+        chunk_type="section",
+        addon="",
+        addon_name="",
+        symbol="",
+        heading="Scene tree",
+        breadcrumb="Tutorial",
+        text="Attach scripts to scene nodes.",
+    )
+
+    ranked = rerank_results(plan, [lexical, weak_alias])
+
+    assert ranked[0].symbol == "Node.add_child"
+
+
+def test_rerank_symbol_query_does_not_apply_tutorial_intent():
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.searcher import rerank_results
+
+    plan = build_query_plan("Node.add_child")
+    class_result = SearchResult(
+        score=1.0,
+        path="classes/class_node.md",
+        start_line=1,
+        end_line=2,
+        doc_type="class",
+        chunk_type="method",
+        addon="",
+        addon_name="",
+        symbol="Node.add_child",
+        heading="add_child",
+        breadcrumb="Node",
+        text="Adds a child node.",
+    )
+    tutorial_result = SearchResult(
+        score=2.0,
+        path="tutorials/scripting/change_scenes_manually.md",
+        start_line=1,
+        end_line=2,
+        doc_type="tutorial",
+        chunk_type="section",
+        addon="",
+        addon_name="",
+        symbol="",
+        heading="Scene tree",
+        breadcrumb="Tutorial",
+        text="Attach scripts to scene nodes.",
+    )
+
+    ranked = rerank_results(plan, [tutorial_result, class_result])
+
+    assert ranked[0].symbol == "Node.add_child"
 
 
 if __name__ == "__main__":
