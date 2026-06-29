@@ -1,0 +1,11 @@
+[
+  {
+    "id": "node-add-child",
+    "query": "attach node to scene tree",
+    "category": "class",
+    "required_at": 5,
+    "expected_paths": ["classes/class_node.md"],
+    "expected_symbols": ["Node.add_child"],
+    "tags": ["symbol_variant"]
+  }
+]
