@@ -310,3 +310,49 @@ def test_apply_baseline_ignores_new_queries_outside_baseline_gate(tmp_path):
 
     assert updated.baseline_compared is True
     assert updated.regression_failed is False
+
+
+def test_evaluate_database_attaches_failure_diagnostics(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    base = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
+    query = replace(
+        base,
+        id="timer-low-window",
+        query="timer start",
+        expected_paths=("classes/class_timer.md",),
+        expected_symbols=("Timer.is_stopped",),
+        required_at=1,
+    )
+
+    report = evaluate_database(db_path, [query], limit=1, diagnostic_limit=20)
+    assert report.failures
+
+    diagnostics = report.failures[0].diagnostics
+    assert diagnostics is not None
+    assert diagnostics.expected_present is True
+    assert diagnostics.diagnostic_window == 20
+    assert diagnostics.expected_rows[0]["path"] == "classes/class_timer.md"
+
+    data = report_to_dict(report)
+    assert data["failures"][0]["diagnostics"]["expected_present"] is True
+    assert "best_rank" in data["failures"][0]["diagnostics"]
+
+
+def test_text_report_includes_failure_diagnostics_summary(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    base = load_queries(Path("rst2md/tests/fixtures/search_eval_fixture_queries.json"))[0]
+    query = replace(
+        base,
+        id="timer-diagnostic-text",
+        query="timer start",
+        expected_paths=("classes/class_timer.md",),
+        expected_symbols=("Timer.is_stopped",),
+        required_at=1,
+    )
+
+    report = evaluate_database(db_path, [query], limit=1, diagnostic_limit=20)
+    text = format_text_report(report)
+
+    assert "diagnostics:" in text
+    assert "expected_present=True" in text
+    assert "best_rank=" in text

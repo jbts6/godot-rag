@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
 
@@ -23,6 +23,15 @@ class GoldenQuery:
 
 
 @dataclass(frozen=True)
+class FailureDiagnostics:
+    expected_present: bool
+    expected_rows: list[dict]
+    best_rank: int | None
+    best_rank_no_graph: int | None
+    diagnostic_window: int
+
+
+@dataclass(frozen=True)
 class QueryResult:
     query: GoldenQuery
     matched_rank: int | None
@@ -30,6 +39,7 @@ class QueryResult:
     failure_classification: str
     observed: list[dict]
     graph_changed: bool = False
+    diagnostics: FailureDiagnostics | None = None
 
 
 def _as_tuple(data: dict, key: str) -> tuple[str, ...]:
@@ -83,6 +93,67 @@ def result_matches(query: GoldenQuery, result: SearchResult) -> bool:
         and _matches_any(result.symbol, query.expected_symbols)
         and _matches_any(result.doc_type, query.expected_doc_types)
         and _matches_any(result.addon, query.expected_addons)
+    )
+
+
+def _query_constraints(query: GoldenQuery) -> tuple[list[str], list[str]]:
+    clauses = []
+    params = []
+    if query.expected_paths:
+        clauses.append("path IN ({})".format(",".join("?" for _ in query.expected_paths)))
+        params.extend(query.expected_paths)
+    if query.expected_symbols:
+        clauses.append("symbol IN ({})".format(",".join("?" for _ in query.expected_symbols)))
+        params.extend(query.expected_symbols)
+    if query.expected_doc_types:
+        clauses.append("doc_type IN ({})".format(",".join("?" for _ in query.expected_doc_types)))
+        params.extend(query.expected_doc_types)
+    if query.expected_addons:
+        clauses.append("addon IN ({})".format(",".join("?" for _ in query.expected_addons)))
+        params.extend(query.expected_addons)
+    return clauses, params
+
+
+def _fetch_expected_rows(db_path: Path, query: GoldenQuery, *, limit: int = 10) -> list[dict]:
+    import sqlite3
+
+    clauses, params = _query_constraints(query)
+    if not clauses:
+        return []
+
+    sql = (
+        "SELECT path, symbol, doc_type, addon, heading "
+        "FROM chunks WHERE " + " AND ".join(clauses) + " "
+        "ORDER BY path, symbol LIMIT ?"
+    )
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(sql, [*params, limit]).fetchall()
+    return [dict(row) for row in rows]
+
+
+def _find_matching_rank(query: GoldenQuery, results: Sequence[SearchResult]) -> int | None:
+    for rank, result in enumerate(results, start=1):
+        if result_matches(query, result):
+            return rank
+    return None
+
+
+def diagnose_failure(
+    db_path: Path,
+    query: GoldenQuery,
+    expanded_results: Sequence[SearchResult],
+    no_graph_results: Sequence[SearchResult],
+    *,
+    diagnostic_window: int,
+) -> FailureDiagnostics:
+    expected_rows = _fetch_expected_rows(db_path, query)
+    return FailureDiagnostics(
+        expected_present=bool(expected_rows),
+        expected_rows=expected_rows,
+        best_rank=_find_matching_rank(query, expanded_results[:diagnostic_window]),
+        best_rank_no_graph=_find_matching_rank(query, no_graph_results[:diagnostic_window]),
+        diagnostic_window=diagnostic_window,
     )
 
 
@@ -205,28 +276,36 @@ def evaluate_database(
     *,
     limit: int = 5,
     compare_graph: bool = False,
+    diagnostic_limit: int = 50,
 ) -> EvaluationReport:
     from rag.searcher import search_database
 
     query_results = []
     graph_changes = []
     required_window = max(10, limit)
+    diagnostic_window = max(required_window, diagnostic_limit)
     for query in queries:
-        results = search_database(db_path, query.query, limit=required_window, expand_graph=True)
+        results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=True)
         evaluated = evaluate_results(query, results, required_window=required_window)
+        no_graph_results = []
+        if compare_graph or not evaluated.passed:
+            no_graph_results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=False)
         if compare_graph:
-            no_graph_results = search_database(db_path, query.query, limit=required_window, expand_graph=False)
             no_graph = evaluate_results(query, no_graph_results, required_window=required_window)
             if no_graph.passed != evaluated.passed:
-                evaluated = QueryResult(
-                    query=evaluated.query,
-                    matched_rank=evaluated.matched_rank,
-                    passed=evaluated.passed,
-                    failure_classification=evaluated.failure_classification,
-                    observed=evaluated.observed,
-                    graph_changed=True,
-                )
+                evaluated = replace(evaluated, graph_changed=True)
                 graph_changes.append(evaluated)
+        if not evaluated.passed:
+            evaluated = replace(
+                evaluated,
+                diagnostics=diagnose_failure(
+                    db_path,
+                    query,
+                    results,
+                    no_graph_results,
+                    diagnostic_window=diagnostic_window,
+                ),
+            )
         query_results.append(evaluated)
 
     overall, categories = calculate_metrics(query_results)
@@ -334,6 +413,15 @@ def format_text_report(report: EvaluationReport) -> str:
             lines.append(f"  query: {failure.query.query}")
             lines.append(f"  category={failure.query.category} required_at={failure.query.required_at}")
             lines.append(f"  expected: {_format_expected(failure.query)}")
+            if failure.diagnostics:
+                lines.append("  diagnostics:")
+                lines.append(
+                    "  "
+                    f"expected_present={failure.diagnostics.expected_present} "
+                    f"best_rank={failure.diagnostics.best_rank} "
+                    f"best_rank_no_graph={failure.diagnostics.best_rank_no_graph} "
+                    f"diagnostic_window={failure.diagnostics.diagnostic_window}"
+                )
             if failure.observed:
                 lines.append("  observed:")
                 for observed in failure.observed:
@@ -365,6 +453,17 @@ def _query_result_to_dict(result: QueryResult) -> dict:
             "addons": list(result.query.expected_addons),
         },
         "observed": result.observed,
+        "diagnostics": (
+            {
+                "expected_present": result.diagnostics.expected_present,
+                "expected_rows": result.diagnostics.expected_rows,
+                "best_rank": result.diagnostics.best_rank,
+                "best_rank_no_graph": result.diagnostics.best_rank_no_graph,
+                "diagnostic_window": result.diagnostics.diagnostic_window,
+            }
+            if result.diagnostics
+            else None
+        ),
     }
 
 
