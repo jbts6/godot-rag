@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import time
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Sequence
@@ -56,6 +57,27 @@ def database_fingerprint(db_path: str) -> DatabaseFingerprint:
         symbols=symbols,
         vectors=vectors,
     )
+
+
+def _percentile(values: Sequence[float], percentile: float) -> float:
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    n = len(ordered)
+    if n == 1:
+        return ordered[0]
+    if percentile == 0.50 and n % 2 == 0:
+        return (ordered[n // 2 - 1] + ordered[n // 2]) / 2
+    index = min(n - 1, max(0, int((n - 1) * percentile + 0.5)))
+    return ordered[index]
+
+
+def latency_summary(elapsed_seconds: Sequence[float]) -> dict:
+    return {
+        "count": len(elapsed_seconds),
+        "p50_ms": round(_percentile(elapsed_seconds, 0.50) * 1000, 3),
+        "p95_ms": round(_percentile(elapsed_seconds, 0.95) * 1000, 3),
+    }
 
 
 def query_suite_hash(queries: Sequence[GoldenQuery]) -> str:
@@ -374,6 +396,7 @@ class EvaluationReport:
     query_suite_hash: str = ""
     category_warnings: tuple[str, ...] = ()
     baseline_warnings: tuple[str, ...] = ()
+    latency: dict | None = None
 
 
 _REQUIRED_CATEGORIES = {"class", "symbol", "tutorial", "engine", "addon"}
@@ -403,10 +426,13 @@ def evaluate_database(
 
     query_results = []
     graph_changes = []
+    elapsed_seconds = []
     required_window = max(10, limit)
     diagnostic_window = max(required_window, diagnostic_limit)
     for query in queries:
+        started = time.perf_counter()
         results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=True)
+        elapsed_seconds.append(time.perf_counter() - started)
         evaluated = evaluate_results(query, results, required_window=required_window)
         no_graph_results = []
         if compare_graph or not evaluated.passed:
@@ -445,6 +471,7 @@ def evaluate_database(
         database=fp,
         query_suite_hash=suite_hash,
         category_warnings=category_warnings,
+        latency=latency_summary(elapsed_seconds),
     )
 
 
@@ -478,6 +505,7 @@ def apply_baseline(
             query_suite_hash=report.query_suite_hash,
             category_warnings=report.category_warnings,
             baseline_warnings=report.baseline_warnings,
+            latency=report.latency,
         )
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
         baseline_path.write_text(json.dumps(report_to_dict(baseline_report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -520,6 +548,7 @@ def apply_baseline(
         query_suite_hash=report.query_suite_hash,
         category_warnings=report.category_warnings,
         baseline_warnings=tuple(baseline_warnings),
+        latency=report.latency,
     )
 
 
@@ -664,6 +693,8 @@ def report_to_dict(report: EvaluationReport) -> dict:
         "category_warnings": list(category_warnings),
         "baseline_warnings": list(report.baseline_warnings),
     }
+    if report.latency is not None:
+        result["latency"] = report.latency
     if report.database:
         result["metadata"] = {
             "query_suite_hash": report.query_suite_hash,

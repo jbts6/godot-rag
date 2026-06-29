@@ -664,3 +664,28 @@ def test_category_coverage_warns_missing_addon_category():
     data = report_to_dict(report)
 
     assert "addon" in data["category_warnings"]
+
+
+def test_latency_summary_reports_p50_and_p95():
+    from rag.search_eval import latency_summary
+
+    summary = latency_summary([0.010, 0.020, 0.030, 0.040])
+
+    assert summary["count"] == 4
+    assert summary["p50_ms"] == 25.0
+    assert summary["p95_ms"] == 40.0
+
+
+def test_report_to_dict_includes_latency_summary():
+    from rag.search_eval import EvaluationReport, report_to_dict
+
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        latency={"count": 2, "p50_ms": 1.0, "p95_ms": 2.0},
+    )
+
+    assert report_to_dict(report)["latency"] == {"count": 2, "p50_ms": 1.0, "p95_ms": 2.0}
