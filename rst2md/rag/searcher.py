@@ -228,7 +228,10 @@ def _run_fts_query(
     escaped_query = _smart_tokenize(normalize_symbol(query))
     rows = conn.execute(
         f"""
-        SELECT c.*, bm25(chunks_fts) as score
+        SELECT c.id, c.path, c.start_line, c.end_line, c.doc_type,
+               c.chunk_type, c.addon, c.addon_name, c.symbol, c.heading,
+               c.breadcrumb, c.text,
+               bm25(chunks_fts) as score
         FROM chunks_fts
         JOIN chunks c ON chunks_fts.rowid = c.id
         WHERE chunks_fts MATCH ?

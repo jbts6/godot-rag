@@ -25,7 +25,7 @@ class GoldenQuery:
 @dataclass(frozen=True)
 class FailureDiagnostics:
     expected_present: bool
-    expected_rows: list[dict]
+    expected_rows: tuple[dict, ...]
     best_rank: int | None
     best_rank_no_graph: int | None
     diagnostic_window: int
@@ -129,7 +129,7 @@ def _fetch_expected_rows(db_path: Path, query: GoldenQuery, *, limit: int = 10) 
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute(sql, [*params, limit]).fetchall()
-    return [dict(row) for row in rows]
+    return tuple(dict(row) for row in rows)
 
 
 def _find_matching_rank(query: GoldenQuery, results: Sequence[SearchResult]) -> int | None:
