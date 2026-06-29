@@ -599,6 +599,9 @@ def format_text_report(report: EvaluationReport) -> str:
         lines.append(f"category_warning: missing gating queries for '{warning}'")
     for warning in report.baseline_warnings:
         lines.append(f"baseline_warning: {warning}")
+    if report.latency is not None:
+        lat = report.latency
+        lines.append(f"latency: count={lat['count']} p50={lat['p50_ms']}ms p95={lat['p95_ms']}ms")
     if report.failures:
         lines.append("failures:")
         for failure in report.failures:
