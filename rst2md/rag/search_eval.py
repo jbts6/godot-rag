@@ -224,6 +224,34 @@ def diagnose_failure(
     )
 
 
+@dataclass(frozen=True)
+class PromotionStatus:
+    eligible: bool
+    reason: str
+
+
+def promotion_eligibility(
+    *,
+    passed: bool,
+    report_only: bool,
+    expected_present: bool,
+    matched_rank: int | None,
+    required_at: int,
+    category: str,
+) -> PromotionStatus:
+    if not report_only:
+        return PromotionStatus(eligible=False, reason="not_report_only")
+    if not expected_present:
+        return PromotionStatus(eligible=False, reason="expected_not_present")
+    if not passed:
+        if matched_rank is not None and matched_rank > required_at:
+            return PromotionStatus(eligible=False, reason="rank_too_low")
+        return PromotionStatus(eligible=False, reason="not_passing")
+    if category == "addon":
+        return PromotionStatus(eligible=False, reason="addon_data_unstable")
+    return PromotionStatus(eligible=True, reason="eligible")
+
+
 def _classify_failure(query: GoldenQuery, results: Sequence[SearchResult], matched_rank: int | None) -> str:
     if matched_rank is not None and matched_rank > query.required_at:
         return "low_ranking"

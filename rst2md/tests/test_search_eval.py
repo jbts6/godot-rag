@@ -437,6 +437,102 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert any("graph" in query.tags for query in queries)
 
 
+def test_report_only_query_with_missing_expected_rows_is_not_promotable():
+    from rag.search_eval import PromotionStatus, promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=False,
+        matched_rank=None,
+        required_at=5,
+        category="addon",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "expected_not_present"
+
+
+def test_report_only_query_that_passes_with_present_expected_rows_is_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=True,
+        expected_present=True,
+        matched_rank=3,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is True
+    assert status.reason == "eligible"
+
+
+def test_not_report_only_query_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=False,
+        expected_present=True,
+        matched_rank=1,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "not_report_only"
+
+
+def test_report_only_query_that_fails_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=True,
+        matched_rank=None,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "not_passing"
+
+
+def test_report_only_query_with_rank_above_required_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=False,
+        report_only=True,
+        expected_present=True,
+        matched_rank=7,
+        required_at=5,
+        category="class",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "rank_too_low"
+
+
+def test_report_only_addon_query_is_not_promotable():
+    from rag.search_eval import promotion_eligibility
+
+    status = promotion_eligibility(
+        passed=True,
+        report_only=True,
+        expected_present=True,
+        matched_rank=2,
+        required_at=5,
+        category="addon",
+    )
+
+    assert status.eligible is False
+    assert status.reason == "addon_data_unstable"
+
+
 def test_database_fingerprint_returns_nonzero_counts(tmp_path, monkeypatch):
     db_path = _build_eval_db(tmp_path, monkeypatch)
 
