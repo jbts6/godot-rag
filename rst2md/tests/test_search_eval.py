@@ -437,6 +437,26 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert any("graph" in query.tags for query in queries)
 
 
+def test_packaged_eval_queries_meet_expanded_coverage_requirements():
+    queries = load_queries(Path("rst2md/rag/search_eval_queries.json"))
+    gating = [query for query in queries if not query.report_only]
+    report_only = [query for query in queries if query.report_only]
+    categories = {query.category for query in queries}
+    tags = {tag for query in queries for tag in query.tags}
+
+    assert len({query.id for query in queries}) == len(queries)
+    assert len(queries) >= 40
+    assert len(gating) >= 25
+    assert len(report_only) >= 10
+    assert {"class", "symbol", "tutorial", "engine", "addon"} <= categories
+    assert "normalization" in tags
+    assert "graph" in tags
+    assert any(
+        not query.report_only and (query.expected_doc_types or query.expected_addons)
+        for query in queries
+    )
+
+
 def test_report_only_query_with_missing_expected_rows_is_not_promotable():
     from rag.search_eval import PromotionStatus, promotion_eligibility
 

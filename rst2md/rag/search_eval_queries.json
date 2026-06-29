@@ -28,5 +28,20 @@
   {"id": "addon-phantom-camera", "query": "phantom camera addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"], "report_only": true},
   {"id": "addon-limboai-behavior-tree", "query": "behavior tree addon", "category": "addon", "required_at": 5, "expected_doc_types": ["addon"], "report_only": true},
   {"id": "vector-fallback-metadata", "query": "semantic search vector fallback", "category": "engine", "required_at": 5, "expected_doc_types": ["tutorial"], "report_only": true},
-  {"id": "editor-plugin-running-code", "query": "running code in the editor plugin", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "report_only": true}
+  {"id": "editor-plugin-running-code", "query": "running code in the editor plugin", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "report_only": true},
+  {"id": "characterbody3d-movement", "query": "CharacterBody3D move and slide", "category": "class", "required_at": 5, "expected_paths": ["classes/class_characterbody3d.md"], "expected_doc_types": ["class"]},
+  {"id": "animationplayer-play", "query": "AnimationPlayer.play", "category": "symbol", "required_at": 3, "expected_symbols": ["AnimationPlayer.play"], "tags": ["normalization"]},
+  {"id": "rigidbody3d-physics", "query": "RigidBody3D", "category": "class", "required_at": 5, "expected_paths": ["classes/class_rigidbody3d.md"]},
+  {"id": "resource-loader", "query": "ResourceLoader.load", "category": "symbol", "required_at": 3, "expected_symbols": ["ResourceLoader.load"], "tags": ["normalization"]},
+  {"id": "input-is-action-pressed", "query": "Input.is_action_pressed", "category": "symbol", "required_at": 3, "expected_symbols": ["Input.is_action_pressed"], "tags": ["normalization"]},
+  {"id": "control-grab-focus", "query": "Control.grab_focus", "category": "symbol", "required_at": 3, "expected_symbols": ["Control.grab_focus"], "tags": ["normalization"]},
+  {"id": "gdscript-export-variables-tutorial", "query": "GDScript export variables tutorial", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"]},
+  {"id": "gdscript-syntax-engine", "query": "GDScript syntax reference", "category": "engine", "required_at": 5, "expected_doc_types": ["tutorial"]},
+  {"id": "sprite2d-class", "query": "Sprite2D", "category": "class", "required_at": 5, "expected_paths": ["classes/class_sprite2d.md"]},
+  {"id": "node-connect-signal", "query": "Node.connect", "category": "symbol", "required_at": 3, "expected_symbols": ["Object.connect"], "tags": ["normalization"]},
+  {"id": "container-ui-class", "query": "VBoxContainer HBoxContainer", "category": "class", "required_at": 5, "expected_paths": ["classes/class_boxcontainer.md"], "report_only": true},
+  {"id": "shader-material-class", "query": "ShaderMaterial", "category": "class", "required_at": 5, "expected_paths": ["classes/class_shadermaterial.md"], "report_only": true},
+  {"id": "navigation-agent-3d-class", "query": "NavigationAgent3D pathfinding", "category": "class", "required_at": 5, "expected_paths": ["classes/class_navigationagent3d.md"], "report_only": true},
+  {"id": "physics-raycast-query", "query": "PhysicsRayQueryParameters3D", "category": "class", "required_at": 5, "expected_paths": ["classes/class_physicsrayqueryparameters3d.md"], "report_only": true},
+  {"id": "multiplayer-networking-tutorial", "query": "multiplayer networking tutorial", "category": "tutorial", "required_at": 5, "expected_doc_types": ["tutorial"], "tags": ["intent"], "report_only": true}
 ]
