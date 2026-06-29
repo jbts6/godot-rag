@@ -371,7 +371,7 @@ rtk git commit -m "feat: add structured search query plan"
 - Consumes: `build_query_plan()`, `QueryPlan.symbol_candidates`.
 - Produces: helper functions for symbol candidate recall inside `_search_database_impl()`.
 
-- [ ] **Step 1: Write failing integration test for alias symbol recall**
+- [x] **Step 1: Write failing integration test for alias symbol recall**
 
 Use the existing fixture pattern in `rst2md/tests/test_semantic_search.py`. Add a test that builds or reuses a DB containing `Node.add_child`, searches `"attach node to scene tree"` with `expand_graph=False`, and asserts `Node.add_child` appears in top 5.
 
@@ -386,13 +386,13 @@ def test_alias_query_uses_symbol_recall(db_path):
 
 If the file uses a different fixture name, adapt only the fixture argument, not the assertion.
 
-- [ ] **Step 2: Run the focused test and verify it fails**
+- [x] **Step 2: Run the focused test and verify it fails**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_semantic_search.py -q
 ```
 
-- [ ] **Step 3: Implement symbol candidate recall**
+- [x] **Step 3: Implement symbol candidate recall**
 
 In `rst2md/rag/searcher.py`:
 
@@ -402,11 +402,11 @@ In `rst2md/rag/searcher.py`:
 4. Keep scoring tiers compatible with the current exact `100`, suffix `80`, prefix `40` behavior.
 5. Deduplicate by chunk ID through the existing `results` dict.
 
-- [ ] **Step 4: Ensure FTS still uses variants and vector still uses original query**
+- [x] **Step 4: Ensure FTS still uses variants and vector still uses original query**
 
 Keep `_run_vector_query()` input as `query` or `plan.original`. Use `plan.fts_variants` in the FTS loop instead of calling `expand_query_variants(query)` directly.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 ```bash
 rtk uv run pytest rst2md/tests/test_semantic_search.py rst2md/tests/test_searcher_module.py -q

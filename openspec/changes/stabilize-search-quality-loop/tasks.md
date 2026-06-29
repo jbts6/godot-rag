@@ -7,7 +7,7 @@
 ## 2. Query Planning and Ranking
 
 - [x] 2.1 Introduce a structured query plan that captures original text, normalized symbols, alias-derived symbol candidates, doc-type intent, and addon intent.
-- [ ] 2.2 Route query-plan symbol candidates through exact, suffix, and prefix symbol recall while preserving existing FTS query variants.
+- [x] 2.2 Route query-plan symbol candidates through exact, suffix, and prefix symbol recall while preserving existing FTS query variants.
 - [ ] 2.3 Replace the narrow post-ranking intent boost with deterministic reranking signals for alias, symbol, doc-type, addon, path, and heading matches.
 
 ## 3. Search Quality Promotion
