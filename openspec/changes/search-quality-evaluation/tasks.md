@@ -22,7 +22,7 @@
 
 ## 4. Documentation And Verification
 
-- [ ] 4.1 Document how to run fixture evaluation, real-database evaluation, and baseline refresh.
-- [ ] 4.2 Add CLI or command tests for text output, JSON output, first-run baseline creation, and regression failure.
-- [ ] 4.3 Run focused search quality tests.
-- [ ] 4.4 Run relevant RAG, semantic-search, CLI, and OpenSpec validation checks.
+- [x] 4.1 Document how to run fixture evaluation, real-database evaluation, and baseline refresh.
+- [x] 4.2 Add CLI or command tests for text output, JSON output, first-run baseline creation, and regression failure.
+- [x] 4.3 Run focused search quality tests.
+- [x] 4.4 Run relevant RAG, semantic-search, CLI, and OpenSpec validation checks.

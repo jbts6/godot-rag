@@ -77,6 +77,10 @@ def assemble_package_tree(root: Path) -> list[str]:
         shutil.copy2(source, target)
         _rewrite_imports(target)
 
+    for source in sorted((root / "rst2md/rag").glob("*.json")):
+        target = rag_out / source.name
+        shutil.copy2(source, target)
+
     addon_source = root / "rst2md/rag/addon_configs"
     addon_target = rag_out / "addon_configs"
     if addon_source.exists():

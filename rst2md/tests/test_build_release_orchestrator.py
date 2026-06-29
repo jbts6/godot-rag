@@ -28,6 +28,7 @@ def write_minimal_build_tree(root: Path):
     (root / "godot-docs/classes").mkdir(parents=True)
     (root / "godot-docs/conf.py").write_text('godot_version = "4.7"\n', encoding="utf-8")
     (root / "rst2md/rag/addon_configs").mkdir(parents=True)
+    (root / "rst2md/rag/search_eval_queries.json").write_text("[]\n", encoding="utf-8")
     (root / "rst2md/rag/cli.py").write_text("from rag.store import x\n", encoding="utf-8")
     (root / "rst2md/rag/store.py").write_text("VALUE = 1\n", encoding="utf-8")
     (root / "scripts").mkdir()
@@ -79,6 +80,8 @@ def test_assemble_package_tree_rewrites_imports(tmp_path):
     assert copied.exists()
     assert "from godot_rag.rag.store import x" in copied.read_text(encoding="utf-8")
     assert "godot_rag/rag/cli.py" in outputs
+    assert (tmp_path / "godot_rag/rag/search_eval_queries.json").exists()
+    assert "godot_rag/rag/search_eval_queries.json" in outputs
 
 
 def test_wiki_build_cleans_transient_addon_docs(tmp_path):

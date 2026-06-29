@@ -151,6 +151,40 @@ godot-rag diagnostics --json
 godot-rag diagnostics --no-model
 ```
 
+## Search Quality Evaluation
+
+Run the deterministic fixture tests during development:
+
+```bash
+uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py
+```
+
+Evaluate a generated release database manually:
+
+```bash
+godot-rag eval-search --db godot_rag/rag/godot_docs.sqlite
+```
+
+Write or refresh a baseline:
+
+```bash
+godot-rag eval-search \
+  --db godot_rag/rag/godot_docs.sqlite \
+  --baseline docs/search-quality/baseline.json \
+  --write-baseline
+```
+
+Compare against a baseline and fail only on clear regressions:
+
+```bash
+godot-rag eval-search \
+  --db godot_rag/rag/godot_docs.sqlite \
+  --baseline docs/search-quality/baseline.json \
+  --compare-graph
+```
+
+Use `--json` for machine-readable reports.
+
 ## Examples
 
 ```bash
