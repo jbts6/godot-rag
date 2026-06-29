@@ -6,8 +6,7 @@ from typing import List, Optional
 from rag.db import clean_chunk_text, get_connection
 from rag.models import SearchMetadata, SearchResponse, SearchResult
 from dataclasses import replace
-from rag.query_rewrite import doc_type_boost
-from rag.query_plan import build_query_plan
+from rag.query_plan import QueryPlan, build_query_plan
 from rag.symbols import normalize_symbol
 
 
@@ -108,16 +107,7 @@ def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) ->
     return results
 
 
-def _apply_intent_boost(query: str, results: list[SearchResult]) -> list[SearchResult]:
-    boosted = [
-        replace(result, score=result.score + doc_type_boost(query, result.doc_type))
-        for result in results
-    ]
-    return sorted(boosted, key=lambda result: result.score, reverse=True)
-
-
-def _rerank_bonus(plan, result: SearchResult) -> float:
-    from rag.query_plan import QueryPlan
+def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
     bonus = 0.0
     if result.symbol in plan.alias_symbol_candidates:
         bonus += 5.0
@@ -130,7 +120,7 @@ def _rerank_bonus(plan, result: SearchResult) -> float:
     return bonus
 
 
-def rerank_results(plan, results: list[SearchResult]) -> list[SearchResult]:
+def rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchResult]:
     boosted = [
         replace(result, score=result.score + _rerank_bonus(plan, result))
         for result in results

@@ -239,6 +239,13 @@ def promotion_eligibility(
     required_at: int,
     category: str,
 ) -> PromotionStatus:
+    """Determine whether a report-only query is eligible for promotion to gating.
+
+    This is a library helper for programmatic use (e.g. CLI ``promote``
+    sub-commands).  It is intentionally **not** called automatically inside
+    the evaluation pipeline so that callers can apply their own promotion
+    policies.
+    """
     if not report_only:
         return PromotionStatus(eligible=False, reason="not_report_only")
     if not expected_present:

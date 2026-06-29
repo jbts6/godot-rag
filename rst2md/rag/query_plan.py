@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 
 from rag.query_rewrite import _ALIAS_RULES, _tokens, expand_query_variants
@@ -28,8 +27,7 @@ def _addon_intent(query: str) -> str | None:
     return None
 
 
-def _symbol_candidates(query: str) -> tuple[str, ...]:
-    variants = expand_query_variants(query)
+def _symbol_candidates(variants: tuple[str, ...]) -> tuple[str, ...]:
     seen: set[str] = set()
     result: list[str] = []
     for v in variants:
@@ -51,6 +49,16 @@ def _alias_symbol_candidates(query: str) -> tuple[str, ...]:
 
 @dataclass(frozen=True)
 class QueryPlan:
+    """Pre-computed search plan for a query.
+
+    ``symbol_candidates`` includes **all** query variants produced by
+    :func:`expand_query_variants` (original, lower-cased, dot-split, etc.),
+    not just dot-notation symbols.
+
+    ``alias_symbol_candidates`` includes **only** symbols derived from
+    alias rules (e.g. ``_ALIAS_RULES`` matches).
+    """
+
     original: str
     fts_variants: tuple[str, ...]
     symbol_candidates: tuple[str, ...]
@@ -64,7 +72,7 @@ def build_query_plan(query: str) -> QueryPlan:
     return QueryPlan(
         original=query,
         fts_variants=tuple(variants),
-        symbol_candidates=_symbol_candidates(query),
+        symbol_candidates=_symbol_candidates(variants),
         alias_symbol_candidates=_alias_symbol_candidates(query),
         doc_type_intent=_doc_type_intent(query),
         addon_intent=_addon_intent(query),
