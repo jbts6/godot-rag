@@ -2,6 +2,7 @@
 change: search-quality-evaluation
 design-doc: openspec/changes/search-quality-evaluation/design.md
 base-ref: 30eaba0f87effcba5204857dc416f4cf05f284fd
+archived-with: 2026-06-29-search-quality-evaluation
 ---
 
 # Search Quality Evaluation Implementation Plan
@@ -25,6 +26,7 @@ base-ref: 30eaba0f87effcba5204857dc416f4cf05f284fd
 - Generated SQLite database files remain untracked.
 - Real-database quality gates fail only on clear regressions.
 
+archived-with: 2026-06-29-search-quality-evaluation
 ---
 
 ## File Structure
