@@ -1,10 +1,10 @@
-"""TDD test: search functions are importable from their focused modules."""
+"""TDD test: search functions are importable from focused modules and facade."""
 
 import unittest
 
 
 class SearcherModuleImportTests(unittest.TestCase):
-    """Verify that search functions are importable from their focused modules."""
+    """Verify search functions are importable from focused modules and legacy facade."""
 
     def test_import_smart_tokenize(self):
         from rag.retrieval import _smart_tokenize
@@ -53,6 +53,32 @@ class SearcherModuleImportTests(unittest.TestCase):
     def test_import_rerank_results(self):
         from rag.fusion import rerank_results
         self.assertTrue(callable(rerank_results))
+
+    def test_searcher_reexports_legacy_helper_imports(self):
+        from rag import fusion, retrieval, snippet
+        from rag.searcher import (
+            _FTS5_SPECIAL,
+            _escape_fts5,
+            _extract_snippet,
+            _run_fts_query,
+            _run_vector_query,
+            _smart_tokenize,
+            _vector_availability,
+            rerank_results,
+            rrf_fusion,
+            vector_search,
+        )
+
+        self.assertIs(_FTS5_SPECIAL, retrieval._FTS5_SPECIAL)
+        self.assertIs(_escape_fts5, retrieval._escape_fts5)
+        self.assertIs(_run_fts_query, retrieval._run_fts_query)
+        self.assertIs(_run_vector_query, retrieval._run_vector_query)
+        self.assertIs(_smart_tokenize, retrieval._smart_tokenize)
+        self.assertIs(_vector_availability, retrieval._vector_availability)
+        self.assertIs(vector_search, retrieval.vector_search)
+        self.assertIs(rerank_results, fusion.rerank_results)
+        self.assertIs(rrf_fusion, fusion.rrf_fusion)
+        self.assertIs(_extract_snippet, snippet._extract_snippet)
 
     def test_rrf_fusion_basic(self):
         from rag.fusion import rrf_fusion
