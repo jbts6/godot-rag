@@ -6,7 +6,7 @@ base-ref: 5cecde7cb751a762fe725fa7759c57ee91144a7f
 
 # Search Ranking Report-Only Triage Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox syntax for tracking.
 
 **Goal:** 在搜索质量评估诊断输出中为 report-only 查询生成结构化 triage，总结 promotion 候选和后续工作归属。
 
@@ -77,14 +77,14 @@ Expected:
 
 In `openspec/changes/search-ranking-report-only-triage/tasks.md`, change:
 
-```markdown
-- [ ] 1.1 Run the current search evaluation and record the 25 gating / 20 report-only baseline behavior.
+```
+[ ] 1.1 Run the current search evaluation and record the 25 gating / 20 report-only baseline behavior.
 ```
 
 to:
 
-```markdown
-- [x] 1.1 Run the current search evaluation and record the 25 gating / 20 report-only baseline behavior.
+```
+[x] 1.1 Run the current search evaluation and record the 25 gating / 20 report-only baseline behavior.
 ```
 
 - [x] **Step 4: Commit**
