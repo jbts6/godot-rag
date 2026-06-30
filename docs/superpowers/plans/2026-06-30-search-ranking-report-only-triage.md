@@ -752,7 +752,7 @@ rtk git commit -m "feat: expose report-only triage in eval output"
 - Consumes: full implementation from Tasks 2-4.
 - Produces: verified test/run evidence and checked-off OpenSpec verification tasks.
 
-- [ ] **Step 1: Run focused search evaluation tests**
+- [x] **Step 1: Run focused search evaluation tests**
 
 Run:
 
@@ -762,7 +762,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_e
 
 Expected: PASS.
 
-- [ ] **Step 2: Run broader impacted tests**
+- [x] **Step 2: Run broader impacted tests**
 
 Run:
 
@@ -772,7 +772,7 @@ rtk uv run pytest -q rst2md/tests/test_rag_search.py rst2md/tests/test_semantic_
 
 Expected: PASS.
 
-- [ ] **Step 3: Run full test suite**
+- [x] **Step 3: Run full test suite**
 
 Run:
 
@@ -782,7 +782,7 @@ rtk uv run pytest -q
 
 Expected: PASS.
 
-- [ ] **Step 4: Run real evaluator with diagnostics**
+- [x] **Step 4: Run real evaluator with diagnostics**
 
 Run:
 
@@ -792,7 +792,7 @@ rtk uv run godot-rag eval-search --db godot_rag.db --diagnostic-limit 50 --json
 
 Expected: JSON output includes a top-level `report_only_triage` array. The command may still report search-quality failures according to the current corpus; do not treat report-only triage itself as a regression gate.
 
-- [ ] **Step 5: Extract promotion and follow-up candidates**
+- [x] **Step 5: Extract promotion and follow-up candidates**
 
 Run:
 
@@ -803,7 +803,7 @@ rtk uv run python -c "import json; d=json.load(open('/tmp/search-triage.json'));
 
 Expected: prints one line per report-only triage entry.
 
-- [ ] **Step 6: Update documentation only if there is a concrete next-step list**
+- [x] **Step 6: Update documentation only if there is a concrete next-step list**
 
 If Step 5 produces actionable candidates, update the relevant existing WIP/search-quality document with a short section like:
 
@@ -815,7 +815,7 @@ If Step 5 produces actionable candidates, update the relevant existing WIP/searc
 
 If no existing document clearly owns this list, skip the doc update and record the candidate list in the final implementation summary instead.
 
-- [ ] **Step 7: Update OpenSpec task checklist**
+- [x] **Step 7: Update OpenSpec task checklist**
 
 In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 
@@ -831,7 +831,7 @@ If Step 6 intentionally skipped documentation because no owning document existed
 <!-- 4.3 candidate list captured in implementation summary; no owning WIP doc updated -->
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add openspec/changes/search-ranking-report-only-triage/tasks.md
