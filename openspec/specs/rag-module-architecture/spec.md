@@ -28,8 +28,9 @@ The implementation SHALL separate indexing, search execution, relation building,
 - **THEN** schema initialization, document insertion, addon insertion, symbol insertion, FTS sync, and embedding storage concerns MUST live behind an indexing-focused module interface rather than directly inside the public `rag.store` facade
 
 #### Scenario: Search execution is localized
-- **WHEN** search ranking, vector fallback, FTS fallback, result mapping, or graph expansion behavior changes in the future
-- **THEN** those concerns MUST live behind a search-focused module interface rather than directly inside the public `rag.store` facade
+- **WHEN** search ranking, vector fallback, FTS fallback, result mapping, or snippet extraction behavior changes in the future
+- **THEN** those concerns MUST live behind focused search sub-modules (retrieval, fusion, snippet) rather than directly inside a single search module or the public `rag.store` facade
+- **AND** the public `search_database` and `search_database_with_metadata` interfaces MUST remain stable
 
 #### Scenario: Addon discovery is localized
 - **WHEN** addon documentation layout rules or file collection rules change in the future

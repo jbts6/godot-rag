@@ -2,6 +2,8 @@
 comet_change: split-searcher-modules
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-06-30-split-searcher-modules
+status: final
 ---
 
 # Split Searcher Modules — Design Doc

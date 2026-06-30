@@ -2,6 +2,7 @@
 change: split-searcher-modules
 design-doc: docs/superpowers/specs/2026-06-30-split-searcher-modules-design.md
 base-ref: de8d9a2a9872f95cf14f70600e52908a9fe10ea8
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 # Split Searcher Modules 实施计划
@@ -32,6 +33,7 @@ base-ref: de8d9a2a9872f95cf14f70600e52908a9fe10ea8
 - **45 条 query 确定性套件**：`rst2md/tests/test_search_eval.py` + `rst2md/tests/test_search_eval_cli.py`（确定性，无 DB 依赖；绿 = 结果等价）
 - **p50/p95 延迟基准**：`uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/baseline.json --compare-graph`（仅当 `godot_rag.db` 存在时跑；容差 ±5%）
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## File Structure
@@ -56,6 +58,7 @@ base-ref: de8d9a2a9872f95cf14f70600e52908a9fe10ea8
 | `snippet.py` | `_extract_snippet` |
 | `searcher.py`（瘦身后） | `_search_database_impl`（编排），`search_database`，`search_database_with_metadata`；re-export 上述 10 个 + `vector_search` |
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 1: 基线快照
@@ -99,6 +102,7 @@ git add docs/superpowers/plans/.baseline-split-searcher-modules.txt
 git commit -m "chore(split-searcher-modules): record pre-split baseline"
 ```
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 2: 拆 fusion 模块（最独立，无下游依赖）
@@ -232,6 +236,7 @@ git commit -m "refactor(split-searcher-modules): extract fusion.py (rrf_fusion, 
 
 verify: searcher re-export fusion 符号，store.py 零改动，全量测试绿。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 3: 拆 snippet 模块
@@ -325,6 +330,7 @@ git commit -m "refactor(split-searcher-modules): extract snippet.py (_extract_sn
 
 verify: searcher re-export `_extract_snippet`，全量测试绿。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 4: 拆 retrieval 模块 + searcher 瘦身收尾
@@ -558,6 +564,7 @@ git commit -m "refactor(split-searcher-modules): extract retrieval.py + slim sea
 
 verify: searcher 仅剩 `_search_database_impl` + 公开 API + 三块 re-export；store.py 零改动；monkeypatch 测试绿；全量测试绿。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 5: 改 `test_searcher_module.py` import 路径（方案 A）
@@ -625,6 +632,7 @@ git commit -m "test(split-searcher-modules): point importability tests at focuse
 
 verify: 12 处 import 改路径，3 处保留 searcher，断言不变，全量测试绿。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 6: 全量验证与延迟对比
@@ -670,6 +678,7 @@ Expected: 最近 5 个 commit 为 Task 1-5 的 commit；工作树干净（除可
 
 verify: 全量绿 + 45 query 等价 +（若适用）p50/p95 无回归。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Task 7: build.sh 同步构建产物 + WIP 更新
@@ -721,6 +730,7 @@ git commit -m "docs(split-searcher-modules): mark searcher split done, retire st
 
 verify: build.sh 成功生成三个新模块产物，import 链路通，WIP 更新。
 
+archived-with: 2026-06-30-split-searcher-modules
 ---
 
 ## Rollback
