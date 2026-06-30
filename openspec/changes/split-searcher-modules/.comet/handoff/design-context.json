@@ -1,0 +1,14 @@
+{
+  "change": "split-searcher-modules",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "957d6f8b95ad514d2d377aa5028d25e099e0069a9698e80b57b89e261c24777b",
+  "files": [
+    { "path": "openspec/changes/split-searcher-modules/proposal.md", "sha256": "4247f57bce2861f19a20fb5f24ce48c2b203e2f730b94f434ed470f42aa31e64" },
+    { "path": "openspec/changes/split-searcher-modules/design.md", "sha256": "9406a6720cb67857d2a20cff05eb89ae6b72ee0a85b291f9fe5f5bfaa463de4b" },
+    { "path": "openspec/changes/split-searcher-modules/tasks.md", "sha256": "6aa7e249150334f6368a666f9137d97c211344c9077fa41d7282ad8de7ba31ab" },
+    { "path": "openspec/changes/split-searcher-modules/specs/rag-module-architecture/spec.md", "sha256": "bdd4e7287d2b939ce4afca0f4bca0983d64f99da7d4cfa23599cba772d199c49" }
+  ]
+}
