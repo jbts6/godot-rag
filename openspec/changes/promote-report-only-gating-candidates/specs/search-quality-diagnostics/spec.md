@@ -1,4 +1,4 @@
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Promotion-ready report-only queries can be reviewed into gating
 Search quality diagnostics SHALL support a manual workflow where report-only queries classified as promotion-ready can be converted into gating queries after review.
