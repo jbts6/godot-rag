@@ -4,6 +4,10 @@
 
 ## 2026-06-30
 
+### build orchestrator
+
+- `godot-docs` 子模块指纹改为 commit hash，避免每次全量遍历目录。
+
 ### `split-searcher-modules`
 
 - 任务：21/21
