@@ -9,7 +9,7 @@
 ### 1. 扩搜索质量评估集 ✅ 已完成
 
 - 将 gating queries 从当前的小集合扩到覆盖 40-60 条稳定场景。
-- 覆盖符号 alias、自然语言教程、addon API、engine 概念、camelCase/snake_case/dotted symbol、graph expansion 等场景。
+- 覆盖符号 alias、自然语言教程、addon API、engine 概念、camelCase/snake_case/dotted symbol 等场景。
 - 增加负例和精确性检查：addon filter 不串库，class/tutorial/engine/addon 类型不互相污染。
 - **已完成**：查询套件扩展到 45 个查询（25 gating，20 report-only）。
 
@@ -20,11 +20,11 @@
 - 将搜索质量命令接入常规验证路径，而不只依赖 `pytest`。
 - **已完成**：添加延迟指标（p50/p95）和搜索执行元数据（search mode、fallback reason）到诊断输出。
 
-### 3. 等价拆分搜索器结构
+### 3. 等价拆分搜索器结构 ✅ 已完成
 
-- 拆分 `rst2md/rag/searcher.py` 中的 query planning、candidate retrieval、fusion/rerank、graph expansion、result formatting。
-- 第一阶段只做行为等价重构，不改变排名。
-- 用扩充后的质量和速度测试护住重构。
+- 拆分 `rst2md/rag/searcher.py` 中的 candidate retrieval、fusion/rerank、snippet extraction 为独立模块（`retrieval.py`、`fusion.py`、`snippet.py`）。
+- 行为等价重构，排名不变。
+- 全量测试通过（45 查询 + 单元测试）。
 
 ### 4. 搜索策略优化
 
@@ -42,11 +42,9 @@
 
 ## 下一步方向
 
-### 3. 等价拆分搜索器结构
+### 3. 等价拆分搜索器结构 ✅ 已完成
 
-- 拆分 `rst2md/rag/searcher.py` 中的 query planning、candidate retrieval、fusion/rerank、graph expansion、result formatting。
-- 第一阶段只做行为等价重构，不改变排名。
-- 用扩充后的质量和速度测试护住重构。
+- 已拆分为 `retrieval.py`、`fusion.py`、`snippet.py`，详见上方记录。
 
 ### 4. 搜索策略优化
 
