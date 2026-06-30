@@ -1,0 +1,14 @@
+{
+  "change": "search-ranking-report-only-triage",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "8cb9b32b42ba11df86a7464b7b839fe083630b30943e1b839cd888e884797566",
+  "files": [
+    { "path": "openspec/changes/search-ranking-report-only-triage/proposal.md", "sha256": "914fee8daad379f78b1ecdf5509c439131b1fdd0e8e3fd6540b1ba55930af7ff" },
+    { "path": "openspec/changes/search-ranking-report-only-triage/design.md", "sha256": "08d8d24cb2a4891dfc6620c110f5b8012682128e2f8fac65d7ee4527228ac315" },
+    { "path": "openspec/changes/search-ranking-report-only-triage/tasks.md", "sha256": "0099695e308514ea8592bd06145477846b203285b2485a8d9e728dd5a089501d" },
+    { "path": "openspec/changes/search-ranking-report-only-triage/specs/search-quality-diagnostics/spec.md", "sha256": "6ad00187e2181b07ba99a687f4f5ebcdeff0195a683d400557a09e4b44fd0de2" }
+  ]
+}

@@ -2,6 +2,7 @@
 change: search-ranking-report-only-triage
 design-doc: docs/superpowers/specs/2026-06-30-search-ranking-report-only-triage-design.md
 base-ref: 5cecde7cb751a762fe725fa7759c57ee91144a7f
+archived-with: 2026-06-30-search-ranking-report-only-triage
 ---
 
 # Search Ranking Report-Only Triage Implementation Plan
@@ -23,6 +24,7 @@ base-ref: 5cecde7cb751a762fe725fa7759c57ee91144a7f
 - baseline comparison 继续只基于现有 gating metrics、metadata 和 latency 阈值，不因 triage 缺失或变化失败。
 - 每个实现任务先写失败测试，再写最小实现，再跑 focused tests。
 
+archived-with: 2026-06-30-search-ranking-report-only-triage
 ---
 
 ## File Structure
