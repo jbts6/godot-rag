@@ -34,6 +34,16 @@
 
 ## 已完成的 Comet change
 
+### 2026-06-30
+
+- 名称：`split-searcher-modules`
+- 状态：✅ 已归档（2026-06-30）
+- 范围：将 `searcher.py`（526 行、13 个顶层函数）按职责拆分为 `retrieval.py`、`fusion.py`、`snippet.py` 三个 focused sub-module。
+- 成果：searcher.py 瘦身为 facade + 编排，行为 byte-for-byte 等价，172 测试全通过，store.py 零改动。
+- 非目标：不改排名权重、不换 embedding、不动 DB schema、不实现 graph expansion。
+
+### 2026-06-29
+
 - 名称：`search-quality-evaluation-expansion`
 - 状态：✅ 已归档（2026-06-29）
 - 范围：评估集扩容、速度/稳定性指标设计、搜索器等价拆分的前置验证边界。
@@ -41,10 +51,6 @@
 - 非目标：本 change 不直接大幅调整 ranking 权重，不更换 embedding 模型，不改变数据库 schema。
 
 ## 下一步方向
-
-### 3. 等价拆分搜索器结构 ✅ 已完成
-
-- 已拆分为 `retrieval.py`、`fusion.py`、`snippet.py`，详见上方记录。
 
 ### 4. 搜索策略优化
 

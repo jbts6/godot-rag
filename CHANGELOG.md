@@ -2,6 +2,17 @@
 
 本文件记录已归档的 Comet changes。更细的提案、设计和任务记录保留在 `openspec/changes/archive/`。
 
+## 2026-06-30
+
+### `split-searcher-modules`
+
+- 任务：21/21
+- 将 `searcher.py`（526 行、13 个顶层函数）按职责拆分为 `retrieval.py`、`fusion.py`、`snippet.py` 三个 focused sub-module。
+- `searcher.py` 瘦身为 facade + 编排（`_search_database_impl` + 公开 API + re-export）。
+- 行为 byte-for-byte 等价重构，172 测试全通过，`store.py` 零改动。
+- 更新 `test_searcher_module.py` import 路径指向 focused modules（Scheme A）。
+- `build.sh` 同步构建产物到 `godot_rag/rag/`。
+
 ## 2026-06-29
 
 ### `search-quality-evaluation-expansion`
