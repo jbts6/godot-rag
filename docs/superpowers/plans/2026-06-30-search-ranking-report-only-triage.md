@@ -562,7 +562,7 @@ rtk git commit -m "feat: report search eval report-only triage"
 - Updates: `format_text_report(report) -> str`
 - Verifies: `cmd_eval_search()` emits JSON/text triage through existing report formatters.
 
-- [ ] **Step 1: Add failing text report test**
+- [x] **Step 1: Add failing text report test**
 
 Append this test to `rst2md/tests/test_search_eval.py`:
 
@@ -601,7 +601,7 @@ def test_text_report_includes_report_only_triage_summary():
     assert "expected_present=True best_rank=12 required_at=5 search_mode=hybrid fallback_reason=" in text
 ```
 
-- [ ] **Step 2: Add failing CLI JSON/text tests**
+- [x] **Step 2: Add failing CLI JSON/text tests**
 
 In `rst2md/tests/test_search_eval_cli.py`, update imports:
 
@@ -681,7 +681,7 @@ def test_eval_search_text_output_includes_report_only_triage(capsys, tmp_path):
     assert "report_only_triage:" in capsys.readouterr().out
 ```
 
-- [ ] **Step 3: Run tests and verify RED**
+- [x] **Step 3: Run tests and verify RED**
 
 Run:
 
@@ -691,7 +691,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py::test_text_report_includes
 
 Expected: text report test FAILS before formatter implementation.
 
-- [ ] **Step 4: Add text report section**
+- [x] **Step 4: Add text report section**
 
 In `format_text_report()`, after latency output and before failures, add:
 
@@ -715,7 +715,7 @@ In `format_text_report()`, after latency output and before failures, add:
             )
 ```
 
-- [ ] **Step 5: Run focused output tests and verify GREEN**
+- [x] **Step 5: Run focused output tests and verify GREEN**
 
 Run:
 
@@ -725,7 +725,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py::test_text_report_includes
 
 Expected: PASS.
 
-- [ ] **Step 6: Update OpenSpec task checklist**
+- [x] **Step 6: Update OpenSpec task checklist**
 
 In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 
@@ -735,7 +735,7 @@ In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 - [x] 3.3 Emit advisory follow-up ownership for each non-promotion-ready query: data/fixture, recall, ranking, filter, or degraded search investigation.
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_cli.py openspec/changes/search-ranking-report-only-triage/tasks.md
