@@ -1,25 +1,25 @@
-"""TDD test: search functions should be importable from rag.searcher."""
+"""TDD test: search functions are importable from their focused modules."""
 
 import unittest
 
 
 class SearcherModuleImportTests(unittest.TestCase):
-    """Verify that search functions are importable from rag.searcher."""
+    """Verify that search functions are importable from their focused modules."""
 
     def test_import_smart_tokenize(self):
-        from rag.searcher import _smart_tokenize
+        from rag.retrieval import _smart_tokenize
         self.assertTrue(callable(_smart_tokenize))
 
     def test_import_escape_fts5(self):
-        from rag.searcher import _escape_fts5
+        from rag.retrieval import _escape_fts5
         self.assertTrue(callable(_escape_fts5))
 
     def test_import_vector_search(self):
-        from rag.searcher import vector_search
+        from rag.retrieval import vector_search
         self.assertTrue(callable(vector_search))
 
     def test_import_rrf_fusion(self):
-        from rag.searcher import rrf_fusion
+        from rag.fusion import rrf_fusion
         self.assertTrue(callable(rrf_fusion))
 
     def test_import_search_database(self):
@@ -31,19 +31,19 @@ class SearcherModuleImportTests(unittest.TestCase):
         self.assertTrue(callable(search_database_with_metadata))
 
     def test_import_extract_snippet(self):
-        from rag.searcher import _extract_snippet
+        from rag.snippet import _extract_snippet
         self.assertTrue(callable(_extract_snippet))
 
     def test_import_vector_availability(self):
-        from rag.searcher import _vector_availability
+        from rag.retrieval import _vector_availability
         self.assertTrue(callable(_vector_availability))
 
     def test_import_run_vector_query(self):
-        from rag.searcher import _run_vector_query
+        from rag.retrieval import _run_vector_query
         self.assertTrue(callable(_run_vector_query))
 
     def test_import_fts5_special(self):
-        from rag.searcher import _FTS5_SPECIAL
+        from rag.retrieval import _FTS5_SPECIAL
         self.assertIsInstance(_FTS5_SPECIAL, set)
 
     def test_import_search_database_impl(self):
@@ -51,11 +51,11 @@ class SearcherModuleImportTests(unittest.TestCase):
         self.assertTrue(callable(_search_database_impl))
 
     def test_import_rerank_results(self):
-        from rag.searcher import rerank_results
+        from rag.fusion import rerank_results
         self.assertTrue(callable(rerank_results))
 
     def test_rrf_fusion_basic(self):
-        from rag.searcher import rrf_fusion
+        from rag.fusion import rrf_fusion
         fts = [{'id': 1}, {'id': 2}]
         vec = [{'id': 2, 'distance': 0.1}, {'id': 3, 'distance': 0.2}]
         fused = rrf_fusion(fts, vec, k=60)
@@ -139,7 +139,7 @@ def test_query_plan_detects_tutorial_and_addon_intent():
 def test_rerank_promotes_alias_symbol_match():
     from rag.models import SearchResult
     from rag.query_plan import build_query_plan
-    from rag.searcher import rerank_results
+    from rag.fusion import rerank_results
 
     plan = build_query_plan("attach node to scene tree")
     weak_alias = SearchResult(
@@ -179,7 +179,7 @@ def test_rerank_promotes_alias_symbol_match():
 def test_rerank_symbol_query_does_not_apply_tutorial_intent():
     from rag.models import SearchResult
     from rag.query_plan import build_query_plan
-    from rag.searcher import rerank_results
+    from rag.fusion import rerank_results
 
     plan = build_query_plan("Node.add_child")
     class_result = SearchResult(
