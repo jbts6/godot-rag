@@ -68,7 +68,7 @@ base-ref: de8d9a2a9872f95cf14f70600e52908a9fe10ea8
 - Consumes: 当前 `git rev-parse HEAD` = `de8d9a2a9872f95cf14f70600e52908a9fe10ea8`（base-ref）
 - Produces: 一份全绿基线（pytest 通过数 + test_search_eval 通过数），后续每个 Task 的 verify 与之对比
 
-- [ ] **Step 1: 跑全量测试套件记录基线**
+- [x] **Step 1: 跑全量测试套件记录基线**
 
 Run:
 ```bash
@@ -76,7 +76,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_sear
 ```
 Expected: 全绿，结尾 `N passed`。记录通过数 `N` 供后续对比。若 `test_search_eval*.py` 计数与设计所述 45 条 query 不符，以实际数字 `N` 为基线（不调整断言）。
 
-- [ ] **Step 2:（可选）p50/p95 延迟基线**
+- [x] **Step 2:（可选）p50/p95 延迟基线**
 
 仅当 `godot_rag.db` 存在时执行：
 ```bash
@@ -84,7 +84,7 @@ uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/ba
 ```
 Expected: 通过 gate，记录 p50/p95 数值。若 DB 不存在则跳过（确定性套件已护等价），在基线文件末尾追加一行 `# p50/p95 skipped: godot_rag.db not found`。
 
-- [ ] **Step 3: 确认 git 工作树干净 + base-ref**
+- [x] **Step 3: 确认 git 工作树干净 + base-ref**
 
 Run:
 ```bash
@@ -92,7 +92,7 @@ git status --short && git rev-parse HEAD
 ```
 Expected: 工作树干净（无输出），HEAD = `de8d9a2a9872f95cf14f70600e52908a9fe10ea8`。
 
-- [ ] **Step 4: Commit 基线存档**
+- [x] **Step 4: Commit 基线存档**
 
 ```bash
 git add docs/superpowers/plans/.baseline-split-searcher-modules.txt
@@ -112,7 +112,7 @@ git commit -m "chore(split-searcher-modules): record pre-split baseline"
 - Consumes: `from rag.models import SearchResult`（dataclass frozen），`from rag.query_plan import QueryPlan`，`from dataclasses import replace`
 - Produces: `rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) -> List[dict]`；`_rerank_bonus(plan: QueryPlan, result: SearchResult) -> float`；`rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchResult]`。签名/行为与原 searcher.py 一字不差。
 
-- [ ] **Step 1: 创建 `rst2md/rag/fusion.py`（完整内容）**
+- [x] **Step 1: 创建 `rst2md/rag/fusion.py`（完整内容）**
 
 写入以下完整文件（函数体 verbatim 自 `searcher.py:74-128`）：
 
@@ -186,7 +186,7 @@ def rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchR
     return sorted(boosted, key=lambda result: result.score, reverse=True)
 ```
 
-- [ ] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export fusion 符号**
+- [x] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export fusion 符号**
 
 在 searcher.py 顶部现有 import 块之后（`from rag.symbols import normalize_symbol` 这一行之后）新增 re-export 块。**注意 import 形式约束（见 Global Constraints）：必须用 `from rag.fusion import ...` 形式。**
 
@@ -201,13 +201,13 @@ from rag.fusion import (  # noqa: F401 — rrf_fusion re-exported for store.py f
 
 > 注：`_rerank_bonus` 不在 searcher re-export 列表——grep 确认 `store.py` 与 `test_searcher_module.py` 均不 import 它，searcher 自身也不调用（`rerank_results` 在 fusion 内部调它）。它只活在 `fusion.py` 内部。
 
-- [ ] **Step 3: 删除 `rst2md/rag/searcher.py` 中 `rrf_fusion` / `_rerank_bonus` / `rerank_results` 三个函数定义**
+- [x] **Step 3: 删除 `rst2md/rag/searcher.py` 中 `rrf_fusion` / `_rerank_bonus` / `rerank_results` 三个函数定义**
 
 删除 searcher.py 中以下行范围的函数体（含函数签名行与尾随空行，共约 55 行：原 `rrf_fusion` line 74-107、`_rerank_bonus` line 110-120、`rerank_results` line 123-128）。删除后 searcher.py 不再定义这三个函数，改为通过 Step 2 的 re-export 引用。
 
 执行者用 Edit 工具，逐个函数删除（匹配从 `def rrf_fusion(...)` 到其 `return results` 后的空行；`def _rerank_bonus(...)` 到 `return bonus` 后空行；`def rerank_results(...)` 到 `return sorted(...)` 后空行）。删除后这三个名字在 searcher 模块全局由 re-export 提供，`_search_database_impl` 体内的 `rrf_fusion(...)`（line 349）与 `rerank_results(plan, search_results)`（line 525）调用保持 bare name 不变。
 
-- [ ] **Step 4: 跑 focused 测试 + 45 query 套件**
+- [x] **Step 4: 跑 focused 测试 + 45 query 套件**
 
 Run:
 ```bash
@@ -215,7 +215,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic
 ```
 Expected: 全绿，通过数与 Task 1 基线一致。重点看 `test_rrf_fusion` / `test_rrf_fusion_empty` / `test_rrf_fusion_single_source` / `test_rrf_fusion_basic` / `test_rerank_promotes_alias_symbol_match` / `test_rerank_symbol_query_does_not_apply_tutorial_intent` 全绿（这些直接调 `rrf_fusion` / `rerank_results`，此时仍从 `rag.searcher` import，靠 re-export 生效）。
 
-- [ ] **Step 5: 跑全量套件确认无回归**
+- [x] **Step 5: 跑全量套件确认无回归**
 
 Run:
 ```bash
@@ -223,7 +223,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_sear
 ```
 Expected: 全绿，通过数 = Task 1 基线 `N`。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/fusion.py rst2md/rag/searcher.py
@@ -244,7 +244,7 @@ verify: searcher re-export fusion 符号，store.py 零改动，全量测试绿�
 - Consumes: 无外部依赖（纯字符串操作）
 - Produces: `_extract_snippet(text: str, query: str, context_lines: int = 3) -> str`
 
-- [ ] **Step 1: 创建 `rst2md/rag/snippet.py`（完整内容）**
+- [x] **Step 1: 创建 `rst2md/rag/snippet.py`（完整内容）**
 
 写入以下完整文件（函数体 verbatim 自 `searcher.py:131-160`）：
 
@@ -288,7 +288,7 @@ def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
     return '\n'.join(snippet_lines)
 ```
 
-- [ ] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export snippet 符号**
+- [x] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export snippet 符号**
 
 在 Task 2 新增的 fusion re-export 块之后追加：
 
@@ -296,11 +296,11 @@ def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
 from rag.snippet import _extract_snippet  # noqa: F401 — re-export for store.py facade backward compat
 ```
 
-- [ ] **Step 3: 删除 `rst2md/rag/searcher.py` 中 `_extract_snippet` 函数定义**
+- [x] **Step 3: 删除 `rst2md/rag/searcher.py` 中 `_extract_snippet` 函数定义**
 
 删除 searcher.py 中 `def _extract_snippet(...)` 到 `return '\n'.join(snippet_lines)` 后空行的整段（原 line 131-160）。`_search_database_impl` 体内 `snippet=_extract_snippet(r["text"], query)`（line 521）保持 bare name 不变。
 
-- [ ] **Step 4: 跑 focused 测试 + 45 query 套件**
+- [x] **Step 4: 跑 focused 测试 + 45 query 套件**
 
 Run:
 ```bash
@@ -308,7 +308,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic
 ```
 Expected: 全绿，通过数与基线一致。`test_import_extract_snippet` 靠 re-export 生效。
 
-- [ ] **Step 5: 跑全量套件确认无回归**
+- [x] **Step 5: 跑全量套件确认无回归**
 
 Run:
 ```bash
@@ -316,7 +316,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_sear
 ```
 Expected: 全绿，通过数 = 基线 `N`。
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/snippet.py rst2md/rag/searcher.py
@@ -337,7 +337,7 @@ verify: searcher re-export `_extract_snippet`，全量测试绿。
 - Consumes: `from rag.symbols import normalize_symbol`（`_run_fts_query` 用），`import re` / `import sqlite3` / `from typing import List`
 - Produces: `_FTS5_SPECIAL`（set），`_smart_tokenize(query: str) -> str`，`_escape_fts5(query: str) -> str`，`vector_search(conn, query_embedding: List[float], limit: int = 10) -> List[dict]`，`_vector_availability(conn) -> tuple[bool, str]`，`_run_vector_query(conn, query_embedding, limit, type_filter, type_params, addon_filter, addon_params)`，`_run_fts_query(conn, query, limit, fts_type_filter, fts_type_params, fts_addon_filter, fts_addon_params, fused_exclude="", fused_exclude_params=None) -> list[dict]`
 
-- [ ] **Step 1: 创建 `rst2md/rag/retrieval.py`（完整内容）**
+- [x] **Step 1: 创建 `rst2md/rag/retrieval.py`（完整内容）**
 
 写入以下完整文件（函数体 verbatim 自 `searcher.py:13-71` + `163-199` + `233-259`）：
 
@@ -484,7 +484,7 @@ def _run_fts_query(
     return [{"id": row["id"], "score": row["score"], "row": row} for row in rows]
 ```
 
-- [ ] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export retrieval 符号**
+- [x] **Step 2: 修改 `rst2md/rag/searcher.py` 顶部 import 块，re-export retrieval 符号**
 
 在 Task 3 新增的 snippet re-export 之后追加（**`from ... import ...` 形式，遵守 import 形式约束**）。retrieval 的 7 个符号中，4 个（`_run_fts_query` / `_run_vector_query` / `_smart_tokenize` / `_vector_availability`）被 `_search_database_impl` 直接调用（used），3 个（`_FTS5_SPECIAL` / `_escape_fts5` / `vector_search`）是 store facade re-export only：
 
@@ -502,7 +502,7 @@ from rag.retrieval import (  # noqa: F401
 )
 ```
 
-- [ ] **Step 3: 删除 `rst2md/rag/searcher.py` 中 7 个 retrieval 符号的定义**
+- [x] **Step 3: 删除 `rst2md/rag/searcher.py` 中 7 个 retrieval 符号的定义**
 
 逐个删除以下定义段（删除后这些名字由 Step 2 re-export 提供）：
 - `_FTS5_SPECIAL = set('"*+-:()^')`（原 line 13）
@@ -515,7 +515,7 @@ from rag.retrieval import (  # noqa: F401
 
 `_search_database_impl` 体内对这些函数的调用（line 336 `_smart_tokenize(query)`、line 328 `_run_vector_query(...)`、line 430 `_run_fts_query(...)`、line 280 `_vector_availability(conn)`）保持 bare name 不变——由 re-export 提供模块全局绑定。
 
-- [ ] **Step 4: 删除 `rst2md/rag/searcher.py` 的 orphan import**
+- [x] **Step 4: 删除 `rst2md/rag/searcher.py` 的 orphan import**
 
 本 Task 的删除使以下 import 在 searcher.py 中不再被使用（CLAUDE.md「Surgical Changes」要求清理自己造成的 orphan）：
 - 删 `import re`（仅 `_smart_tokenize` 用，已移走）
@@ -524,7 +524,7 @@ from rag.retrieval import (  # noqa: F401
 
 **保留**：`import sqlite3`（`_search_database_impl` line 345/449 的 `sqlite3.OperationalError`）、`from pathlib import Path`、`from typing import List, Optional`、`from rag.db import clean_chunk_text, get_connection`（`_make_result` line 316/497 用）、`from rag.models import SearchMetadata, SearchResponse, SearchResult`、`from rag.symbols import normalize_symbol`（line 370 用）。
 
-- [ ] **Step 5: 确认 `_search_database_impl` 编排体与公开 API 未改一行**
+- [x] **Step 5: 确认 `_search_database_impl` 编排体与公开 API 未改一行**
 
 Read searcher.py，确认以下三段 verbatim 保留、调用顺序不变：
 - `_search_database_impl`（原 line 262-526）：编排顺序 `build_query_plan → _vector_availability → _run_vector_query + _smart_tokenize + rrf_fusion → _run_fts_query → _extract_snippet → rerank_results`，且 `from rag.embeddings import generate_embeddings`（原 line 325）局部 import 仍在函数体内（embeddings optional dependency 随编排层留 searcher）
@@ -533,7 +533,7 @@ Read searcher.py，确认以下三段 verbatim 保留、调用顺序不变：
 
 Expected: 三段函数体无任何字符改动；仅顶部 import 块 + 删除的 10 个函数定义发生变化。
 
-- [ ] **Step 6: 跑 focused 测试 + fallback 路径测试（monkeypatch 关键验证）**
+- [x] **Step 6: 跑 focused 测试 + fallback 路径测试（monkeypatch 关键验证）**
 
 Run:
 ```bash
@@ -541,7 +541,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_semantic
 ```
 Expected: 全绿。**重点**：`test_search_metadata_reports_vector_query_failure` 必须绿——它验证 `monkeypatch.setattr(searcher, "_run_vector_query", fail_vector_search)` 仍能触发 fallback（mode=fts_only, fallback_reason=vector_query_failed）。若它假绿（vector 不 fail 仍走 hybrid），说明 import 形式违反约束（Step 2 改成了模块限定名），立即回 Step 2 确认用 `from rag.retrieval import (...)` 形式。
 
-- [ ] **Step 7: 跑全量套件 + 45 query 确认无回归**
+- [x] **Step 7: 跑全量套件 + 45 query 确认无回归**
 
 Run:
 ```bash
@@ -549,7 +549,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_sear
 ```
 Expected: 全绿，通过数 = 基线 `N`。
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add rst2md/rag/retrieval.py rst2md/rag/searcher.py
@@ -571,13 +571,13 @@ verify: searcher 仅剩 `_search_database_impl` + 公开 API + 三块 re-export�
 
 设计 D6：改路径，断言不变。共 12 处 `from rag.searcher import X` 改路径（移动函数的）；3 处保留 `from rag.searcher`（`search_database` / `search_database_with_metadata` / `_search_database_impl`）。
 
-- [ ] **Step 1: 更新 docstring**
+- [x] **Step 1: 更新 docstring**
 
 修改 `rst2md/tests/test_searcher_module.py`：
 - line 1: `"""TDD test: search functions should be importable from rag.searcher."""` → `"""TDD test: search functions are importable from their focused modules."""`
 - line 7: `"""Verify that search functions are importable from rag.searcher."""` → `"""Verify that search functions are importable from their focused modules."""`
 
-- [ ] **Step 2: 改 12 处 import 路径（断言不变）**
+- [x] **Step 2: 改 12 处 import 路径（断言不变）**
 
 按 D6 分组替换（`replace_all` 按符号精确替换；每处只改 `from rag.searcher import X` 的模块部分，断言行不动）：
 
@@ -600,7 +600,7 @@ snippet（1 处）：
 
 替换后核对：`grep -n "from rag.searcher import" rst2md/tests/test_searcher_module.py` 应只剩 3 行（search_database / search_database_with_metadata / _search_database_impl）。
 
-- [ ] **Step 3: 跑 `test_searcher_module.py` 确认 importability 契约从 focused module 成立**
+- [x] **Step 3: 跑 `test_searcher_module.py` 确认 importability 契约从 focused module 成立**
 
 Run:
 ```bash
@@ -608,7 +608,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py
 ```
 Expected: 全绿。12 个 import 测试 + `test_rrf_fusion_basic` + 2 个 rerank 测试 + query_rewrite/query_plan 等其他测试全过。这验证 focused module 自身可独立 import（不再依赖 searcher re-export）。
 
-- [ ] **Step 4: 跑全量套件确认无回归**
+- [x] **Step 4: 跑全量套件确认无回归**
 
 Run:
 ```bash
@@ -616,7 +616,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_sear
 ```
 Expected: 全绿，通过数 = 基线 `N`。`test_rag_search.py` 的 `from rag.store import _smart_tokenize`（line 282/290/295）仍靠 store re-export 生效，不动。
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add rst2md/tests/test_searcher_module.py
@@ -636,7 +636,7 @@ verify: 12 处 import 改路径，3 处保留 searcher，断言不变，全量�
 - Consumes: Task 2-5 全部完成后的拆分后状态
 - Produces: 拆分后全量绿 + p50/p95 无回归（容差 ±5%）的证据
 
-- [ ] **Step 1: 跑全量 `uv run pytest -q`**
+- [x] **Step 1: 跑全量 `uv run pytest -q`**
 
 Run:
 ```bash
@@ -644,7 +644,7 @@ uv run pytest -q
 ```
 Expected: 全绿，通过数 = 基线 `N`（全量套件含本 change 未触及的其他测试文件，确认无连锁回归）。
 
-- [ ] **Step 2: 跑 45 query 确定性套件最终对比**
+- [x] **Step 2: 跑 45 query 确定性套件最终对比**
 
 Run:
 ```bash
@@ -652,7 +652,7 @@ uv run pytest -q rst2md/tests/test_search_eval.py rst2md/tests/test_search_eval_
 ```
 Expected: 全绿。绿 = 拆分前后排名结果 byte-级一致（确定性套件即等价快照）。
 
-- [ ] **Step 3:（可选）p50/p95 延迟对比**
+- [x] **Step 3:（可选）p50/p95 延迟对比**
 
 仅当 `godot_rag.db` 存在且 Task 1 Step 2 跑过基线时执行：
 ```bash
@@ -660,7 +660,7 @@ uv run godot-rag eval-search --db godot_rag.db --baseline docs/search-quality/ba
 ```
 Expected: gate 通过；p50/p95 相对基线漂移 ≤ ±5%（多一层 import 不应超此阈值）。若超容差，先排查是否 import 形式违反约束导致 monkeypatch 假绿使 vector 路径异常；排除后再判断是否可接受。
 
-- [ ] **Step 4: 确认 git 工作树状态**
+- [x] **Step 4: 确认 git 工作树状态**
 
 Run:
 ```bash
@@ -682,7 +682,7 @@ verify: 全量绿 + 45 query 等价 +（若适用）p50/p95 无回归。
 - Consumes: Task 2-5 完成的 `rst2md/rag/` 源码
 - Produces: `godot_rag/rag/` 同步含 `retrieval.py` / `fusion.py` / `snippet.py`，import 被改写为 `from godot_rag.rag.<module>`
 
-- [ ] **Step 1: 运行 build.sh 同步构建产物**
+- [x] **Step 1: 运行 build.sh 同步构建产物**
 
 Run:
 ```bash
@@ -696,7 +696,7 @@ ls godot_rag/rag/retrieval.py godot_rag/rag/fusion.py godot_rag/rag/snippet.py
 ```
 Expected: 三个文件均存在。
 
-- [ ] **Step 2: 验证构建产物 import 正确**
+- [x] **Step 2: 验证构建产物 import 正确**
 
 Run:
 ```bash
@@ -704,11 +704,11 @@ uv run python -c "from godot_rag.rag.searcher import search_database, search_dat
 ```
 Expected: 输出 `imports ok`，无 ImportError。
 
-- [ ] **Step 3: 更新 WIP.md**
+- [x] **Step 3: 更新 WIP.md**
 
 Read `WIP.md`，按 tasks.md 6.4：标记第 3 步（searcher 拆分）完成；归档/删除 graph expansion 的过时描述（设计已确认 graph expansion 未实现、措辞过时）。具体措辞按 WIP.md 现有风格，最小改动。
 
-- [ ] **Step 4: Commit 源码改动与 WIP（不含 build.sh 自动版本号）**
+- [x] **Step 4: Commit 源码改动与 WIP（不含 build.sh 自动版本号）**
 
 注意：`build.sh` 会自动递增版本号，**不要手动 commit 版本号**（CLAUDE.md 警告：手动 commit 导致版本跳号）。只 commit WIP.md 与源码状态：
 
