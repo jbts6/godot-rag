@@ -378,7 +378,7 @@ rtk git commit -m "feat: classify report-only search eval triage"
 - Produces: `_report_only_triage_to_dict(triage: ReportOnlyTriage) -> dict`
 - Updates: `report_to_dict(report)["report_only_triage"]`
 
-- [ ] **Step 1: Add failing JSON/evaluation tests**
+- [x] **Step 1: Add failing JSON/evaluation tests**
 
 Append these tests to `rst2md/tests/test_search_eval.py`:
 
@@ -447,7 +447,7 @@ def test_evaluate_database_omits_report_only_triage_without_diagnostics(tmp_path
     assert report.report_only_triage == ()
 ```
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run:
 
@@ -457,7 +457,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py -k "report_only_triage or 
 
 Expected: FAIL because `EvaluationReport` has no `report_only_triage` field and report serialization is missing.
 
-- [ ] **Step 3: Add report field and JSON serialization**
+- [x] **Step 3: Add report field and JSON serialization**
 
 In `EvaluationReport`, add:
 
@@ -490,7 +490,7 @@ In `apply_baseline()`, preserve `report_only_triage` in both `baseline_report` a
             report_only_triage=report.report_only_triage,
 ```
 
-- [ ] **Step 4: Build triage in `evaluate_database()`**
+- [x] **Step 4: Build triage in `evaluate_database()`**
 
 In `evaluate_database()`, initialize:
 
@@ -513,7 +513,7 @@ In the returned `EvaluationReport`, add:
         report_only_triage=tuple(report_only_triage),
 ```
 
-- [ ] **Step 5: Run focused tests and verify GREEN**
+- [x] **Step 5: Run focused tests and verify GREEN**
 
 Run:
 
@@ -523,7 +523,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py -k "report_only_triage or 
 
 Expected: PASS.
 
-- [ ] **Step 6: Run baseline safety tests**
+- [x] **Step 6: Run baseline safety tests**
 
 Run:
 
@@ -533,7 +533,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py -k "baseline or latency or
 
 Expected: PASS.
 
-- [ ] **Step 7: Update OpenSpec task checklist**
+- [x] **Step 7: Update OpenSpec task checklist**
 
 In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 
@@ -542,7 +542,7 @@ In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 - [x] 3.1 Include report-only triage summaries in JSON evaluation output.
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py openspec/changes/search-ranking-report-only-triage/tasks.md
