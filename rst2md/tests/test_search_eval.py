@@ -771,3 +771,248 @@ def test_failure_diagnostics_include_search_execution_metadata():
 
     assert data["diagnostics"]["search_mode"] == "fts_only"
     assert data["diagnostics"]["fallback_reason"] == "missing_vec_chunks"
+
+
+def _report_only_query(**overrides):
+    from rag.search_eval import GoldenQuery
+
+    values = {
+        "id": "report-only-node",
+        "query": "attach node to scene tree",
+        "category": "class",
+        "required_at": 5,
+        "expected_paths": ("classes/class_node.md",),
+        "expected_symbols": ("Node.add_child",),
+        "expected_doc_types": (),
+        "expected_addons": (),
+        "report_only": True,
+        "tags": (),
+    }
+    values.update(overrides)
+    return GoldenQuery(**values)
+
+
+def _query_result(query, *, matched_rank=None, passed=False, failure_classification="", observed=None, diagnostics=None):
+    from rag.search_eval import QueryResult
+
+    return QueryResult(
+        query=query,
+        matched_rank=matched_rank,
+        passed=passed,
+        failure_classification=failure_classification,
+        observed=observed or [],
+        diagnostics=diagnostics,
+    )
+
+
+def _diagnostics(**overrides):
+    from rag.search_eval import FailureDiagnostics
+
+    values = {
+        "expected_present": True,
+        "expected_rows": ({"path": "classes/class_node.md", "symbol": "Node.add_child", "doc_type": "class", "addon": "", "heading": "Methods"},),
+        "best_rank": None,
+        "best_rank_no_graph": None,
+        "diagnostic_window": 50,
+        "search_mode": "hybrid",
+        "fallback_reason": "",
+    }
+    values.update(overrides)
+    return FailureDiagnostics(**values)
+
+
+def test_report_only_triage_marks_promotion_ready():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(_report_only_query(), matched_rank=3, passed=True)
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "promotion_ready"
+    assert triage.promotion_candidate is True
+    assert triage.recommended_followup == "promotion"
+    assert triage.evidence["matched_rank"] == 3
+
+
+def test_report_only_triage_marks_missing_expected_data():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(expected_present=False, expected_rows=(), best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "missing_expected_data"
+    assert triage.promotion_candidate is False
+    assert triage.recommended_followup == "data"
+    assert triage.evidence["expected_present"] is False
+
+
+def test_report_only_triage_marks_low_ranking():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(required_at=5),
+        matched_rank=None,
+        failure_classification="low_ranking",
+        diagnostics=_diagnostics(best_rank=12),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "low_ranking"
+    assert triage.recommended_followup == "ranking"
+    assert triage.evidence["best_rank"] == 12
+    assert triage.evidence["required_at"] == 5
+
+
+def test_report_only_triage_marks_filter_mismatch():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(expected_doc_types=("class",)),
+        failure_classification="filter_mismatch",
+        observed=[{"rank": 1, "path": "tutorials/nodes.md", "symbol": "", "doc_type": "tutorial", "addon": "", "heading": "Nodes"}],
+        diagnostics=_diagnostics(best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "filter_mismatch"
+    assert triage.recommended_followup == "filter"
+    assert triage.evidence["observed"][0]["doc_type"] == "tutorial"
+
+
+def test_report_only_triage_marks_degraded_search_before_other_causes():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        matched_rank=1,
+        passed=True,
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(best_rank=1, fallback_reason="vector_query_failed"),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "degraded_search"
+    assert triage.promotion_candidate is False
+    assert triage.recommended_followup == "degraded_search"
+    assert triage.evidence["fallback_reason"] == "vector_query_failed"
+
+
+def test_report_only_triage_marks_missing_recall():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(expected_present=True, best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "missing_recall"
+    assert triage.recommended_followup == "recall"
+
+
+def test_report_to_dict_includes_report_only_triage():
+    from rag.search_eval import EvaluationReport, ReportOnlyTriage, report_to_dict
+
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        report_only_triage=(
+            ReportOnlyTriage(
+                query_id="report-only-node",
+                classification="promotion_ready",
+                promotion_candidate=True,
+                recommended_followup="promotion",
+                evidence={"matched_rank": 1, "required_at": 5, "observed": []},
+            ),
+        ),
+    )
+
+    data = report_to_dict(report)
+
+    assert data["report_only_triage"] == [
+        {
+            "query_id": "report-only-node",
+            "classification": "promotion_ready",
+            "promotion_candidate": True,
+            "recommended_followup": "promotion",
+            "evidence": {"matched_rank": 1, "required_at": 5, "observed": []},
+        }
+    ]
+
+
+def test_evaluate_database_builds_report_only_triage_when_diagnostics_enabled(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    query = _report_only_query(
+        id="fixture-report-only",
+        query="Node add_child",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=("Node.add_child",),
+    )
+
+    report = evaluate_database(db_path, [query], limit=5, diagnostic_limit=10)
+
+    assert len(report.report_only_triage) == 1
+    assert report.report_only_triage[0].query_id == "fixture-report-only"
+    assert report.report_only_triage[0].classification == "degraded_search"
+    assert report.report_only_triage[0].promotion_candidate is False
+
+
+def test_text_report_includes_report_only_triage_summary():
+    from rag.search_eval import EvaluationReport, ReportOnlyTriage, format_text_report
+
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        report_only_triage=(
+            ReportOnlyTriage(
+                query_id="addon-dialogue-manager",
+                classification="low_ranking",
+                promotion_candidate=False,
+                recommended_followup="ranking",
+                evidence={
+                    "expected_present": True,
+                    "best_rank": 12,
+                    "required_at": 5,
+                    "search_mode": "hybrid",
+                    "fallback_reason": "",
+                    "observed": [],
+                },
+            ),
+        ),
+    )
+
+    text = format_text_report(report)
+
+    assert "report_only_triage:" in text
+    assert "- addon-dialogue-manager: low_ranking followup=ranking promotion_candidate=False" in text
+    assert "expected_present=True best_rank=12 required_at=5 search_mode=hybrid fallback_reason=" in text
+
+
+def test_evaluate_database_omits_report_only_triage_without_diagnostics(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    query = _report_only_query(
+        id="fixture-report-only",
+        query="Node add_child",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=("Node.add_child",),
+    )
+
+    report = evaluate_database(db_path, [query], limit=5, diagnostic_limit=None)
+
+    assert report.report_only_triage == ()

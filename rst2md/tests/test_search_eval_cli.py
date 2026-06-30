@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 
 from rag.cli import cmd_eval_search
-from rag.search_eval import EvaluationReport
+from rag.search_eval import EvaluationReport, ReportOnlyTriage
 
 
 def _report(regression_failed=False):
@@ -238,3 +238,69 @@ def test_project_script_targets_importable_rag_cli():
     module_name, _, attr_name = script_match.group(1).partition(":")
     module = importlib.import_module(module_name)
     assert callable(getattr(module, attr_name))
+
+
+def _triage():
+    return (
+        ReportOnlyTriage(
+            query_id="report-only-node",
+            classification="promotion_ready",
+            promotion_candidate=True,
+            recommended_followup="promotion",
+            evidence={"matched_rank": 1, "required_at": 5, "observed": []},
+        ),
+    )
+
+
+def test_eval_search_json_output_includes_report_only_triage(capsys, tmp_path):
+    report = replace(_report(), report_only_triage=_triage())
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        limit=5,
+        compare_graph=False,
+        baseline=None,
+        write_baseline=False,
+        json=True,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+        diagnostic_limit=50,
+        p95_latency_threshold_ms=None,
+    )
+
+    with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
+        cmd_eval_search(args)
+
+    output = json.loads(capsys.readouterr().out)
+    assert output["report_only_triage"][0]["query_id"] == "report-only-node"
+    assert output["report_only_triage"][0]["promotion_candidate"] is True
+
+
+def test_eval_search_text_output_includes_report_only_triage(capsys, tmp_path):
+    report = replace(_report(), report_only_triage=_triage())
+    db_path = tmp_path / "db.sqlite"
+    db_path.write_text("", encoding="utf-8")
+    queries = tmp_path / "queries.json"
+    queries.write_text("[]", encoding="utf-8")
+    args = Namespace(
+        db=str(db_path),
+        queries=str(queries),
+        limit=5,
+        compare_graph=False,
+        baseline=None,
+        write_baseline=False,
+        json=False,
+        hit5_drop_threshold=0.05,
+        mrr5_relative_drop_threshold=0.10,
+        diagnostic_limit=50,
+        p95_latency_threshold_ms=None,
+    )
+
+    with patch("rag.cli.load_queries", return_value=[]), patch("rag.cli.evaluate_database", return_value=report), patch("rag.cli.apply_baseline", side_effect=lambda report, *a, **k: report):
+        cmd_eval_search(args)
+
+    assert "report_only_triage:" in capsys.readouterr().out
