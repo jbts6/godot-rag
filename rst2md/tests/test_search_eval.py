@@ -481,7 +481,7 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert len(queries) >= 30
     assert len(ids) == len(set(ids))
     assert len(gating) >= 12
-    assert len(report_only) >= 8
+    assert len(report_only) >= 7
     assert {"class", "symbol", "tutorial", "engine", "addon"}.issubset(categories)
     assert any("normalization" in query.tags for query in queries)
     assert any("graph" in query.tags for query in queries)
@@ -497,7 +497,7 @@ def test_packaged_eval_queries_meet_expanded_coverage_requirements():
     assert len({query.id for query in queries}) == len(queries)
     assert len(queries) >= 40
     assert len(gating) >= 25
-    assert len(report_only) >= 10
+    assert len(report_only) >= 7
     assert {"class", "symbol", "tutorial", "engine", "addon"} <= categories
     assert "normalization" in tags
     assert "graph" in tags
@@ -505,6 +505,41 @@ def test_packaged_eval_queries_meet_expanded_coverage_requirements():
         not query.report_only and (query.expected_doc_types or query.expected_addons)
         for query in queries
     )
+
+
+def test_packaged_eval_queries_promote_reviewed_report_only_candidates():
+    queries = load_queries(Path("rst2md/rag/search_eval_queries.json"))
+    by_id = {query.id: query for query in queries}
+    promoted_ids = {
+        "child-node-attach",
+        "start-countdown-timer",
+        "how-to-change-scenes",
+        "script-signals-tutorial",
+        "physics-server-engine",
+        "timer-related-methods",
+        "object-signal-methods",
+        "editor-plugin-running-code",
+        "container-ui-class",
+        "shader-material-class",
+        "navigation-agent-3d-class",
+        "physics-raycast-query",
+        "multiplayer-networking-tutorial",
+    }
+    retained_report_only_ids = {
+        "nodes-and-scenes-tutorial",
+        "state-machine-addon",
+        "class-inheritance-node-object",
+        "addon-dialogue-manager",
+        "addon-phantom-camera",
+        "addon-limboai-behavior-tree",
+        "vector-fallback-metadata",
+    }
+
+    assert len(queries) == 45
+    assert sum(not query.report_only for query in queries) == 38
+    assert sum(query.report_only for query in queries) == 7
+    assert {query_id for query_id in promoted_ids if by_id[query_id].report_only} == set()
+    assert {query_id for query_id in retained_report_only_ids if not by_id[query_id].report_only} == set()
 
 
 def test_report_only_query_with_missing_expected_rows_is_not_promotable():

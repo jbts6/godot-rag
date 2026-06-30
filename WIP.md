@@ -11,7 +11,7 @@
 - 将 gating queries 从当前的小集合扩到覆盖 40-60 条稳定场景。
 - 覆盖符号 alias、自然语言教程、addon API、engine 概念、camelCase/snake_case/dotted symbol 等场景。
 - 增加负例和精确性检查：addon filter 不串库，class/tutorial/engine/addon 类型不互相污染。
-- **已完成**：查询套件扩展到 45 个查询（25 gating，20 report-only）。
+- **已完成**：查询套件扩展到 45 个查询；已将稳定非 addon 候选提升后，当前为 38 gating，7 report-only。
 
 ### 2. 加入速度与稳定性基准 ✅ 已完成
 
@@ -32,11 +32,18 @@
 - 强化符号查询的精确优先级，让 `Node.add_child`、`addChild`、`node_add_child` 稳定命中同一族目标。
 - 让 tutorial/addon/engine intent scoring 更可解释，并在诊断输出中展示命中原因。
 - report-only triage 已完成：20 条观察项中 17 条 `promotion_ready`，2 条 `low_ranking`（`nodes-and-scenes-tutorial`、`vector-fallback-metadata`），1 条 `missing_recall`（`class-inheritance-node-object`）。
-- 推荐切入顺序：先把稳定的 `promotion_ready` 候选显式审阅并提升为 gating 保护，再对剩余 3 条进入 ranking signal explainability 与 focused recall/ranking 修复，避免一次性重调权重。
+- gating promotion 已完成：13 条稳定非 addon 候选提升为 gating；4 条 addon 候选和 3 条非 ready 查询保持 report-only。
+- 推荐切入顺序：先解释并修复 baseline 中现有 gating failure（tutorial intent、symbol normalization、class inheritance recall），再考虑 addon 数据稳定化。
 
 ## 已完成的 Comet change
 
 ### 2026-06-30
+
+- 名称：`promote-report-only-gating-candidates`
+- 状态：✅ 已完成（2026-06-30）
+- 范围：把 13 条稳定非 addon `promotion_ready` 查询从 report-only 提升为 gating，保留 4 条 addon 候选和 3 条非 ready 查询为 report-only。
+- 成果：查询套件保持 45 条，gating 从 25 增至 38，report-only 从 20 降至 7；刷新 `docs/search-quality/baseline.json` 并通过 baseline comparison。
+- 下一步：解释并改善当前 baseline 中的 tutorial low-ranking、symbol normalization 和 class inheritance recall failure。
 
 - 名称：`search-ranking-report-only-triage`
 - 状态：✅ 已归档并复审（2026-06-30）
@@ -65,19 +72,18 @@
 
 ## 下一步方向
 
-### 推荐：`promote-report-only-gating-candidates`
+### 推荐：`search-ranking-signal-explanations`
 
-- 目标：审阅 17 条 `promotion_ready` report-only 查询，挑选稳定、非偶然的候选提升为 gating，并更新 baseline/验证路径。
-- 输出：更大的 gating 查询集和新的 baseline，让后续 ranking/alias 调整有更强回归保护。
-- 理由：triage 显示大多数观察项已经稳定命中；在调权重前先扩大保护面，能降低后续优化引入隐性退化的风险。
-
-### 随后：`search-ranking-signal-explanations`
-
-- 目标：把 deterministic rerank 的 alias match、symbol match、doc-type intent、addon intent 等信号显式记录到诊断输出或测试可观测结构中，优先解释 `nodes-and-scenes-tutorial` 与 `vector-fallback-metadata` 的 `low_ranking`。
+- 目标：把 deterministic rerank 的 alias match、symbol match、doc-type intent、addon intent 等信号显式记录到诊断输出或测试可观测结构中，优先解释当前 gating failure：`scene-tree-tutorial`、`how-to-use-scene-tree-nodes`、`resource-loader`、`node-connect-signal`，并继续覆盖 report-only 中的 `nodes-and-scenes-tutorial` 与 `vector-fallback-metadata`。
 - 范围：优先做 explainability，不先大幅改变权重；确保 `intent-ranking` 与 `query-rewrite` spec 中“named deterministic signal”的要求能被测试锁住。
 - 验证：单元测试覆盖信号生成，`eval-search` 输出能说明命中原因，45 查询 baseline 不退化。
 
-### 备选：`class-inheritance-recall-fix`
+### 随后：`class-inheritance-recall-fix`
 
 - 目标：针对 `class-inheritance-node-object` 的 `missing_recall`，调查是 query rewrite、symbol alias、inheritance 文档结构还是 index 数据导致无法进入 diagnostic window。
 - 前提：先保持评估输出可解释，避免在不知道召回缺口来源时直接调 ranking 权重。
+
+### 备选：`addon-gating-stability-review`
+
+- 目标：审阅 4 条仍为 `promotion_ready` 的 addon 查询，决定 addon 数据源是否足够稳定到可进入 gating。
+- 前提：明确 addon fixture/数据更新策略，否则继续保持 report-only，避免外部 addon 数据漂移影响主搜索质量门禁。
