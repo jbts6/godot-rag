@@ -106,7 +106,7 @@ rtk git commit -m "test: record report-only triage baseline"
 - Produces: `_classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None`
 - Consumes: existing `GoldenQuery`, `QueryResult`, `FailureDiagnostics`, and `_result()` test helper.
 
-- [ ] **Step 1: Add failing tests for triage classification**
+- [x] **Step 1: Add failing tests for triage classification**
 
 Append these tests to `rst2md/tests/test_search_eval.py` near the existing diagnostics tests:
 
@@ -257,7 +257,7 @@ def test_report_only_triage_marks_missing_recall():
     assert triage.recommended_followup == "recall"
 ```
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run:
 
@@ -267,7 +267,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py -k "report_only_triage"
 
 Expected: FAIL because `_classify_report_only_triage` does not exist.
 
-- [ ] **Step 3: Add minimal triage model and classifier**
+- [x] **Step 3: Add minimal triage model and classifier**
 
 In `rst2md/rag/search_eval.py`, add this dataclass after `QueryResult`:
 
@@ -338,7 +338,7 @@ def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None
     return _report_only_triage_result(result, "missing_recall", "recall")
 ```
 
-- [ ] **Step 4: Run focused tests and verify GREEN**
+- [x] **Step 4: Run focused tests and verify GREEN**
 
 Run:
 
@@ -348,7 +348,7 @@ rtk uv run pytest -q rst2md/tests/test_search_eval.py -k "report_only_triage"
 
 Expected: PASS.
 
-- [ ] **Step 5: Update OpenSpec task checklist**
+- [x] **Step 5: Update OpenSpec task checklist**
 
 In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 
@@ -358,7 +358,7 @@ In `openspec/changes/search-ranking-report-only-triage/tasks.md`, check off:
 - [x] 2.2 Classify report-only queries as `promotion_ready`, `missing_expected_data`, `missing_recall`, `low_ranking`, `filter_mismatch`, or `degraded_search`.
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 rtk git add rst2md/rag/search_eval.py rst2md/tests/test_search_eval.py openspec/changes/search-ranking-report-only-triage/tasks.md
