@@ -532,14 +532,15 @@ def evaluate_database(
         evaluated = evaluate_results(query, results, required_window=required_window)
         no_graph_results = []
         diagnostics_enabled = diagnostic_limit is not None
-        if compare_graph or (diagnostics_enabled and not evaluated.passed):
+        needs_diagnostics = diagnostics_enabled and (not evaluated.passed or query.report_only)
+        if compare_graph or needs_diagnostics:
             no_graph_results = search_database(db_path, query.query, limit=diagnostic_window, expand_graph=False)
         if compare_graph:
             no_graph = evaluate_results(query, no_graph_results, required_window=required_window)
             if no_graph.passed != evaluated.passed:
                 evaluated = replace(evaluated, graph_changed=True)
                 graph_changes.append(evaluated)
-        if diagnostics_enabled and not evaluated.passed:
+        if needs_diagnostics:
             evaluated = replace(
                 evaluated,
                 diagnostics=diagnose_failure(

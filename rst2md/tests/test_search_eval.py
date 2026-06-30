@@ -970,6 +970,25 @@ def test_evaluate_database_builds_report_only_triage_when_diagnostics_enabled(tm
     assert report.report_only_triage[0].promotion_candidate is False
 
 
+def test_evaluate_database_triages_passing_report_only_with_diagnostics(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    query = _report_only_query(
+        id="passing-report-only",
+        query="Node",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=(),
+    )
+
+    report = evaluate_database(db_path, [query], limit=5, diagnostic_limit=10)
+
+    triage = report.report_only_triage[0]
+    assert triage.classification == "degraded_search"
+    assert triage.promotion_candidate is False
+    assert triage.evidence["expected_present"] is True
+    assert triage.evidence["search_mode"] == "fts_only"
+    assert triage.evidence["fallback_reason"] == "empty_vec_chunks"
+
+
 def test_text_report_includes_report_only_triage_summary():
     from rag.search_eval import EvaluationReport, ReportOnlyTriage, format_text_report
 

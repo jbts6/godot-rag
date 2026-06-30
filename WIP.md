@@ -31,11 +31,18 @@
 - 扩展 alias/query rewrite 机制，减少硬编码孤例。
 - 强化符号查询的精确优先级，让 `Node.add_child`、`addChild`、`node_add_child` 稳定命中同一族目标。
 - 让 tutorial/addon/engine intent scoring 更可解释，并在诊断输出中展示命中原因。
-- 推荐切入顺序：先跑现有 45 查询评估并分析 20 个 report-only 查询，再挑 1-2 类低风险 ranking 信号做小步 change，避免一次性重调权重。
+- report-only triage 已完成：20 条观察项中 17 条 `promotion_ready`，2 条 `low_ranking`（`nodes-and-scenes-tutorial`、`vector-fallback-metadata`），1 条 `missing_recall`（`class-inheritance-node-object`）。
+- 推荐切入顺序：先把稳定的 `promotion_ready` 候选显式审阅并提升为 gating 保护，再对剩余 3 条进入 ranking signal explainability 与 focused recall/ranking 修复，避免一次性重调权重。
 
 ## 已完成的 Comet change
 
 ### 2026-06-30
+
+- 名称：`search-ranking-report-only-triage`
+- 状态：✅ 已归档并复审（2026-06-30）
+- 范围：为 20 条 report-only 查询输出 triage 分类、证据和 follow-up ownership，不调整 ranking 权重或 alias 规则。
+- 成果：当前完整评估分布为 17 条 `promotion_ready`、2 条 `low_ranking`、1 条 `missing_recall`；复审修复了通过的 report-only 查询在 degraded fallback 下缺少诊断证据、可能误标为 `promotion_ready` 的问题。
+- 下一步：审阅并提升稳定 gating 候选，同时针对 `nodes-and-scenes-tutorial`、`vector-fallback-metadata`、`class-inheritance-node-object` 建立 focused optimization change。
 
 - 名称：`lock-searcher-helper-facade-compatibility`
 - 状态：✅ 已提交（2026-06-30）
@@ -58,19 +65,19 @@
 
 ## 下一步方向
 
-### 推荐：`search-ranking-report-only-triage`
+### 推荐：`promote-report-only-gating-candidates`
 
-- 目标：先用现有 45 查询评估集和 diagnostic window 对 20 个 report-only 查询做分类，区分 missing data、recall miss、low ranking、filter mismatch、degraded vector mode。
-- 输出：一份候选优化清单，标明哪些查询可提升为 gating，哪些需要数据/fixture，哪些适合进入 ranking change。
-- 理由：现在评估与 searcher 模块边界都已就绪，下一步最缺的是“先改哪一个 ranking 信号”的证据；直接调权重容易把质量变化和数据缺口混在一起。
+- 目标：审阅 17 条 `promotion_ready` report-only 查询，挑选稳定、非偶然的候选提升为 gating，并更新 baseline/验证路径。
+- 输出：更大的 gating 查询集和新的 baseline，让后续 ranking/alias 调整有更强回归保护。
+- 理由：triage 显示大多数观察项已经稳定命中；在调权重前先扩大保护面，能降低后续优化引入隐性退化的风险。
 
 ### 随后：`search-ranking-signal-explanations`
 
-- 目标：把 deterministic rerank 的 alias match、symbol match、doc-type intent、addon intent 等信号显式记录到诊断输出或测试可观测结构中。
+- 目标：把 deterministic rerank 的 alias match、symbol match、doc-type intent、addon intent 等信号显式记录到诊断输出或测试可观测结构中，优先解释 `nodes-and-scenes-tutorial` 与 `vector-fallback-metadata` 的 `low_ranking`。
 - 范围：优先做 explainability，不先大幅改变权重；确保 `intent-ranking` 与 `query-rewrite` spec 中“named deterministic signal”的要求能被测试锁住。
 - 验证：单元测试覆盖信号生成，`eval-search` 输出能说明命中原因，45 查询 baseline 不退化。
 
-### 备选：`query-alias-rule-expansion`
+### 备选：`class-inheritance-recall-fix`
 
-- 目标：扩展 alias/query rewrite 规则，覆盖 report-only 中已有 `child node attach`、`start countdown timer`、`signals in gdscript tutorial` 等自然语言查询。
-- 前提：先完成 triage，确认失败主因是 alias/normalization 或低排名，而不是目标数据缺失。
+- 目标：针对 `class-inheritance-node-object` 的 `missing_recall`，调查是 query rewrite、symbol alias、inheritance 文档结构还是 index 数据导致无法进入 diagnostic window。
+- 前提：先保持评估输出可解释，避免在不知道召回缺口来源时直接调 ranking 权重。
