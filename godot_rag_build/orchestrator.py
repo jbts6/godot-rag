@@ -101,6 +101,17 @@ def _run_cmd(ctx: StageContext, args: list[str]) -> None:
     ctx.runner.run(args, cwd=ctx.root, env=_env_with_pythonpath(ctx.root))
 
 
+def _submodule_commit_hash(ctx: StageContext, submodule: str) -> str:
+    try:
+        result = ctx.runner.run(
+            ["git", "-C", submodule, "rev-parse", "HEAD"],
+            cwd=ctx.root, capture_output=True, check=True,
+        )
+        return result.stdout.strip()
+    except (RuntimeError, OSError):
+        return "unknown"
+
+
 def _tool_version(ctx: StageContext, args: list[str]) -> str:
     try:
         result = ctx.runner.run(args, cwd=ctx.root, capture_output=True, check=False)
@@ -213,7 +224,7 @@ def _fingerprint_common(ctx: StageContext, stage: str) -> str:
     }
 
     if stage in {"docs-md", "rag-db"}:
-        inputs["godot_docs"] = fingerprint_tree(ctx.root / "godot-docs", include_suffixes=(".rst", ".py", ".png", ".jpg", ".jpeg", ".webp", ".svg"))
+        inputs["godot_docs"] = _submodule_commit_hash(ctx, "godot-docs")
         inputs["rst2md"] = fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml"))
 
     if stage in {"wiki", "rag-db"}:
