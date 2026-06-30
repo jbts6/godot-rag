@@ -157,6 +157,7 @@ agent 不应跳过这些决策点；其他明确无歧义的阶段衔接必须�
 | `/comet-build` | 3. 计划与构建 | Superpowers | 实施计划、代码提交 |
 | `/comet-verify` | 4. 验证与收尾 | Both | 验证报告、分支处理 |
 | `/comet-archive` | 5. 归档 | OpenSpec | delta→main spec 同步、design doc 标注、归档 |
+| `/comet-review` | 归档后回顾 | Both | 回顾报告（spec 合并完整性、设计对齐、经验教训） |
 | `/comet-hotfix` | 预设路径 | Both | 快速修复（跳过 brainstorming） |
 | `/comet-tweak` | 预设路径 | Both | 小改动（跳过 brainstorming 和完整 plan） |
 
@@ -165,9 +166,13 @@ agent 不应跳过这些决策点；其他明确无歧义的阶段衔接必须�
   ↓ 自动检测
 /comet-open ──→ /comet-design ──→ /comet-build ──→ /comet-verify ──→ /comet-archive
   (OpenSpec)      (Superpowers)     (Superpowers)     (Both)          (OpenSpec)
+                                                                            │
+                                                                            ↓
+                                                                      /comet-review
+                                                                      （归档后回顾，可选）
 
 /comet-hotfix（预设路径，跳过 brainstorming）
-  open ──→ build ──→ verify ──→ archive
+  open ──→ build ──→ verify ──→ archive ──→ review（可选）
     ↑ 如触发升级条件 → 阻塞确认升级 → 补充 Design Doc → 回到完整流程
 
 /comet-tweak（预设路径，跳过 brainstorming 和完整 plan）
@@ -267,3 +272,4 @@ fi
 9. **归档闭环** — design doc 和 plan 必须标注 `archived-with` 状态
 10. **修改已有功能** — 直接 open 新 change 即可
 11. **Preset 有上限** — hotfix/tweak 满足升级条件时及时切换到完整流程
+12. **归档后回顾** — full workflow 归档后推荐执行 `/comet-review` 提取经验教训；hotfix/tweak 可选

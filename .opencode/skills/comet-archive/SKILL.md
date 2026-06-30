@@ -95,6 +95,8 @@ brainstorming → delta spec → 实施 → 验证 → 主 spec 合并 → desig
 
 Comet 流程全部完成。如需开始新工作，调用 `/comet` 或 `/comet-open`。
 
+归档后推荐调用 `/comet-review` 回顾本次变更，提取经验教训。
+
 ## 上下文压缩恢复
 
 按 `comet/reference/context-recovery.md` 执行，phase 参数为 `archive`。若 `archived: true` 且归档目录存在，归档已完成，无需再次执行归档操作。
