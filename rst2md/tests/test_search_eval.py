@@ -771,3 +771,149 @@ def test_failure_diagnostics_include_search_execution_metadata():
 
     assert data["diagnostics"]["search_mode"] == "fts_only"
     assert data["diagnostics"]["fallback_reason"] == "missing_vec_chunks"
+
+
+def _report_only_query(**overrides):
+    from rag.search_eval import GoldenQuery
+
+    values = {
+        "id": "report-only-node",
+        "query": "attach node to scene tree",
+        "category": "class",
+        "required_at": 5,
+        "expected_paths": ("classes/class_node.md",),
+        "expected_symbols": ("Node.add_child",),
+        "expected_doc_types": (),
+        "expected_addons": (),
+        "report_only": True,
+        "tags": (),
+    }
+    values.update(overrides)
+    return GoldenQuery(**values)
+
+
+def _query_result(query, *, matched_rank=None, passed=False, failure_classification="", observed=None, diagnostics=None):
+    from rag.search_eval import QueryResult
+
+    return QueryResult(
+        query=query,
+        matched_rank=matched_rank,
+        passed=passed,
+        failure_classification=failure_classification,
+        observed=observed or [],
+        diagnostics=diagnostics,
+    )
+
+
+def _diagnostics(**overrides):
+    from rag.search_eval import FailureDiagnostics
+
+    values = {
+        "expected_present": True,
+        "expected_rows": ({"path": "classes/class_node.md", "symbol": "Node.add_child", "doc_type": "class", "addon": "", "heading": "Methods"},),
+        "best_rank": None,
+        "best_rank_no_graph": None,
+        "diagnostic_window": 50,
+        "search_mode": "hybrid",
+        "fallback_reason": "",
+    }
+    values.update(overrides)
+    return FailureDiagnostics(**values)
+
+
+def test_report_only_triage_marks_promotion_ready():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(_report_only_query(), matched_rank=3, passed=True)
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "promotion_ready"
+    assert triage.promotion_candidate is True
+    assert triage.recommended_followup == "promotion"
+    assert triage.evidence["matched_rank"] == 3
+
+
+def test_report_only_triage_marks_missing_expected_data():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(expected_present=False, expected_rows=(), best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "missing_expected_data"
+    assert triage.promotion_candidate is False
+    assert triage.recommended_followup == "data"
+    assert triage.evidence["expected_present"] is False
+
+
+def test_report_only_triage_marks_low_ranking():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(required_at=5),
+        matched_rank=None,
+        failure_classification="low_ranking",
+        diagnostics=_diagnostics(best_rank=12),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "low_ranking"
+    assert triage.recommended_followup == "ranking"
+    assert triage.evidence["best_rank"] == 12
+    assert triage.evidence["required_at"] == 5
+
+
+def test_report_only_triage_marks_filter_mismatch():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(expected_doc_types=("class",)),
+        failure_classification="filter_mismatch",
+        observed=[{"rank": 1, "path": "tutorials/nodes.md", "symbol": "", "doc_type": "tutorial", "addon": "", "heading": "Nodes"}],
+        diagnostics=_diagnostics(best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "filter_mismatch"
+    assert triage.recommended_followup == "filter"
+    assert triage.evidence["observed"][0]["doc_type"] == "tutorial"
+
+
+def test_report_only_triage_marks_degraded_search_before_other_causes():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        matched_rank=1,
+        passed=True,
+        diagnostics=_diagnostics(best_rank=1, fallback_reason="vector_query_failed"),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "degraded_search"
+    assert triage.promotion_candidate is False
+    assert triage.recommended_followup == "degraded_search"
+    assert triage.evidence["fallback_reason"] == "vector_query_failed"
+
+
+def test_report_only_triage_marks_missing_recall():
+    from rag.search_eval import _classify_report_only_triage
+
+    result = _query_result(
+        _report_only_query(),
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(expected_present=True, best_rank=None),
+    )
+
+    triage = _classify_report_only_triage(result)
+
+    assert triage.classification == "missing_recall"
+    assert triage.recommended_followup == "recall"

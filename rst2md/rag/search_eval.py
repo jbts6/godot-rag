@@ -137,6 +137,15 @@ class QueryResult:
     diagnostics: FailureDiagnostics | None = None
 
 
+@dataclass(frozen=True)
+class ReportOnlyTriage:
+    query_id: str
+    classification: str
+    promotion_candidate: bool
+    recommended_followup: str
+    evidence: dict
+
+
 def _as_tuple(data: dict, key: str) -> tuple[str, ...]:
     value = data.get(key) or []
     return tuple(str(item) for item in value)
@@ -300,6 +309,60 @@ def _classify_failure(query: GoldenQuery, results: Sequence[SearchResult], match
     if "normalization" in query.tags or "symbol_variant" in query.tags:
         return "query_normalization"
     return "missing_recall"
+
+
+def _triage_evidence(result: QueryResult) -> dict:
+    diagnostics = result.diagnostics
+    return {
+        "expected_present": diagnostics.expected_present if diagnostics else None,
+        "matched_rank": result.matched_rank,
+        "best_rank": diagnostics.best_rank if diagnostics else result.matched_rank,
+        "best_rank_no_graph": diagnostics.best_rank_no_graph if diagnostics else None,
+        "required_at": result.query.required_at,
+        "search_mode": diagnostics.search_mode if diagnostics else "",
+        "fallback_reason": diagnostics.fallback_reason if diagnostics else "",
+        "observed": result.observed,
+    }
+
+
+def _report_only_triage_result(
+    result: QueryResult,
+    classification: str,
+    recommended_followup: str,
+    *,
+    promotion_candidate: bool = False,
+) -> ReportOnlyTriage:
+    return ReportOnlyTriage(
+        query_id=result.query.id,
+        classification=classification,
+        promotion_candidate=promotion_candidate,
+        recommended_followup=recommended_followup,
+        evidence=_triage_evidence(result),
+    )
+
+
+def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None:
+    if not result.query.report_only:
+        return None
+
+    evidence = _triage_evidence(result)
+    if evidence["fallback_reason"]:
+        return _report_only_triage_result(result, "degraded_search", "degraded_search")
+    if result.passed and result.matched_rank is not None and result.matched_rank <= result.query.required_at:
+        return _report_only_triage_result(
+            result,
+            "promotion_ready",
+            "promotion",
+            promotion_candidate=True,
+        )
+    if evidence["expected_present"] is False:
+        return _report_only_triage_result(result, "missing_expected_data", "data")
+    if result.failure_classification == "filter_mismatch":
+        return _report_only_triage_result(result, "filter_mismatch", "filter")
+    best_rank = evidence["best_rank"]
+    if best_rank is not None and best_rank > result.query.required_at:
+        return _report_only_triage_result(result, "low_ranking", "ranking")
+    return _report_only_triage_result(result, "missing_recall", "recall")
 
 
 def evaluate_results(query: GoldenQuery, results: Sequence[SearchResult], *, required_window: int = 10) -> QueryResult:
