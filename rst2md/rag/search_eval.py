@@ -346,6 +346,8 @@ def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None
         return None
 
     evidence = _triage_evidence(result)
+    if evidence["fallback_reason"]:
+        return _report_only_triage_result(result, "degraded_search", "degraded_search")
     if result.passed and result.matched_rank is not None and result.matched_rank <= result.query.required_at:
         return _report_only_triage_result(
             result,
@@ -353,8 +355,6 @@ def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None
             "promotion",
             promotion_candidate=True,
         )
-    if evidence["fallback_reason"]:
-        return _report_only_triage_result(result, "degraded_search", "degraded_search")
     if evidence["expected_present"] is False:
         return _report_only_triage_result(result, "missing_expected_data", "data")
     if result.failure_classification == "filter_mismatch":

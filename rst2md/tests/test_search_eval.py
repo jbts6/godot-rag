@@ -891,10 +891,10 @@ def test_report_only_triage_marks_degraded_search_before_other_causes():
 
     result = _query_result(
         _report_only_query(),
-        matched_rank=None,
-        passed=False,
+        matched_rank=1,
+        passed=True,
         failure_classification="missing_recall",
-        diagnostics=_diagnostics(best_rank=None, fallback_reason="vector_query_failed"),
+        diagnostics=_diagnostics(best_rank=1, fallback_reason="vector_query_failed"),
     )
 
     triage = _classify_report_only_triage(result)
@@ -966,8 +966,8 @@ def test_evaluate_database_builds_report_only_triage_when_diagnostics_enabled(tm
 
     assert len(report.report_only_triage) == 1
     assert report.report_only_triage[0].query_id == "fixture-report-only"
-    assert report.report_only_triage[0].classification == "promotion_ready"
-    assert report.report_only_triage[0].promotion_candidate is True
+    assert report.report_only_triage[0].classification == "degraded_search"
+    assert report.report_only_triage[0].promotion_candidate is False
 
 
 def test_text_report_includes_report_only_triage_summary():
