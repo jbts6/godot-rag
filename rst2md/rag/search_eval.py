@@ -703,6 +703,23 @@ def format_text_report(report: EvaluationReport) -> str:
     if report.latency is not None:
         lat = report.latency
         lines.append(f"latency: count={lat['count']} p50={lat['p50_ms']}ms p95={lat['p95_ms']}ms")
+    if report.report_only_triage:
+        lines.append("report_only_triage:")
+        for triage in report.report_only_triage:
+            evidence = triage.evidence
+            lines.append(
+                f"- {triage.query_id}: {triage.classification} "
+                f"followup={triage.recommended_followup} "
+                f"promotion_candidate={triage.promotion_candidate}"
+            )
+            lines.append(
+                "  evidence: "
+                f"expected_present={evidence.get('expected_present')} "
+                f"best_rank={evidence.get('best_rank')} "
+                f"required_at={evidence.get('required_at')} "
+                f"search_mode={evidence.get('search_mode')} "
+                f"fallback_reason={evidence.get('fallback_reason')}"
+            )
     if report.failures:
         lines.append("failures:")
         for failure in report.failures:

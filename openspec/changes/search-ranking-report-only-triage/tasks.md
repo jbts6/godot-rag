@@ -2,7 +2,7 @@
 
 - [x] 1.1 Run the current search evaluation and record the 25 gating / 20 report-only baseline behavior.
 - [x] 1.2 Add focused failing tests for report-only triage classifications and promotion recommendations.
-- [ ] 1.3 Add CLI/report tests for the triage summary in JSON and text output.
+- [x] 1.3 Add CLI/report tests for the triage summary in JSON and text output.
 
 ## 2. Triage Model and Classification
 
@@ -13,8 +13,8 @@
 ## 3. Reporting and Follow-up Recommendations
 
 - [x] 3.1 Include report-only triage summaries in JSON evaluation output.
-- [ ] 3.2 Include concise report-only triage summaries in text evaluation output.
-- [ ] 3.3 Emit advisory follow-up ownership for each non-promotion-ready query: data/fixture, recall, ranking, filter, or degraded search investigation.
+- [x] 3.2 Include concise report-only triage summaries in text evaluation output.
+- [x] 3.3 Emit advisory follow-up ownership for each non-promotion-ready query: data/fixture, recall, ranking, filter, or degraded search investigation.
 
 ## 4. Verification and Documentation
 

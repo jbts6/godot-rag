@@ -970,6 +970,40 @@ def test_evaluate_database_builds_report_only_triage_when_diagnostics_enabled(tm
     assert report.report_only_triage[0].promotion_candidate is True
 
 
+def test_text_report_includes_report_only_triage_summary():
+    from rag.search_eval import EvaluationReport, ReportOnlyTriage, format_text_report
+
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        report_only_triage=(
+            ReportOnlyTriage(
+                query_id="addon-dialogue-manager",
+                classification="low_ranking",
+                promotion_candidate=False,
+                recommended_followup="ranking",
+                evidence={
+                    "expected_present": True,
+                    "best_rank": 12,
+                    "required_at": 5,
+                    "search_mode": "hybrid",
+                    "fallback_reason": "",
+                    "observed": [],
+                },
+            ),
+        ),
+    )
+
+    text = format_text_report(report)
+
+    assert "report_only_triage:" in text
+    assert "- addon-dialogue-manager: low_ranking followup=ranking promotion_candidate=False" in text
+    assert "expected_present=True best_rank=12 required_at=5 search_mode=hybrid fallback_reason=" in text
+
+
 def test_evaluate_database_omits_report_only_triage_without_diagnostics(tmp_path, monkeypatch):
     db_path = _build_eval_db(tmp_path, monkeypatch)
     query = _report_only_query(
