@@ -31,10 +31,16 @@
 - 扩展 alias/query rewrite 机制，减少硬编码孤例。
 - 强化符号查询的精确优先级，让 `Node.add_child`、`addChild`、`node_add_child` 稳定命中同一族目标。
 - 让 tutorial/addon/engine intent scoring 更可解释，并在诊断输出中展示命中原因。
+- 推荐切入顺序：先跑现有 45 查询评估并分析 20 个 report-only 查询，再挑 1-2 类低风险 ranking 信号做小步 change，避免一次性重调权重。
 
 ## 已完成的 Comet change
 
 ### 2026-06-30
+
+- 名称：`lock-searcher-helper-facade-compatibility`
+- 状态：✅ 已提交（2026-06-30）
+- 范围：补充 `rag.searcher` 对 `_smart_tokenize`、`_escape_fts5`、`vector_search`、`rrf_fusion`、`rerank_results`、`_extract_snippet` 等 legacy helper re-export 的兼容性测试。
+- 成果：把 split-searcher-modules 审核中的残余风险转成自动化测试，防止后续清理 import 时误删 facade 兼容路径。
 
 - 名称：`split-searcher-modules`
 - 状态：✅ 已归档（2026-06-30）
@@ -52,8 +58,19 @@
 
 ## 下一步方向
 
-### 4. 搜索策略优化
+### 推荐：`search-ranking-report-only-triage`
 
-- 扩展 alias/query rewrite 机制，减少硬编码孤例。
-- 强化符号查询的精确优先级，让 `Node.add_child`、`addChild`、`node_add_child` 稳定命中同一族目标。
-- 让 tutorial/addon/engine intent scoring 更可解释，并在诊断输出中展示命中原因。
+- 目标：先用现有 45 查询评估集和 diagnostic window 对 20 个 report-only 查询做分类，区分 missing data、recall miss、low ranking、filter mismatch、degraded vector mode。
+- 输出：一份候选优化清单，标明哪些查询可提升为 gating，哪些需要数据/fixture，哪些适合进入 ranking change。
+- 理由：现在评估与 searcher 模块边界都已就绪，下一步最缺的是“先改哪一个 ranking 信号”的证据；直接调权重容易把质量变化和数据缺口混在一起。
+
+### 随后：`search-ranking-signal-explanations`
+
+- 目标：把 deterministic rerank 的 alias match、symbol match、doc-type intent、addon intent 等信号显式记录到诊断输出或测试可观测结构中。
+- 范围：优先做 explainability，不先大幅改变权重；确保 `intent-ranking` 与 `query-rewrite` spec 中“named deterministic signal”的要求能被测试锁住。
+- 验证：单元测试覆盖信号生成，`eval-search` 输出能说明命中原因，45 查询 baseline 不退化。
+
+### 备选：`query-alias-rule-expansion`
+
+- 目标：扩展 alias/query rewrite 规则，覆盖 report-only 中已有 `child node attach`、`start countdown timer`、`signals in gdscript tutorial` 等自然语言查询。
+- 前提：先完成 triage，确认失败主因是 alias/normalization 或低排名，而不是目标数据缺失。
