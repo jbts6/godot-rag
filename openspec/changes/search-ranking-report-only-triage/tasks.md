@@ -20,4 +20,5 @@
 
 - [x] 4.1 Verify existing gating evaluation and baseline comparison behavior remains unchanged.
 - [x] 4.2 Run focused and full test suites.
-- [ ] 4.3 Update WIP or related docs with the resulting next-step candidate list.
+- [x] 4.3 Update WIP or related docs with the resulting next-step candidate list.
+<!-- 4.3 candidate list captured in implementation summary; no owning WIP doc updated -->
