@@ -1,0 +1,244 @@
+........................................................................ [ 41%]
+........................................................................ [ 83%]
+............................                                             [100%]
+172 passed in 4.75s
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]Fetching 10 files: 100%|██████████| 10/10 [00:00<00:00, 7850.09it/s]
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+Generating embeddings... (1/1)
+=== Search Quality Evaluation ===
+overall: count=25 hit@1=0.760 hit@3=0.880 hit@5=0.880 mrr@5=0.807
+addon: count=0 hit@5=0.000 mrr@5=0.000
+class: count=10 hit@5=1.000 mrr@5=0.933
+engine: count=2 hit@5=1.000 mrr@5=0.667
+symbol: count=10 hit@5=0.800 mrr@5=0.800
+tutorial: count=3 hit@5=0.667 mrr@5=0.500
+baseline: compared
+regression: hit@5 regressed from 1.0000 to 0.9333; drop 0.0667 exceeds threshold 0.0500
+regression: mrr@5 regressed from 1.0000 to 0.8556; relative drop 0.1444 exceeds threshold 0.1000
+category_warning: missing gating queries for 'addon'
+baseline_warning: query_suite_hash mismatch: baseline=e0053fb5af2d current=c0c170a349d4
+latency: count=45 p50=30.53ms p95=49.276ms
+failures:
+- state-machine-addon: filter_mismatch
+  query: state machine addon
+  category=addon required_at=5
+  expected: doc_types=['addon']
+  observed:
+  #1 path=engine_details/engine_api/custom_godot_servers.md symbol= doc_type=tutorial addon=
+  #2 path=classes/class_animationnodestatemachine.md symbol=AnimationNodeStateMachine doc_type=class addon=
+  #3 path=tutorials/scripting/gdscript/gdscript_styleguide.md symbol= doc_type=tutorial addon=
+  #4 path=tutorials/animation/animation_tree.md symbol= doc_type=tutorial addon=
+  #5 path=tutorials/3d/csg_tools.md symbol= doc_type=tutorial addon=
+  #6 path=tutorials/3d/procedural_geometry/surfacetool.md symbol= doc_type=tutorial addon=
+  #7 path=tutorials/xr/xr_action_map.md symbol= doc_type=tutorial addon=
+  #8 path=tutorials/export/one-click_deploy.md symbol= doc_type=tutorial addon=
+  #9 path=tutorials/editor/using_engine_compilation_configuration_editor.md symbol= doc_type=tutorial addon=
+  #10 path=tutorials/xr/deploying_to_android.md symbol= doc_type=tutorial addon=
+- how-to-use-scene-tree-nodes: low_ranking
+  query: how to use scene tree nodes
+  category=tutorial required_at=5
+  expected: doc_types=['tutorial']
+  observed:
+  #1 path=classes/class_animation.md symbol=Animation doc_type=class addon=
+  #2 path=classes/class_physicsserver3d.md symbol=PhysicsServer3D doc_type=class addon=
+  #3 path=classes/class_physicsserver2d.md symbol=PhysicsServer2D doc_type=class addon=
+  #4 path=classes/class_projectsettings.md symbol=ProjectSettings.settings_changed doc_type=class addon=
+  #5 path=classes/class_engine.md symbol=Engine doc_type=class addon=
+  #6 path=classes/class_camera2d.md symbol=Camera2D doc_type=class addon=
+  #7 path=classes/class_gltfobjectmodelproperty.md symbol=GLTFObjectModelProperty doc_type=class addon=
+  #8 path=classes/class_camera3d.md symbol=Camera3D doc_type=class addon=
+  #9 path=classes/class_lightmapgi.md symbol=LightmapGI doc_type=class addon=
+  #10 path=tutorials/navigation/navigation_introduction_3d.md symbol= doc_type=tutorial addon=
+- class-inheritance-node-object: missing_recall
+  query: Node inherits Object
+  category=class required_at=5
+  expected: paths=['classes/class_node.md']
+  observed:
+  #1 path=classes/class_scrollbar.md symbol=ScrollBar doc_type=class addon=
+  #2 path=classes/class_slider.md symbol=Slider doc_type=class addon=
+  #3 path=classes/class_popuppanel.md symbol=PopupPanel doc_type=class addon=
+  #4 path=classes/class_openxrinteractionprofileeditor.md symbol=OpenXRInteractionProfileEditor doc_type=class addon=
+  #5 path=classes/class_tabbar.md symbol=TabBar doc_type=class addon=
+  #6 path=classes/class_visualshadernodetexture2darrayparameter.md symbol=VisualShaderNodeTexture2DArrayParameter doc_type=class addon=
+  #7 path=classes/class_visualshadernoderandomrange.md symbol=VisualShaderNodeRandomRange doc_type=class addon=
+  #8 path=classes/class_visualshadernodevec3constant.md symbol=VisualShaderNodeVec3Constant doc_type=class addon=
+  #9 path=classes/class_visualshadernodevec2constant.md symbol=VisualShaderNodeVec2Constant doc_type=class addon=
+  #10 path=classes/class_animationnodeblendtree.md symbol=AnimationNodeBlendTree doc_type=class addon=
+- addon-dialogue-manager: filter_mismatch
+  query: dialogue manager addon
+  category=addon required_at=5
+  expected: doc_types=['addon']
+  observed:
+  #1 path=getting_started/introduction/first_look_at_the_editor.md symbol= doc_type=tutorial addon=
+  #2 path=engine_details/engine_api/custom_godot_servers.md symbol= doc_type=tutorial addon=
+  #3 path=classes/class_filedialog.md symbol=FileDialog.menu_show_in_file_manager doc_type=class addon=
+  #4 path=tutorials/editor/project_manager.md symbol= doc_type=tutorial addon=
+  #5 path=classes/class_richtextlabel.md symbol=RichTextLabel.get_menu doc_type=class addon=
+  #6 path=classes/class_editorplugin.md symbol=EditorPlugin.add_scene_post_import_plugin doc_type=class addon=
+  #7 path=classes/class_textedit.md symbol=TextEdit.get_menu doc_type=class addon=
+  #8 path=tutorials/audio/text_to_speech.md symbol= doc_type=tutorial addon=
+  #9 path=tutorials/xr/xr_action_map.md symbol= doc_type=tutorial addon=
+  #10 path=tutorials/plugins/editor/making_plugins.md symbol= doc_type=tutorial addon=
+- addon-phantom-camera: filter_mismatch
+  query: phantom camera addon
+  category=addon required_at=5
+  expected: doc_types=['addon']
+  observed:
+  #1 path=classes/class_camerafeed.md symbol=CameraFeed doc_type=class addon=
+  #2 path=classes/class_cameraserver.md symbol=CameraServer doc_type=class addon=
+  #3 path=tutorials/3d/introduction_to_3d.md symbol= doc_type=tutorial addon=
+  #4 path=getting_started/first_3d_game/03.player_movement_code.md symbol= doc_type=tutorial addon=
+  #5 path=tutorials/editor/game_embedding.md symbol= doc_type=tutorial addon=
+  #6 path=tutorials/3d/environment_and_post_processing.md symbol= doc_type=tutorial addon=
+  #7 path=tutorials/3d/spring_arm.md symbol= doc_type=tutorial addon=
+  #8 path=classes/class_cameraserver.md symbol=CameraServer.camera_feed_added doc_type=class addon=
+  #9 path=classes/class_cameraserver.md symbol=CameraServer.is_monitoring_feeds doc_type=class addon=
+  #10 path=tutorials/editor/game_embedding.md symbol= doc_type=tutorial addon=
+- addon-limboai-behavior-tree: filter_mismatch
+  query: behavior tree addon
+  category=addon required_at=5
+  expected: doc_types=['addon']
+  observed:
+  #1 path=classes/class_editorplugin.md symbol=EditorPlugin.add_inspector_plugin doc_type=class addon=
+  #2 path=classes/class_tree.md symbol=Tree doc_type=class addon=
+  #3 path=tutorials/scripting/overridable_functions.md symbol= doc_type=tutorial addon=
+  #4 path=tutorials/best_practices/godot_notifications.md symbol= doc_type=tutorial addon=
+  #5 path=classes/class_animationtree.md symbol=AnimationTree.tree_root doc_type=class addon=
+  #6 path=classes/class_animationtree.md symbol=AnimationTree.get_tree_root doc_type=class addon=
+  #7 path=classes/class_node.md symbol=Node.child_entered_tree doc_type=class addon=
+  #8 path=classes/class_node.md symbol=Node doc_type=class addon=
+  #9 path=tutorials/scripting/overridable_functions.md symbol= doc_type=tutorial addon=
+  #10 path=tutorials/scripting/scene_tree.md symbol= doc_type=tutorial addon=
+- vector-fallback-metadata: low_ranking
+  query: semantic search vector fallback
+  category=engine required_at=5
+  expected: doc_types=['tutorial']
+  observed:
+  #1 path=classes/class_vector3.md symbol=Vector3.cross doc_type=class addon=
+  #2 path=classes/class_vector3.md symbol=Vector3.project doc_type=class addon=
+  #3 path=classes/class_vector2.md symbol=Vector2.project doc_type=class addon=
+  #4 path=classes/class_themedb.md symbol=ThemeDB.get_fallback_icon doc_type=class addon=
+  #5 path=classes/class_vector3.md symbol=Vector3.BACK doc_type=class addon=
+  #6 path=classes/class_vector3i.md symbol=Vector3i.BACK doc_type=class addon=
+  #7 path=classes/class_themedb.md symbol=ThemeDB.fallback_changed doc_type=class addon=
+  #8 path=tutorials/scripting/gdscript/gdscript_exports.md symbol= doc_type=tutorial addon=
+  #9 path=classes/class_vector3.md symbol=Vector3.ONE doc_type=class addon=
+  #10 path=classes/class_vector3.md symbol=Vector3.Vector3 doc_type=class addon=
+- resource-loader: query_normalization
+  query: ResourceLoader.load
+  category=symbol required_at=3
+  expected: symbols=['ResourceLoader.load']
+  observed:
+  #1 path=tutorials/io/background_loading.md symbol= doc_type=tutorial addon=
+  #2 path=tutorials/io/background_loading.md symbol= doc_type=tutorial addon=
+  #3 path=engine_details/architecture/object_class.md symbol= doc_type=tutorial addon=
+  #4 path=tutorials/best_practices/logic_preferences.md symbol= doc_type=tutorial addon=
+  #5 path=classes/class_resourceloader.md symbol=ResourceLoader doc_type=class addon=
+  #6 path=engine_details/engine_api/custom_resource_format_loaders.md symbol= doc_type=tutorial addon=
+  #7 path=classes/class_@gdscript.md symbol=@GDScript.load doc_type=class addon=
+  #8 path=tutorials/best_practices/logic_preferences.md symbol= doc_type=tutorial addon=
+  #9 path=classes/class_resourceformatloader.md symbol=ResourceFormatLoader doc_type=class addon=
+  #10 path=classes/class_@globalscope.md symbol=@GlobalScope.ResourceLoader doc_type=class addon=
+- node-connect-signal: query_normalization
+  query: Node.connect
+  category=symbol required_at=3
+  expected: symbols=['Object.connect']
+  observed:
+  #1 path=getting_started/step_by_step/signals.md symbol= doc_type=tutorial addon=
+  #2 path=getting_started/step_by_step/signals.md symbol= doc_type=tutorial addon=
+  #3 path=classes/class_visualshader.md symbol=VisualShader.connect_nodes_forced doc_type=class addon=
+  #4 path=tutorials/animation/animation_tree.md symbol= doc_type=tutorial addon=
+  #5 path=classes/class_animationnodeblendtree.md symbol=AnimationNodeBlendTree.connect_node doc_type=class addon=
+  #6 path=getting_started/step_by_step/nodes_and_scenes.md symbol= doc_type=tutorial addon=
+  #7 path=classes/class_visualshader.md symbol=VisualShader.connect_nodes doc_type=class addon=
+  #8 path=tutorials/scripting/gdscript/gdscript_exports.md symbol= doc_type=tutorial addon=
+  #9 path=classes/class_graphedit.md symbol=GraphEdit.connect_node doc_type=class addon=
+  #10 path=classes/class_scenetree.md symbol=SceneTree.node_added doc_type=class addon=
