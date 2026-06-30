@@ -891,9 +891,10 @@ def test_report_only_triage_marks_degraded_search_before_other_causes():
 
     result = _query_result(
         _report_only_query(),
-        matched_rank=1,
-        passed=True,
-        diagnostics=_diagnostics(best_rank=1, fallback_reason="vector_query_failed"),
+        matched_rank=None,
+        passed=False,
+        failure_classification="missing_recall",
+        diagnostics=_diagnostics(best_rank=None, fallback_reason="vector_query_failed"),
     )
 
     triage = _classify_report_only_triage(result)
@@ -917,3 +918,67 @@ def test_report_only_triage_marks_missing_recall():
 
     assert triage.classification == "missing_recall"
     assert triage.recommended_followup == "recall"
+
+
+def test_report_to_dict_includes_report_only_triage():
+    from rag.search_eval import EvaluationReport, ReportOnlyTriage, report_to_dict
+
+    report = EvaluationReport(
+        overall={"count": 0, "hit@1": 0.0, "hit@3": 0.0, "hit@5": 0.0, "mrr@5": 0.0},
+        categories={},
+        failures=[],
+        query_results=[],
+        graph_changes=[],
+        report_only_triage=(
+            ReportOnlyTriage(
+                query_id="report-only-node",
+                classification="promotion_ready",
+                promotion_candidate=True,
+                recommended_followup="promotion",
+                evidence={"matched_rank": 1, "required_at": 5, "observed": []},
+            ),
+        ),
+    )
+
+    data = report_to_dict(report)
+
+    assert data["report_only_triage"] == [
+        {
+            "query_id": "report-only-node",
+            "classification": "promotion_ready",
+            "promotion_candidate": True,
+            "recommended_followup": "promotion",
+            "evidence": {"matched_rank": 1, "required_at": 5, "observed": []},
+        }
+    ]
+
+
+def test_evaluate_database_builds_report_only_triage_when_diagnostics_enabled(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    query = _report_only_query(
+        id="fixture-report-only",
+        query="Node add_child",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=("Node.add_child",),
+    )
+
+    report = evaluate_database(db_path, [query], limit=5, diagnostic_limit=10)
+
+    assert len(report.report_only_triage) == 1
+    assert report.report_only_triage[0].query_id == "fixture-report-only"
+    assert report.report_only_triage[0].classification == "promotion_ready"
+    assert report.report_only_triage[0].promotion_candidate is True
+
+
+def test_evaluate_database_omits_report_only_triage_without_diagnostics(tmp_path, monkeypatch):
+    db_path = _build_eval_db(tmp_path, monkeypatch)
+    query = _report_only_query(
+        id="fixture-report-only",
+        query="Node add_child",
+        expected_paths=("classes/class_node.md",),
+        expected_symbols=("Node.add_child",),
+    )
+
+    report = evaluate_database(db_path, [query], limit=5, diagnostic_limit=None)
+
+    assert report.report_only_triage == ()

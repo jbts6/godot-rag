@@ -119,7 +119,7 @@ def _run_fts_query(
 ) -> list[dict]:
     if fused_exclude_params is None:
         fused_exclude_params = []
-    escaped_query = _smart_tokenize(normalize_symbol(query))
+    escaped_query = _smart_tokenize(query)
     rows = conn.execute(
         f"""
         SELECT c.id, c.path, c.start_line, c.end_line, c.doc_type,

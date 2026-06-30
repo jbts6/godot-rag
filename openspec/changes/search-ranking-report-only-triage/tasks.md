@@ -12,12 +12,12 @@
 
 ## 3. Reporting and Follow-up Recommendations
 
-- [ ] 3.1 Include report-only triage summaries in JSON evaluation output.
+- [x] 3.1 Include report-only triage summaries in JSON evaluation output.
 - [ ] 3.2 Include concise report-only triage summaries in text evaluation output.
 - [ ] 3.3 Emit advisory follow-up ownership for each non-promotion-ready query: data/fixture, recall, ranking, filter, or degraded search investigation.
 
 ## 4. Verification and Documentation
 
-- [ ] 4.1 Verify existing gating evaluation and baseline comparison behavior remains unchanged.
-- [ ] 4.2 Run focused and full test suites.
+- [x] 4.1 Verify existing gating evaluation and baseline comparison behavior remains unchanged.
+- [x] 4.2 Run focused and full test suites.
 - [ ] 4.3 Update WIP or related docs with the resulting next-step candidate list.

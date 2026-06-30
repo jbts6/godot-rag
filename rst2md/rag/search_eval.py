@@ -346,8 +346,6 @@ def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None
         return None
 
     evidence = _triage_evidence(result)
-    if evidence["fallback_reason"]:
-        return _report_only_triage_result(result, "degraded_search", "degraded_search")
     if result.passed and result.matched_rank is not None and result.matched_rank <= result.query.required_at:
         return _report_only_triage_result(
             result,
@@ -355,6 +353,8 @@ def _classify_report_only_triage(result: QueryResult) -> ReportOnlyTriage | None
             "promotion",
             promotion_candidate=True,
         )
+    if evidence["fallback_reason"]:
+        return _report_only_triage_result(result, "degraded_search", "degraded_search")
     if evidence["expected_present"] is False:
         return _report_only_triage_result(result, "missing_expected_data", "data")
     if result.failure_classification == "filter_mismatch":
@@ -490,6 +490,7 @@ class EvaluationReport:
     category_warnings: tuple[str, ...] = ()
     baseline_warnings: tuple[str, ...] = ()
     latency: dict | None = None
+    report_only_triage: tuple[ReportOnlyTriage, ...] = ()
 
 
 _REQUIRED_CATEGORIES = {"class", "symbol", "tutorial", "engine", "addon"}
@@ -519,6 +520,7 @@ def evaluate_database(
 
     query_results = []
     graph_changes = []
+    report_only_triage = []
     elapsed_seconds = []
     required_window = max(10, limit)
     diagnostic_window = max(required_window, diagnostic_limit or 0)
@@ -549,6 +551,10 @@ def evaluate_database(
                     metadata=response.metadata,
                 ),
             )
+        if diagnostics_enabled and query.report_only:
+            triage = _classify_report_only_triage(evaluated)
+            if triage:
+                report_only_triage.append(triage)
         query_results.append(evaluated)
 
     overall, categories = calculate_metrics(query_results)
@@ -568,6 +574,7 @@ def evaluate_database(
         query_suite_hash=suite_hash,
         category_warnings=category_warnings,
         latency=latency_summary(elapsed_seconds),
+        report_only_triage=tuple(report_only_triage),
     )
 
 
@@ -603,6 +610,7 @@ def apply_baseline(
             category_warnings=report.category_warnings,
             baseline_warnings=report.baseline_warnings,
             latency=report.latency,
+            report_only_triage=report.report_only_triage,
         )
         baseline_path.parent.mkdir(parents=True, exist_ok=True)
         baseline_path.write_text(json.dumps(report_to_dict(baseline_report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -652,6 +660,7 @@ def apply_baseline(
         category_warnings=report.category_warnings,
         baseline_warnings=tuple(baseline_warnings),
         latency=report.latency,
+        report_only_triage=report.report_only_triage,
     )
 
 
@@ -763,6 +772,16 @@ def _query_result_to_dict(result: QueryResult) -> dict:
     }
 
 
+def _report_only_triage_to_dict(triage: ReportOnlyTriage) -> dict:
+    return {
+        "query_id": triage.query_id,
+        "classification": triage.classification,
+        "promotion_candidate": triage.promotion_candidate,
+        "recommended_followup": triage.recommended_followup,
+        "evidence": triage.evidence,
+    }
+
+
 def _package_version() -> str:
     """Resolve the godot-rag package version, falling back to pyproject.toml then 'unknown'."""
     try:
@@ -806,6 +825,7 @@ def report_to_dict(report: EvaluationReport) -> dict:
         "baseline_compared": report.baseline_compared,
         "category_warnings": list(category_warnings),
         "baseline_warnings": list(report.baseline_warnings),
+        "report_only_triage": [_report_only_triage_to_dict(triage) for triage in report.report_only_triage],
     }
     if report.latency is not None:
         result["latency"] = report.latency
