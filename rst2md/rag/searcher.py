@@ -12,6 +12,7 @@ from rag.fusion import (  # noqa: F401 — rrf_fusion re-exported for store.py f
     rerank_results,
     rrf_fusion,
 )
+from rag.snippet import _extract_snippet  # noqa: F401 — re-export for store.py facade backward compat
 
 
 _FTS5_SPECIAL = set('"*+-:()^')
@@ -74,37 +75,6 @@ def vector_search(conn, query_embedding: List[float], limit: int = 10) -> List[d
 
     return [{'id': row[0], 'distance': row[1]} for row in results]
 
-
-def _extract_snippet(text: str, query: str, context_lines: int = 3) -> str:
-    """Extract a snippet from text around the first line containing query keywords."""
-    lines = text.split('\n')
-    query_lower = query.lower()
-    keywords = query_lower.split()
-
-    # Find first line containing any keyword
-    match_idx = None
-    for i, line in enumerate(lines):
-        line_lower = line.lower()
-        if any(kw in line_lower for kw in keywords):
-            match_idx = i
-            break
-
-    if match_idx is None:
-        # No match found, return first few lines
-        return '\n'.join(lines[:context_lines * 2 + 1])
-
-    # Extract context around match
-    start = max(0, match_idx - context_lines)
-    end = min(len(lines), match_idx + context_lines + 1)
-
-    snippet_lines = []
-    if start > 0:
-        snippet_lines.append('...')
-    snippet_lines.extend(lines[start:end])
-    if end < len(lines):
-        snippet_lines.append('...')
-
-    return '\n'.join(snippet_lines)
 
 
 def _vector_availability(conn) -> tuple[bool, str]:
