@@ -18,8 +18,8 @@
 
 ## 4. CLI and Diagnostics Output
 
-- [ ] 4.1 Expose ranking signals in structured or debug search output.
-- [ ] 4.2 Keep default human-readable search output concise and backward-compatible.
+- [x] 4.1 Expose ranking signals in structured or debug search output.
+- [x] 4.2 Keep default human-readable search output concise and backward-compatible.
 
 ## 5. Verification
 

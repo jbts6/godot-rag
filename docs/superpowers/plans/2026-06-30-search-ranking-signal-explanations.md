@@ -1118,7 +1118,7 @@ Then check off OpenSpec `3.1`, `3.2` in `openspec/changes/search-ranking-signal-
 
 **Critical constraint (OpenSpec 4.2):** Default human-readable search output must stay concise and backward-compatible — do NOT print signals when `--debug-search` is not set. JSON output (both plain and `--debug-search`) includes the full `ranking_signals` array.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `rst2md/tests/test_rag_search.py` inside `class CliTests` (after `test_cli_search_without_debug_no_metadata`):
 
@@ -1232,12 +1232,12 @@ Append to `rst2md/tests/test_rag_search.py` inside `class CliTests` (after `test
             self.assertNotIn("signals:", output, "default text output must not print signal payload")
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::CliTests -v -k "ranking_signals or signal_summary or omits_signals"`
 Expected: FAIL — `ranking_signals` key is absent from JSON output (`KeyError` or `assertIn` fails), and no `signals:` line is printed in debug text.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Edit `rst2md/rag/cli.py`.
 
@@ -1302,17 +1302,17 @@ def _result_to_dict(r):
             print(f"text:\n{r.text}")
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::CliTests -v -k "ranking_signals or signal_summary or omits_signals"`
 Expected: PASS (3 tests).
 
-- [ ] **Step 5: Run regression (CLI behavior unchanged for non-signal output)**
+- [x] **Step 5: Run regression (CLI behavior unchanged for non-signal output)**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::CliTests -v`
 Expected: PASS. `test_cli_search_debug_json_includes_metadata`, `test_cli_search_debug_text_includes_metadata`, `test_cli_search_without_debug_no_metadata` still pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/cli.py rst2md/tests/test_rag_search.py
