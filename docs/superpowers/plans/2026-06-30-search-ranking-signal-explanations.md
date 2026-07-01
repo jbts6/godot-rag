@@ -2,6 +2,7 @@
 change: search-ranking-signal-explanations
 design-doc: docs/superpowers/specs/2026-06-30-search-ranking-signal-explanations-design.md
 base-ref: fb5491a279abb9c03f90f5e6b7fc25b7bf63a555
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 # Search Ranking Signal Explanations Implementation Plan
@@ -26,6 +27,7 @@ base-ref: fb5491a279abb9c03f90f5e6b7fc25b7bf63a555
 - **Test commands.** Focused: `uv run pytest -q rst2md/tests/test_rag_search.py`; rerank/unit: `uv run pytest -q rst2md/tests/test_searcher_module.py`; eval: `uv run pytest -q rst2md/tests/test_search_eval.py`; full: `uv run pytest -q`. CLI subprocess tests rely on `PYTHONPATH=rst2md` (already set in `TEST_ENV` at `rst2md/tests/test_rag_search.py:15`).
 - **OpenSpec task tracking.** As each task completes, check off the matching IDs in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## File Structure
@@ -50,6 +52,7 @@ base-ref: fb5491a279abb9c03f90f5e6b7fc25b7bf63a555
 | Task 6 | 4.1, 4.2 |
 | Task 7 | 5.1, 5.2, 5.3 |
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 1: RankingSignal model and additive SearchResult field
@@ -200,6 +203,7 @@ git commit -m "feat(rag): add RankingSignal model and SearchResult.ranking_signa
 
 Then check off OpenSpec `1.1`, `1.2`, `1.3` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 2: Record symbol recall signals
@@ -451,6 +455,7 @@ git commit -m "feat(rag): record symbol recall ranking signals"
 
 Then check off OpenSpec `2.1` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 3: Record hybrid/RRF and FTS scoring signals
@@ -646,6 +651,7 @@ git commit -m "feat(rag): record hybrid RRF and FTS scoring signals"
 
 Then check off OpenSpec `2.2` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 4: Record graph expansion signals
@@ -804,6 +810,7 @@ git commit -m "feat(rag): record graph expansion ranking signals"
 
 Then check off OpenSpec `2.3` (and note `2.4` is now covered across Tasks 2-4) in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 5: Rerank named bonus signals (preserve score math and ordering)
@@ -1104,6 +1111,7 @@ git commit -m "feat(rag): append named rerank bonus signals without changing sco
 
 Then check off OpenSpec `3.1`, `3.2` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 6: CLI structured and debug output for ranking signals
@@ -1321,6 +1329,7 @@ git commit -m "feat(cli): expose ranking signals in JSON and debug-search text o
 
 Then check off OpenSpec `4.1`, `4.2` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Task 7: End-to-end explanation coverage and verification
@@ -1436,6 +1445,7 @@ git commit -m "test(rag): add end-to-end ranking signal coverage tests"
 
 Then check off OpenSpec `5.1`, `5.2`, `5.3` in `openspec/changes/search-ranking-signal-explanations/tasks.md`.
 
+archived-with: 2026-07-01-search-ranking-signal-explanations
 ---
 
 ## Self-Review Summary

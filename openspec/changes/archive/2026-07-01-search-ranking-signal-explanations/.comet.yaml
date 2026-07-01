@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-01-search-ranking-signal-e
 branch_status: handled
 created_at: 2026-06-30
 verified_at: 2026-07-01
-archived: false
+archived: true
 handoff_context: openspec/changes/search-ranking-signal-explanations/.comet/handoff/design-context.json
 handoff_hash: fbcaecbbdd163f07c24a089b946c430f14f810eadc7b986b53bff30f5ee4c0f9

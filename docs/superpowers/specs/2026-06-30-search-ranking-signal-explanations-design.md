@@ -2,6 +2,8 @@
 comet_change: search-ranking-signal-explanations
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-01-search-ranking-signal-explanations
+status: final
 ---
 
 # Search Ranking Signal Explanations - Technical Design
