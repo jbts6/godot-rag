@@ -16,9 +16,9 @@
 
 - [x] 2.1 在 `rst2md/rag/fusion.py` 加模块常量 `TUTORIAL_BOOST_FACTOR = 5.0`（初始值，待 eval 二分上调）
 - [x] 2.2 修改 `_rerank_bonus`（`fusion.py:49`）：当 `plan.doc_type_intent` 非空且 `result.doc_type == plan.doc_type_intent` 且 `not plan.symbol_candidates` 时，bonus 从 `+0.05` 改为 `result.score * (TUTORIAL_BOOST_FACTOR - 1)`
-- [ ] 2.3 同步修改 `_rerank_signals`（`fusion.py:62`）记录 `rerank.doc_type_intent` 信号的 weight 为新的 bonus 值（保持信号名不变，weight 跟随 bonus）
-- [ ] 2.4 修改 `rst2md/rag/query_rewrite.py` 的 `doc_type_boost`：tutorial intent 分支返回 0.0（保留函数签名与守卫逻辑，避免破坏 3 个 caller 与现有测试）
-- [ ] 2.5 更新 `rst2md/tests/test_searcher_module.py` 中 `doc_type_boost_prefers_tutorial_for_how_to_query` 测试，断言新返回值为 0.0；新增测试断言 `_rerank_bonus` 对 tutorial 命中返回 `result.score * (TUTORIAL_BOOST_FACTOR - 1)`
+- [x] 2.3 同步修改 `_rerank_signals`（`fusion.py:62`）记录 `rerank.doc_type_intent` 信号的 weight 为新的 bonus 值（保持信号名不变，weight 跟随 bonus）
+- [x] 2.4 修改 `rst2md/rag/query_rewrite.py` 的 `doc_type_boost`：tutorial intent 分支返回 0.0（保留函数签名与守卫逻辑，避免破坏 3 个 caller 与现有测试）
+- [x] 2.5 更新 `rst2md/tests/test_searcher_module.py` 中 `doc_type_boost_prefers_tutorial_for_how_to_query` 测试，断言新返回值为 0.0；新增测试断言 `_rerank_bonus` 对 tutorial 命中返回 `result.score * (TUTORIAL_BOOST_FACTOR - 1)`
 - [ ] 2.6 跑 `uv run pytest -q rst2md/tests/` 全套不回归
 - [ ] 2.7 跑 `uv run godot-rag eval-search`，factor=5.0 时若两个 tutorial 查询未达 rank ≤5，把 factor 上调到 10.0 重跑；仍未达则上调到 20.0；找到最小可行值后向下微调（如 15.0、12.0）。把最终值写入 `fusion.py` 常量与 spec 注释
 - [ ] 2.8 把 eval 输出存为 `docs/search-quality/loop-2-stage-B.json`
