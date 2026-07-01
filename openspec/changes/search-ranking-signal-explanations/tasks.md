@@ -23,6 +23,6 @@
 
 ## 5. Verification
 
-- [ ] 5.1 Add focused tests for symbol, FTS fallback, hybrid/RRF, graph expansion, and rerank explanations.
-- [ ] 5.2 Run focused searcher, CLI, and search evaluation tests.
-- [ ] 5.3 Run the broader pytest suite if focused tests pass and runtime is practical.
+- [x] 5.1 Add focused tests for symbol, FTS fallback, hybrid/RRF, graph expansion, and rerank explanations.
+- [x] 5.2 Run focused searcher, CLI, and search evaluation tests.
+- [x] 5.3 Run the broader pytest suite if focused tests pass and runtime is practical.

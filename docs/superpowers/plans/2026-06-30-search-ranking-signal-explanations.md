@@ -1333,7 +1333,7 @@ Then check off OpenSpec `4.1`, `4.2` in `openspec/changes/search-ranking-signal-
 - Consumes: all signal names defined in Global Constraints, produced by Tasks 2-6.
 - Produces: a single end-to-end coverage test asserting that, across a small set of real `search_database()` queries, every signal family appears on at least one result. This is the OpenSpec 5.1 acceptance gate; it complements (does not replace) the per-task TDD tests.
 
-- [ ] **Step 1: Write the consolidated coverage test**
+- [x] **Step 1: Write the consolidated coverage test**
 
 Append to `rst2md/tests/test_rag_search.py`:
 
@@ -1412,22 +1412,22 @@ class RankingSignalCoverageTests(unittest.TestCase):
         self.assertIn("rerank.addon_intent", names)
 ```
 
-- [ ] **Step 2: Run the coverage test**
+- [x] **Step 2: Run the coverage test**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::RankingSignalCoverageTests -v`
 Expected: PASS (2 tests). If `test_all_signal_families_observable` reports a missing family, inspect the corresponding stage in `rst2md/rag/searcher.py` and confirm the signal name matches Global Constraints exactly.
 
-- [ ] **Step 3: Run focused searcher + CLI + search-eval suites (OpenSpec 5.2)**
+- [x] **Step 3: Run focused searcher + CLI + search-eval suites (OpenSpec 5.2)**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py rst2md/tests/test_searcher_module.py rst2md/tests/test_search_eval.py -q`
 Expected: PASS. The search-eval suite confirms `result_matches` / `_result_to_observed` (`rst2md/rag/search_eval.py:178-200`) still see the existing `SearchResult` fields — the additive `ranking_signals` field does not affect observed-dict shape.
 
-- [ ] **Step 4: Run the broader pytest suite (OpenSpec 5.3)**
+- [x] **Step 4: Run the broader pytest suite (OpenSpec 5.3)**
 
 Run: `uv run pytest -q`
 Expected: PASS (or only pre-existing failures unrelated to ranking signals). If runtime is impractical, fall back to the focused set from Step 3 and record the broader-suite result in the task notes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add rst2md/tests/test_rag_search.py
