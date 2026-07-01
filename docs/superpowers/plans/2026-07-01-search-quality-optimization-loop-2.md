@@ -530,7 +530,7 @@ git commit -m "chore(eval): lock loop-2 stage-B baseline (tutorial floor boost)"
 
 ### Task B.7: B 段验收
 
-- [ ] **Step 1: 核对指标**
+- [x] **Step 1: 核对指标**
 
 ```bash
 uv run python -c "
@@ -548,7 +548,7 @@ Expected:
 - tutorial 类 hit@5 从 71% 提升到 100%
 - A 段通过的查询不回归（与 `loop-2-stage-A.json` 对比）
 
-- [ ] **Step 2: 回归检查**
+- [x] **Step 2: 回归检查**
 
 若 32 原通过查询有 ≥1 退出 → 回滚 FLOOR/FACTOR 到上一组可行值，或回到 design 补"高分 tutorial overshoot"决策。
 
@@ -926,7 +926,7 @@ git commit -m "chore(eval): lock loop-2 stage-C baseline (inherits traversal)"
 
 ### Task C.9: C 段验收
 
-- [ ] **Step 1: 核对指标**
+- [x] **Step 1: 核对指标**
 
 ```bash
 uv run python -c "
@@ -944,7 +944,7 @@ Expected:
 - class 类 hit@5 保持 100%
 - A/B 段通过的查询不回归（与 `loop-2-stage-B.json` 对比）
 
-- [ ] **Step 2: 回归检查**
+- [x] **Step 2: 回归检查**
 
 若有 ≥1 退出 → 检查 `inheritance_intent` 是否在非继承查询上误亮（如 `extends` 误判），回到 Task C.4 关键词集。
 
