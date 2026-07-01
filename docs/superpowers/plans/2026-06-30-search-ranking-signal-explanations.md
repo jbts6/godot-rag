@@ -463,7 +463,7 @@ Then check off OpenSpec `2.1` in `openspec/changes/search-ranking-signal-explana
 - Consumes: `_make_result(..., ranking_signals=...)`, `_record_signal`, `RankingSignal` (from Task 2).
 - Produces: `hybrid.rrf` signal (weight = scaled RRF score, `details={"scale": 40.0}`) recorded when RRF introduces/improves a candidate; `fts.bm25` signal (weight = scaled FTS score, `details={}`) recorded when FTS introduces/improves a candidate. Prior signals are preserved when RRF or FTS replaces an entry (OpenSpec 2.4 for the RRF→symbol-recall replacement chain).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `rst2md/tests/test_rag_search.py`:
 
@@ -552,12 +552,12 @@ class HybridRrfSignalTests(unittest.TestCase):
             self.assertIn("symbol_recall.exact", names)
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::HybridRrfSignalTests -v`
 Expected: FAIL — no `hybrid.rrf` or `fts.bm25` signals are recorded yet (RRF/FTS still use the old `_make_result(row, score)` form producing empty signal lists).
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Edit `rst2md/rag/searcher.py`.
 
@@ -627,17 +627,17 @@ with:
                     )
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::HybridRrfSignalTests -v`
 Expected: PASS (3 tests).
 
-- [ ] **Step 5: Run regression**
+- [x] **Step 5: Run regression**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py rst2md/tests/test_searcher_module.py -q`
 Expected: PASS. Hybrid/RRF tests (`test_rrf_fusion_basic`, `test_cli_search_debug_json_includes_metadata`) still pass — score math unchanged.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py

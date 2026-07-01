@@ -7,7 +7,7 @@
 ## 2. Search Signal Recording
 
 - [x] 2.1 Record symbol recall signals for exact, suffix, prefix, and alias-derived matches.
-- [ ] 2.2 Record hybrid/RRF and FTS scoring signals during candidate assembly.
+- [x] 2.2 Record hybrid/RRF and FTS scoring signals during candidate assembly.
 - [ ] 2.3 Record graph expansion signals including relation type and distance.
 - [ ] 2.4 Preserve accumulated signals when later ranking stages improve an existing candidate.
 
