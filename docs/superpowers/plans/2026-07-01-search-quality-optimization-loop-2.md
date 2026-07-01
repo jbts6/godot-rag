@@ -373,7 +373,7 @@ Expected: 4 FAIL（`TUTORIAL_SCORE_FLOOR` 不存在 / `doc_type_boost` 仍返回
 
 ### Task B.2: 加双常量 + 地板公式实现（Green）
 
-- [ ] **Step 1: 修改 `rst2md/rag/fusion.py`**
+- [x] **Step 1: 修改 `rst2md/rag/fusion.py`**
 
 在文件顶部 import 之后加常量：
 
