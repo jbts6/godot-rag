@@ -910,14 +910,14 @@ Expected: 全部 PASS
 
 ### Task C.8: 跑 eval 锁定 C 段增量
 
-- [ ] **Step 1: 跑 38 查询 eval**
+- [x] **Step 1: 跑 38 查询 eval**
 
 ```bash
 uv run godot-rag eval-search > /tmp/loop2-stageC.json
 cp /tmp/loop2-stageC.json docs/search-quality/loop-2-stage-C.json
 ```
 
-- [ ] **Step 2: Commit 基线**
+- [x] **Step 2: Commit 基线**
 
 ```bash
 git add docs/search-quality/loop-2-stage-C.json
@@ -968,7 +968,7 @@ Expected: 全部 PASS，无 FAILED
 
 ### Task 4.2: 跑最终 eval
 
-- [ ] **Step 1: 跑 38 查询 eval**
+- [x] **Step 1: 跑 38 查询 eval**
 
 ```bash
 uv run godot-rag eval-search > /tmp/loop2-final.json

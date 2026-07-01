@@ -34,7 +34,7 @@
 - [x] 3.6 在 `rst2md/rag/searcher.py` `_search_database_impl` 图扩展段（line 310-352 之后）加定向 inherits 遍历分支：当 `plan.inheritance_intent` 为 True 时，对 top-K 中每个 `chunk_type == "class_summary"` 的结果，跑 `SELECT c.*, r.relation, r.weight FROM chunk_relations r JOIN chunks c ON c.id = r.target_id WHERE r.source_id = ? AND r.relation = 'inherits'`，把命中 chunk 加入 results，score = `result.score * 0.7`，记录 `graph.inherits` 信号
 - [x] 3.7 在 `rst2md/tests/test_rag_search.py` 加端到端测试：建小型 fixture DB（含 Node class_summary + Object class_summary + 继承边），搜索 `Node inherits Object`，断言 Object class_summary 出现在结果中且 rank ≤5
 - [x] 3.8 跑 `uv run pytest -q rst2md/tests/` 全套不回归
-- [ ] 3.9 跑 `uv run godot-rag eval-search`，把输出存为 `docs/search-quality/loop-2-stage-C.json`
+- [x] 3.9 跑 `uv run godot-rag eval-search`，把输出存为 `docs/search-quality/loop-2-stage-C.json`
 - [ ] 3.10 验证 `Node inherits Object` 命中 rank ≤5；class 类 hit@5 保持 100%；A/B 段通过的查询不回归
 
 ## 4. 收尾验证
