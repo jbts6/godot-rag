@@ -705,7 +705,7 @@ Expected: 6 FAIL（`_inheritance_intent` 不存在 → ImportError）
 
 ### Task C.4: 实现 `_inheritance_intent` + `QueryPlan.inheritance_intent`（Green）
 
-- [ ] **Step 1: 在 `rst2md/rag/query_plan.py` 加函数**
+- [x] **Step 1: 在 `rst2md/rag/query_plan.py` 加函数**
 
 在 `_addon_intent` 之后加：
 
@@ -723,7 +723,7 @@ def _inheritance_intent(query: str) -> bool:
 
 注意：`re` 需在文件顶部 import（加 `import re`）。关键词 **4 个**，不含 `extends`。
 
-- [ ] **Step 2: 在 `QueryPlan` dataclass 加字段**
+- [x] **Step 2: 在 `QueryPlan` dataclass 加字段**
 
 在 `addon_intent` 字段之后加：
 
@@ -731,7 +731,7 @@ def _inheritance_intent(query: str) -> bool:
     inheritance_intent: bool
 ```
 
-- [ ] **Step 3: `build_query_plan` 填充新字段**
+- [x] **Step 3: `build_query_plan` 填充新字段**
 
 ```python
 def build_query_plan(query: str) -> QueryPlan:
@@ -755,7 +755,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py::InheritanceIntentTests -v
 
 Expected: 6 PASS
 
-- [ ] **Step 5: 跑现有 query_plan 测试确认无回归**
+- [x] **Step 5: 跑现有 query_plan 测试确认无回归**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py -k query_plan -v
@@ -763,7 +763,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py -k query_plan -v
 
 Expected: 全部 PASS（注意：`QueryPlan` 是 frozen dataclass，新增字段后所有直接构造 `QueryPlan(...)` 的测试需补 `inheritance_intent` 参数 — 检查 `test_rerank_bonus_equals_signal_weight_sum_doc_type_intent` 等是否直接构造 QueryPlan，若是则补 `inheritance_intent=False`）
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/query_plan.py rst2md/tests/test_searcher_module.py
