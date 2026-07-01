@@ -1,39 +1,39 @@
 {
   "overall": {
     "count": 38,
-    "hit@1": 0.5526315789473685,
-    "hit@3": 0.6578947368421053,
-    "hit@5": 0.6842105263157895,
-    "mrr@5": 0.594298245614035
+    "hit@1": 0.7631578947368421,
+    "hit@3": 0.868421052631579,
+    "hit@5": 0.8947368421052632,
+    "mrr@5": 0.8048245614035088
   },
   "categories": {
     "addon": {
       "count": 0,
-      "hit@1": 0,
-      "hit@3": 0,
-      "hit@5": 0,
-      "mrr@5": 0
+      "hit@1": 0.0,
+      "hit@3": 0.0,
+      "hit@5": 0.0,
+      "mrr@5": 0.0
     },
     "class": {
       "count": 18,
-      "hit@1": 0.7777777777777778,
-      "hit@3": 0.8888888888888888,
-      "hit@5": 0.9444444444444444,
-      "mrr@5": 0.8287037037037037
+      "hit@1": 0.8333333333333334,
+      "hit@3": 0.9444444444444444,
+      "hit@5": 1.0,
+      "mrr@5": 0.8842592592592593
     },
     "engine": {
       "count": 3,
       "hit@1": 0.6666666666666666,
-      "hit@3": 1,
-      "hit@5": 1,
+      "hit@3": 1.0,
+      "hit@5": 1.0,
       "mrr@5": 0.7777777777777777
     },
     "symbol": {
       "count": 10,
-      "hit@1": 0.1,
-      "hit@3": 0.1,
-      "hit@5": 0.1,
-      "mrr@5": 0.1
+      "hit@1": 0.8,
+      "hit@3": 0.8,
+      "hit@5": 0.8,
+      "mrr@5": 0.8
     },
     "tutorial": {
       "count": 7,
@@ -44,454 +44,6 @@
     }
   },
   "failures": [
-    {
-      "id": "node-add-child-symbol",
-      "query": "Node.add_child",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Node.add_child"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 39.15238796080488,
-          "path": "classes/class_button.md",
-          "symbol": "Button",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Button"
-        },
-        {
-          "rank": 2,
-          "score": 39.073148543855865,
-          "path": "classes/class_spinbox.md",
-          "symbol": "SpinBox",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "SpinBox"
-        },
-        {
-          "rank": 3,
-          "score": 38.5873342022285,
-          "path": "getting_started/first_2d_game/05.the_main_game_scene.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Main script"
-        },
-        {
-          "rank": 4,
-          "score": 38.28650911265171,
-          "path": "tutorials/best_practices/scene_organization.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "How to build relationships effectively"
-        },
-        {
-          "rank": 5,
-          "score": 38.257705713655774,
-          "path": "tutorials/scripting/singletons_autoload.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Creating the script"
-        },
-        {
-          "rank": 6,
-          "score": 38.23166432905963,
-          "path": "tutorials/plugins/editor/making_main_screen_plugins.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Update the plugin script"
-        },
-        {
-          "rank": 7,
-          "score": 38.18906161199965,
-          "path": "getting_started/first_3d_game/08.score_and_replay.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Adding music"
-        },
-        {
-          "rank": 8,
-          "score": 38.14157124641399,
-          "path": "tutorials/plugins/editor/inspector_plugins.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "A guard against internal changes when the property is updated."
-        },
-        {
-          "rank": 9,
-          "score": 38.02825364894068,
-          "path": "tutorials/io/saving_games.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "is path independent."
-        },
-        {
-          "rank": 10,
-          "score": 37.94049944405159,
-          "path": "tutorials/io/runtime_file_loading_and_saving.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "`GLTFDocument.generate_buffer()` is also available for saving to memory."
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "timer-start-symbol",
-      "query": "Timer.start",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.start"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 39.84577814249497,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings.settings_changed",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 2,
-          "score": 39.65391715238735,
-          "path": "classes/class_os.md",
-          "symbol": "OS",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "OS"
-        },
-        {
-          "rank": 3,
-          "score": 38.45311430828677,
-          "path": "addons/statecharts/addons/gut/input_sender.gd",
-          "symbol": "input_sender",
-          "doc_type": "addon",
-          "addon": "statecharts",
-          "heading": "input_sender.gd"
-        },
-        {
-          "rank": 4,
-          "score": 38.120538318302536,
-          "path": "addons/gdUnit4/addons/gdUnit4/src/core/execution/GdUnitExecutionContext.gd",
-          "symbol": "GdUnitExecutionContext",
-          "doc_type": "addon",
-          "addon": "gdUnit4",
-          "heading": "GdUnitExecutionContext.gd"
-        },
-        {
-          "rank": 5,
-          "score": 38.08202498117125,
-          "path": "getting_started/first_2d_game/06.heads_up_display.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Heads up display"
-        },
-        {
-          "rank": 6,
-          "score": 38.0158751832687,
-          "path": "addons/doctor/.github/README.md",
-          "symbol": "",
-          "doc_type": "addon",
-          "addon": "doctor",
-          "heading": "Running Godot Doctor on the CLI"
-        },
-        {
-          "rank": 7,
-          "score": 37.895014341698364,
-          "path": "getting_started/first_3d_game/08.score_and_replay.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Adding music"
-        },
-        {
-          "rank": 8,
-          "score": 37.71042019666004,
-          "path": "getting_started/first_3d_game/05.spawning_mobs.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Spawning monsters randomly"
-        },
-        {
-          "rank": 9,
-          "score": 37.67362036415165,
-          "path": "tutorials/inputs/controller_features.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Gyroscope"
-        },
-        {
-          "rank": 10,
-          "score": 19.922889071247486,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "ProjectSettings"
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "timer-stop-symbol",
-      "query": "Timer.stop",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Timer.stop"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 39.87795138395498,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings.settings_changed",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 2,
-          "score": 19.93897569197749,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "ProjectSettings"
-        },
-        {
-          "rank": 3,
-          "score": 11.963385415186494,
-          "path": "classes/class_displayserver.md",
-          "symbol": "DisplayServer.screen_get_refresh_rate",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 4,
-          "score": 11.963385415186494,
-          "path": "classes/class_node.md",
-          "symbol": "Node.reset_physics_interpolation",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
-        },
-        {
-          "rank": 5,
-          "score": 9.969487845988745,
-          "path": "classes/class_heightmapshape3d.md",
-          "symbol": "HeightMapShape3D",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "HeightMapShape3D"
-        },
-        {
-          "rank": 6,
-          "score": 9.969487845988745,
-          "path": "classes/class_vector3.md",
-          "symbol": "Vector3",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Vector3"
-        },
-        {
-          "rank": 7,
-          "score": 3.333333333333333,
-          "path": "classes/class_timer.md",
-          "symbol": "Timer.stop",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 8,
-          "score": 1.3008989952406136,
-          "path": "classes/class_timer.md",
-          "symbol": "Timer.is_one_shot",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Property Descriptions"
-        },
-        {
-          "rank": 9,
-          "score": 1.242176215695715,
-          "path": "classes/class_timer.md",
-          "symbol": "Timer.is_paused",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Property Descriptions"
-        },
-        {
-          "rank": 10,
-          "score": 0.6557377049180328,
-          "path": "tutorials/best_practices/godot_notifications.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "every frame (or even every fixed frame)."
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "object-emit-signal-symbol",
-      "query": "Object.emit_signal",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Object.emit_signal"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 38.634681758230975,
-          "path": "tutorials/best_practices/scene_organization.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "How to build relationships effectively"
-        },
-        {
-          "rank": 2,
-          "score": 9.658670439557744,
-          "path": "classes/class_object.md",
-          "symbol": "Object",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Object"
-        },
-        {
-          "rank": 3,
-          "score": 9.658670439557744,
-          "path": "classes/class_node.md",
-          "symbol": "Node",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Node"
-        },
-        {
-          "rank": 4,
-          "score": 9.658670439557744,
-          "path": "classes/class_packedstringarray.md",
-          "symbol": "PackedStringArray",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "PackedStringArray"
-        },
-        {
-          "rank": 5,
-          "score": 9.658670439557744,
-          "path": "classes/class_script.md",
-          "symbol": "Script",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Script"
-        },
-        {
-          "rank": 6,
-          "score": 9.658670439557744,
-          "path": "classes/class_area2d.md",
-          "symbol": "Area2D",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Area2D"
-        },
-        {
-          "rank": 7,
-          "score": 6.211293260473589,
-          "path": "classes/class_object.md",
-          "symbol": "Object.emit_signal",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 8,
-          "score": 1.2711223203026485,
-          "path": "addons/gdUnit4/documentation/doc/_advanced_testing/signals.md",
-          "symbol": "",
-          "doc_type": "addon",
-          "addon": "gdUnit4",
-          "heading": "Monitor Signals"
-        },
-        {
-          "rank": 9,
-          "score": 1.242176215695715,
-          "path": "classes/class_object.md",
-          "symbol": "Object.set_block_signals",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
-        },
-        {
-          "rank": 10,
-          "score": 1.2146118721461188,
-          "path": "classes/class_object.md",
-          "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Constants"
-        }
-      ],
-      "diagnostics": null
-    },
     {
       "id": "scene-tree-tutorial",
       "query": "scene tree tutorial",
@@ -541,29 +93,29 @@
         {
           "rank": 4,
           "score": 9.915132114689747,
-          "path": "classes/class_string.md",
-          "symbol": "String",
+          "path": "classes/class_node2d.md",
+          "symbol": "Node2D",
           "doc_type": "class",
           "addon": "",
-          "heading": "String"
+          "heading": "Node2D"
         },
         {
           "rank": 5,
+          "score": 9.915132114689747,
+          "path": "classes/class_array.md",
+          "symbol": "Array",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Array"
+        },
+        {
+          "rank": 6,
           "score": 9.915132114689747,
           "path": "classes/class_window.md",
           "symbol": "Window",
           "doc_type": "class",
           "addon": "",
           "heading": "Window"
-        },
-        {
-          "rank": 6,
-          "score": 9.915132114689747,
-          "path": "classes/class_object.md",
-          "symbol": "Object",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Object"
         },
         {
           "rank": 7,
@@ -600,118 +152,6 @@
           "doc_type": "tutorial",
           "addon": "",
           "heading": "Nodes and Scenes"
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "child-node-attach",
-      "query": "child node attach",
-      "category": "class",
-      "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Node.add_child"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 39.15238796080488,
-          "path": "classes/class_button.md",
-          "symbol": "Button",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Button"
-        },
-        {
-          "rank": 2,
-          "score": 39.073148543855865,
-          "path": "classes/class_spinbox.md",
-          "symbol": "SpinBox",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "SpinBox"
-        },
-        {
-          "rank": 3,
-          "score": 38.5873342022285,
-          "path": "getting_started/first_2d_game/05.the_main_game_scene.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Main script"
-        },
-        {
-          "rank": 4,
-          "score": 38.28650911265171,
-          "path": "tutorials/best_practices/scene_organization.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "How to build relationships effectively"
-        },
-        {
-          "rank": 5,
-          "score": 38.257705713655774,
-          "path": "tutorials/scripting/singletons_autoload.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Creating the script"
-        },
-        {
-          "rank": 6,
-          "score": 38.23166432905963,
-          "path": "tutorials/plugins/editor/making_main_screen_plugins.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Update the plugin script"
-        },
-        {
-          "rank": 7,
-          "score": 38.14157124641399,
-          "path": "tutorials/plugins/editor/inspector_plugins.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "A guard against internal changes when the property is updated."
-        },
-        {
-          "rank": 8,
-          "score": 38.02825364894068,
-          "path": "tutorials/io/saving_games.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "is path independent."
-        },
-        {
-          "rank": 9,
-          "score": 37.94049944405159,
-          "path": "tutorials/io/runtime_file_loading_and_saving.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "`GLTFDocument.generate_buffer()` is also available for saving to memory."
-        },
-        {
-          "rank": 10,
-          "score": 37.7294637081801,
-          "path": "tutorials/best_practices/godot_notifications.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "every frame (or even every fixed frame)."
         }
       ],
       "diagnostics": null
@@ -1053,118 +493,6 @@
       "diagnostics": null
     },
     {
-      "id": "animationplayer-play",
-      "query": "AnimationPlayer.play",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "AnimationPlayer.play"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 39.75589373950324,
-          "path": "classes/class_editorsettings.md",
-          "symbol": "EditorSettings.NOTIFICATION_EDITOR_SETTINGS_CHANGED",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 2,
-          "score": 39.65923112961751,
-          "path": "classes/class_springbonesimulator3d.md",
-          "symbol": "SpringBoneSimulator3D",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "SpringBoneSimulator3D"
-        },
-        {
-          "rank": 3,
-          "score": 39.36106909823672,
-          "path": "tutorials/migrating/upgrading_to_godot_4.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Updating scripts to take backwards-incompatible changes into account"
-        },
-        {
-          "rank": 4,
-          "score": 38.959985558750695,
-          "path": "classes/class_animation.md",
-          "symbol": "Animation",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Animation"
-        },
-        {
-          "rank": 5,
-          "score": 38.066583563901865,
-          "path": "engine_details/file_formats/tscn.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Animation"
-        },
-        {
-          "rank": 6,
-          "score": 37.96179285995131,
-          "path": "addons/limboai/demo/demo/agents/player/states/attack_state.gd",
-          "symbol": "addons/limboai/demo/demo/agents/player/states/attack_state.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "attack_state.gd"
-        },
-        {
-          "rank": 7,
-          "score": 37.68934414883049,
-          "path": "getting_started/first_3d_game/09.adding_animations.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Using the animation editor"
-        },
-        {
-          "rank": 8,
-          "score": 37.4818944118705,
-          "path": "addons/limboai/demo/demo/agents/scripts/agent_base.gd",
-          "symbol": "addons/limboai/demo/demo/agents/scripts/agent_base.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "agent_base.gd"
-        },
-        {
-          "rank": 9,
-          "score": 37.37269378884241,
-          "path": "addons/limboai/demo/demo/agents/player/states/dodge_state.gd",
-          "symbol": "addons/limboai/demo/demo/agents/player/states/dodge_state.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "dodge_state.gd"
-        },
-        {
-          "rank": 10,
-          "score": 37.18089782431549,
-          "path": "tutorials/animation/creating_movies.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Quitting Movie Maker mode"
-        }
-      ],
-      "diagnostics": null
-    },
-    {
       "id": "resource-loader",
       "query": "ResourceLoader.load",
       "category": "symbol",
@@ -1272,230 +600,6 @@
           "doc_type": "tutorial",
           "addon": "",
           "heading": "Change scenes manually"
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "input-is-action-pressed",
-      "query": "Input.is_action_pressed",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Input.is_action_pressed"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 38.77087588054909,
-          "path": "getting_started/first_3d_game/08.score_and_replay.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Adding music"
-        },
-        {
-          "rank": 2,
-          "score": 37.60597204600833,
-          "path": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
-          "symbol": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "ExampleBalloon.cs"
-        },
-        {
-          "rank": 3,
-          "score": 37.25959861149888,
-          "path": "tutorials/physics/using_character_body_2d.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Bouncing/reflecting"
-        },
-        {
-          "rank": 4,
-          "score": 36.946746585391516,
-          "path": "tutorials/2d/2d_sprite_animation.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Controlling an AnimationPlayer animation"
-        },
-        {
-          "rank": 5,
-          "score": 36.83647490924195,
-          "path": "getting_started/first_2d_game/03.coding_the_player.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Coding the player"
-        },
-        {
-          "rank": 6,
-          "score": 36.8190433214727,
-          "path": "tutorials/physics/kinematic_character_2d.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Moving the kinematic character"
-        },
-        {
-          "rank": 7,
-          "score": 36.63282347530644,
-          "path": "getting_started/first_3d_game/03.player_movement_code.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "The downward acceleration when in the air, in meters per second squared."
-        },
-        {
-          "rank": 8,
-          "score": 36.57895069580001,
-          "path": "getting_started/first_3d_game/08.score_and_replay.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Coding the retry option"
-        },
-        {
-          "rank": 9,
-          "score": 36.44031884890356,
-          "path": "tutorials/inputs/inputevent.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "What is it?"
-        },
-        {
-          "rank": 10,
-          "score": 36.3673655881229,
-          "path": "getting_started/step_by_step/scripting_player_input.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Listening to player input"
-        }
-      ],
-      "diagnostics": null
-    },
-    {
-      "id": "control-grab-focus",
-      "query": "Control.grab_focus",
-      "category": "symbol",
-      "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
-      "report_only": false,
-      "graph_changed": false,
-      "expected": {
-        "paths": [],
-        "symbols": [
-          "Control.grab_focus"
-        ],
-        "doc_types": [],
-        "addons": []
-      },
-      "observed": [
-        {
-          "rank": 1,
-          "score": 36.74565951034749,
-          "path": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
-          "symbol": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "ExampleBalloon.cs"
-        },
-        {
-          "rank": 2,
-          "score": 9.186414877586872,
-          "path": "addons/dialogue_manager/addons/dialogue_manager/nodes/dialogue_label/dialogue_label.gd",
-          "symbol": "DialogueLabel",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "dialogue_label.gd"
-        },
-        {
-          "rank": 3,
-          "score": 9.186414877586872,
-          "path": "addons/phantom-camera/addons/phantom_camera/scripts/resources/TweenDirectorResource.cs",
-          "symbol": "Type",
-          "doc_type": "addon",
-          "addon": "phantom-camera",
-          "heading": "TweenDirectorResource.cs"
-        },
-        {
-          "rank": 4,
-          "score": 9.186414877586872,
-          "path": "classes/class_float.md",
-          "symbol": "float",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "float"
-        },
-        {
-          "rank": 5,
-          "score": 9.186414877586872,
-          "path": "addons/dialogue_manager/addons/dialogue_manager/dialogue_line.gd",
-          "symbol": "DialogueLine",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "dialogue_line.gd"
-        },
-        {
-          "rank": 6,
-          "score": 9.186414877586872,
-          "path": "classes/class_inputeventmousebutton.md",
-          "symbol": "InputEventMouseButton",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "InputEventMouseButton"
-        },
-        {
-          "rank": 7,
-          "score": 3.1579818031430937,
-          "path": "classes/class_control.md",
-          "symbol": "Control.grab_focus",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Remove the stylebox override."
-        },
-        {
-          "rank": 8,
-          "score": 1.290658339838668,
-          "path": "classes/class_control.md",
-          "symbol": "Control.get_focus_mode",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Property Descriptions"
-        },
-        {
-          "rank": 9,
-          "score": 1.280737704918033,
-          "path": "classes/class_control.md",
-          "symbol": "Control.FocusMode",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Enumerations"
-        },
-        {
-          "rank": 10,
-          "score": 1.2307692307692308,
-          "path": "tutorials/ui/gui_navigation.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Necessary code"
         }
       ],
       "diagnostics": null
@@ -1619,9 +723,9 @@
       "query": "Node.add_child",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1635,6 +739,24 @@
       "observed": [
         {
           "rank": 1,
+          "score": 102.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.add_child",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 3,
           "score": 39.15238796080488,
           "path": "classes/class_button.md",
           "symbol": "Button",
@@ -1643,7 +765,7 @@
           "heading": "Button"
         },
         {
-          "rank": 2,
+          "rank": 4,
           "score": 39.073148543855865,
           "path": "classes/class_spinbox.md",
           "symbol": "SpinBox",
@@ -1652,7 +774,7 @@
           "heading": "SpinBox"
         },
         {
-          "rank": 3,
+          "rank": 5,
           "score": 38.5873342022285,
           "path": "getting_started/first_2d_game/05.the_main_game_scene.md",
           "symbol": "",
@@ -1661,7 +783,7 @@
           "heading": "Main script"
         },
         {
-          "rank": 4,
+          "rank": 6,
           "score": 38.28650911265171,
           "path": "tutorials/best_practices/scene_organization.md",
           "symbol": "",
@@ -1670,7 +792,7 @@
           "heading": "How to build relationships effectively"
         },
         {
-          "rank": 5,
+          "rank": 7,
           "score": 38.257705713655774,
           "path": "tutorials/scripting/singletons_autoload.md",
           "symbol": "",
@@ -1679,7 +801,7 @@
           "heading": "Creating the script"
         },
         {
-          "rank": 6,
+          "rank": 8,
           "score": 38.23166432905963,
           "path": "tutorials/plugins/editor/making_main_screen_plugins.md",
           "symbol": "",
@@ -1688,7 +810,7 @@
           "heading": "Update the plugin script"
         },
         {
-          "rank": 7,
+          "rank": 9,
           "score": 38.18906161199965,
           "path": "getting_started/first_3d_game/08.score_and_replay.md",
           "symbol": "",
@@ -1697,31 +819,13 @@
           "heading": "Adding music"
         },
         {
-          "rank": 8,
+          "rank": 10,
           "score": 38.14157124641399,
           "path": "tutorials/plugins/editor/inspector_plugins.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "A guard against internal changes when the property is updated."
-        },
-        {
-          "rank": 9,
-          "score": 38.02825364894068,
-          "path": "tutorials/io/saving_games.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "is path independent."
-        },
-        {
-          "rank": 10,
-          "score": 37.94049944405159,
-          "path": "tutorials/io/runtime_file_loading_and_saving.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "`GLTFDocument.generate_buffer()` is also available for saving to memory."
         }
       ],
       "diagnostics": null
@@ -1731,9 +835,9 @@
       "query": "Timer.start",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1747,6 +851,15 @@
       "observed": [
         {
           "rank": 1,
+          "score": 102.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.start",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
           "score": 39.84577814249497,
           "path": "classes/class_projectsettings.md",
           "symbol": "ProjectSettings.settings_changed",
@@ -1755,7 +868,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 2,
+          "rank": 3,
           "score": 39.65391715238735,
           "path": "classes/class_os.md",
           "symbol": "OS",
@@ -1764,7 +877,7 @@
           "heading": "OS"
         },
         {
-          "rank": 3,
+          "rank": 4,
           "score": 38.45311430828677,
           "path": "addons/statecharts/addons/gut/input_sender.gd",
           "symbol": "input_sender",
@@ -1773,7 +886,7 @@
           "heading": "input_sender.gd"
         },
         {
-          "rank": 4,
+          "rank": 5,
           "score": 38.120538318302536,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/execution/GdUnitExecutionContext.gd",
           "symbol": "GdUnitExecutionContext",
@@ -1782,7 +895,7 @@
           "heading": "GdUnitExecutionContext.gd"
         },
         {
-          "rank": 5,
+          "rank": 6,
           "score": 38.08202498117125,
           "path": "getting_started/first_2d_game/06.heads_up_display.md",
           "symbol": "",
@@ -1791,7 +904,7 @@
           "heading": "Heads up display"
         },
         {
-          "rank": 6,
+          "rank": 7,
           "score": 38.0158751832687,
           "path": "addons/doctor/.github/README.md",
           "symbol": "",
@@ -1800,7 +913,7 @@
           "heading": "Running Godot Doctor on the CLI"
         },
         {
-          "rank": 7,
+          "rank": 8,
           "score": 37.895014341698364,
           "path": "getting_started/first_3d_game/08.score_and_replay.md",
           "symbol": "",
@@ -1809,7 +922,7 @@
           "heading": "Adding music"
         },
         {
-          "rank": 8,
+          "rank": 9,
           "score": 37.71042019666004,
           "path": "getting_started/first_3d_game/05.spawning_mobs.md",
           "symbol": "",
@@ -1818,22 +931,13 @@
           "heading": "Spawning monsters randomly"
         },
         {
-          "rank": 9,
+          "rank": 10,
           "score": 37.67362036415165,
           "path": "tutorials/inputs/controller_features.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "Gyroscope"
-        },
-        {
-          "rank": 10,
-          "score": 19.922889071247486,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "ProjectSettings"
         }
       ],
       "diagnostics": null
@@ -1843,9 +947,9 @@
       "query": "Timer.stop",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -1859,6 +963,15 @@
       "observed": [
         {
           "rank": 1,
+          "score": 102.0,
+          "path": "classes/class_timer.md",
+          "symbol": "Timer.stop",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
           "score": 39.87795138395498,
           "path": "classes/class_projectsettings.md",
           "symbol": "ProjectSettings.settings_changed",
@@ -1867,7 +980,16 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 2,
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_signal.md",
+          "symbol": "Signal",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signal"
+        },
+        {
+          "rank": 4,
           "score": 19.93897569197749,
           "path": "classes/class_projectsettings.md",
           "symbol": "ProjectSettings",
@@ -1876,7 +998,7 @@
           "heading": "ProjectSettings"
         },
         {
-          "rank": 3,
+          "rank": 5,
           "score": 11.963385415186494,
           "path": "classes/class_displayserver.md",
           "symbol": "DisplayServer.screen_get_refresh_rate",
@@ -1885,7 +1007,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 4,
+          "rank": 6,
           "score": 11.963385415186494,
           "path": "classes/class_node.md",
           "symbol": "Node.reset_physics_interpolation",
@@ -1894,34 +1016,25 @@
           "heading": "Stores the node's non-internal groups only (as an array of StringNames)."
         },
         {
-          "rank": 5,
-          "score": 9.969487845988745,
-          "path": "classes/class_heightmapshape3d.md",
-          "symbol": "HeightMapShape3D",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "HeightMapShape3D"
-        },
-        {
-          "rank": 6,
-          "score": 9.969487845988745,
-          "path": "classes/class_vector3.md",
-          "symbol": "Vector3",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Vector3"
-        },
-        {
           "rank": 7,
-          "score": 3.333333333333333,
-          "path": "classes/class_timer.md",
-          "symbol": "Timer.stop",
+          "score": 9.969487845988745,
+          "path": "classes/class_renderingserver.md",
+          "symbol": "RenderingServer.viewport_set_use_taa",
           "doc_type": "class",
           "addon": "",
           "heading": "Method Descriptions"
         },
         {
           "rank": 8,
+          "score": 9.969487845988745,
+          "path": "classes/class_renderingserver.md",
+          "symbol": "RenderingServer.viewport_set_sdf_oversize_and_scale",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 9,
           "score": 1.3008989952406136,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_one_shot",
@@ -1930,22 +1043,13 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 9,
+          "rank": 10,
           "score": 1.242176215695715,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_paused",
           "doc_type": "class",
           "addon": "",
           "heading": "Property Descriptions"
-        },
-        {
-          "rank": 10,
-          "score": 0.6557377049180328,
-          "path": "tutorials/best_practices/godot_notifications.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "every frame (or even every fixed frame)."
         }
       ],
       "diagnostics": null
@@ -1971,7 +1075,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 6.2146118721461185,
+          "score": 105.0,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_stopped",
           "doc_type": "class",
@@ -1980,6 +1084,15 @@
         },
         {
           "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_bool.md",
+          "symbol": "bool",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "bool"
+        },
+        {
+          "rank": 3,
           "score": 1.290658339838668,
           "path": "classes/class_timer.md",
           "symbol": "Timer.get_time_left",
@@ -1988,7 +1101,7 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 3,
+          "rank": 4,
           "score": 0.6666666666666666,
           "path": "classes/class_timer.md",
           "symbol": "Timer.stop",
@@ -1997,7 +1110,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 4,
+          "rank": 5,
           "score": 0.6557377049180328,
           "path": "classes/class_timer.md",
           "symbol": "Timer.start",
@@ -2006,7 +1119,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 5,
+          "rank": 6,
           "score": 0.6451612903225806,
           "path": "classes/class_tween.md",
           "symbol": "Tween.stop",
@@ -2015,7 +1128,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 6,
+          "rank": 7,
           "score": 0.6451612903225806,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_one_shot",
@@ -2024,7 +1137,7 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 7,
+          "rank": 8,
           "score": 0.6349206349206349,
           "path": "classes/class_inputeventmousemotion.md",
           "symbol": "InputEventMouseMotion",
@@ -2033,7 +1146,7 @@
           "heading": "InputEventMouseMotion"
         },
         {
-          "rank": 8,
+          "rank": 9,
           "score": 0.625,
           "path": "classes/class_projectsettings.md",
           "symbol": "ProjectSettings.settings_changed",
@@ -2042,22 +1155,13 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 9,
+          "rank": 10,
           "score": 0.625,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_paused",
           "doc_type": "class",
           "addon": "",
           "heading": "Property Descriptions"
-        },
-        {
-          "rank": 10,
-          "score": 0.6153846153846154,
-          "path": "classes/class_timer.md",
-          "symbol": "Timer.get_wait_time",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
         }
       ],
       "diagnostics": null
@@ -2067,9 +1171,9 @@
       "query": "Object.emit_signal",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -2083,16 +1187,16 @@
       "observed": [
         {
           "rank": 1,
-          "score": 38.634681758230975,
-          "path": "tutorials/best_practices/scene_organization.md",
-          "symbol": "",
-          "doc_type": "tutorial",
+          "score": 105.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object.emit_signal",
+          "doc_type": "class",
           "addon": "",
-          "heading": "How to build relationships effectively"
+          "heading": "Method Descriptions"
         },
         {
           "rank": 2,
-          "score": 9.658670439557744,
+          "score": 50.0,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -2101,15 +1205,42 @@
         },
         {
           "rank": 3,
-          "score": 9.658670439557744,
-          "path": "classes/class_node.md",
-          "symbol": "Node",
-          "doc_type": "class",
+          "score": 38.634681758230975,
+          "path": "tutorials/best_practices/scene_organization.md",
+          "symbol": "",
+          "doc_type": "tutorial",
           "addon": "",
-          "heading": "Node"
+          "heading": "How to build relationships effectively"
         },
         {
           "rank": 4,
+          "score": 25.0,
+          "path": "classes/class_stringname.md",
+          "symbol": "StringName",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "StringName"
+        },
+        {
+          "rank": 5,
+          "score": 25.0,
+          "path": "classes/class_gdscript.md",
+          "symbol": "GDScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDScript"
+        },
+        {
+          "rank": 6,
+          "score": 9.658670439557744,
+          "path": "addons/phantom-camera/addons/phantom_camera/scripts/panel/editor.gd",
+          "symbol": "editor",
+          "doc_type": "addon",
+          "addon": "phantom-camera",
+          "heading": "editor.gd"
+        },
+        {
+          "rank": 7,
           "score": 9.658670439557744,
           "path": "classes/class_packedstringarray.md",
           "symbol": "PackedStringArray",
@@ -2118,58 +1249,31 @@
           "heading": "PackedStringArray"
         },
         {
-          "rank": 5,
-          "score": 9.658670439557744,
-          "path": "classes/class_script.md",
-          "symbol": "Script",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Script"
-        },
-        {
-          "rank": 6,
-          "score": 9.658670439557744,
-          "path": "classes/class_area2d.md",
-          "symbol": "Area2D",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Area2D"
-        },
-        {
-          "rank": 7,
-          "score": 6.211293260473589,
-          "path": "classes/class_object.md",
-          "symbol": "Object.emit_signal",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
           "rank": 8,
+          "score": 9.658670439557744,
+          "path": "classes/class_collisionshape2d.md",
+          "symbol": "CollisionShape2D",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "CollisionShape2D"
+        },
+        {
+          "rank": 9,
+          "score": 9.658670439557744,
+          "path": "classes/class_string.md",
+          "symbol": "String",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "String"
+        },
+        {
+          "rank": 10,
           "score": 1.2711223203026485,
           "path": "addons/gdUnit4/documentation/doc/_advanced_testing/signals.md",
           "symbol": "",
           "doc_type": "addon",
           "addon": "gdUnit4",
           "heading": "Monitor Signals"
-        },
-        {
-          "rank": 9,
-          "score": 1.242176215695715,
-          "path": "classes/class_object.md",
-          "symbol": "Object.set_block_signals",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "The call order is player.gd -> Node2D -> Node -> Object."
-        },
-        {
-          "rank": 10,
-          "score": 1.2146118721461188,
-          "path": "classes/class_object.md",
-          "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Constants"
         }
       ],
       "diagnostics": null
@@ -2195,7 +1299,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_node.md",
           "symbol": "Node",
           "doc_type": "class",
@@ -2204,7 +1308,7 @@
         },
         {
           "rank": 2,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/dialogue_manager/addons/dialogue_manager/components/code_edit.gd",
           "symbol": "DMCodeEdit",
           "doc_type": "addon",
@@ -2213,7 +1317,7 @@
         },
         {
           "rank": 3,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/doctor/addons/godot_doctor/cli/primitives/godot_doctor_report_printer.gd",
           "symbol": "GodotDoctorReportPrinter",
           "doc_type": "addon",
@@ -2222,7 +1326,7 @@
         },
         {
           "rank": 4,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdObjects.gd",
           "symbol": "GdObjects",
           "doc_type": "addon",
@@ -2231,7 +1335,7 @@
         },
         {
           "rank": 5,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTools.gd",
           "symbol": "GdUnitTools",
           "doc_type": "addon",
@@ -2240,7 +1344,7 @@
         },
         {
           "rank": 6,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitOrphanNodesMonitor.gd",
           "symbol": "GdUnitOrphanNodesMonitor",
           "doc_type": "addon",
@@ -2249,7 +1353,7 @@
         },
         {
           "rank": 7,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/phantom-camera/addons/phantom_camera/scripts/phantom_camera_host/PhantomCameraHost.cs",
           "symbol": "InterpolationMode",
           "doc_type": "addon",
@@ -2258,7 +1362,7 @@
         },
         {
           "rank": 8,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_node.md",
           "symbol": "Node.get_node_or_null",
           "doc_type": "class",
@@ -2267,7 +1371,7 @@
         },
         {
           "rank": 9,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_node.md",
           "symbol": "Node.replacing_by",
           "doc_type": "class",
@@ -2276,7 +1380,7 @@
         },
         {
           "rank": 10,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_node.md",
           "symbol": "Node.editor_description_changed",
           "doc_type": "class",
@@ -2307,7 +1411,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_timer.md",
           "symbol": "Timer",
           "doc_type": "class",
@@ -2316,7 +1420,7 @@
         },
         {
           "rank": 2,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/dialogue_manager/addons/dialogue_manager/components/update_button.gd",
           "symbol": "update_button",
           "doc_type": "addon",
@@ -2325,7 +1429,7 @@
         },
         {
           "rank": 3,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/doctor/addons/godot_doctor/godot_doctor_plugin.gd",
           "symbol": "GodotDoctorPlugin",
           "doc_type": "addon",
@@ -2334,7 +1438,7 @@
         },
         {
           "rank": 4,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/GdUnitAwaiter.gd",
           "symbol": "GdUnitAwaiter",
           "doc_type": "addon",
@@ -2343,7 +1447,7 @@
         },
         {
           "rank": 5,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/asserts/GdUnitFuncAssertImpl.gd",
           "symbol": "GdUnitFuncAssertImpl",
           "doc_type": "addon",
@@ -2352,7 +1456,7 @@
         },
         {
           "rank": 6,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/asserts/GdUnitSignalAssertImpl.gd",
           "symbol": "GdUnitSignalAssertImpl",
           "doc_type": "addon",
@@ -2361,7 +1465,7 @@
         },
         {
           "rank": 7,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitSignalAwaiter.gd",
           "symbol": "GdUnitSignalAwaiter",
           "doc_type": "addon",
@@ -2370,7 +1474,7 @@
         },
         {
           "rank": 8,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTools.gd",
           "symbol": "GdUnitTools",
           "doc_type": "addon",
@@ -2379,7 +1483,7 @@
         },
         {
           "rank": 9,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/command/GdUnitCommandHandler.gd",
           "symbol": "GdUnitCommandHandler",
           "doc_type": "addon",
@@ -2388,7 +1492,7 @@
         },
         {
           "rank": 10,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_timer.md",
           "symbol": "Timer.get_timer_process_callback",
           "doc_type": "class",
@@ -2419,7 +1523,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -2428,7 +1532,7 @@
         },
         {
           "rank": 2,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/statecharts/addons/gut/signal_watcher.gd",
           "symbol": "signal_watcher",
           "doc_type": "addon",
@@ -2437,7 +1541,7 @@
         },
         {
           "rank": 3,
-          "score": 100,
+          "score": 100.0,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdUnitExpressionRunner.gd",
           "symbol": "GdUnitExpressionRunner",
           "doc_type": "addon",
@@ -2446,7 +1550,7 @@
         },
         {
           "rank": 4,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
           "doc_type": "class",
@@ -2455,7 +1559,7 @@
         },
         {
           "rank": 5,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.to_string",
           "doc_type": "class",
@@ -2464,7 +1568,7 @@
         },
         {
           "rank": 6,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.property_list_changed",
           "doc_type": "class",
@@ -2473,7 +1577,7 @@
         },
         {
           "rank": 7,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.script_changed",
           "doc_type": "class",
@@ -2482,7 +1586,7 @@
         },
         {
           "rank": 8,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_DEFERRED",
           "doc_type": "class",
@@ -2491,7 +1595,7 @@
         },
         {
           "rank": 9,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_PERSIST",
           "doc_type": "class",
@@ -2500,7 +1604,7 @@
         },
         {
           "rank": 10,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_ONE_SHOT",
           "doc_type": "class",
@@ -2559,29 +1663,29 @@
         {
           "rank": 4,
           "score": 9.915132114689747,
-          "path": "classes/class_string.md",
-          "symbol": "String",
+          "path": "classes/class_node2d.md",
+          "symbol": "Node2D",
           "doc_type": "class",
           "addon": "",
-          "heading": "String"
+          "heading": "Node2D"
         },
         {
           "rank": 5,
+          "score": 9.915132114689747,
+          "path": "classes/class_array.md",
+          "symbol": "Array",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Array"
+        },
+        {
+          "rank": 6,
           "score": 9.915132114689747,
           "path": "classes/class_window.md",
           "symbol": "Window",
           "doc_type": "class",
           "addon": "",
           "heading": "Window"
-        },
-        {
-          "rank": 6,
-          "score": 9.915132114689747,
-          "path": "classes/class_object.md",
-          "symbol": "Object",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Object"
         },
         {
           "rank": 7,
@@ -2979,7 +2083,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 42.38038879552344,
+          "score": 105.0,
           "path": "classes/class_node.md",
           "symbol": "Node.add_child",
           "doc_type": "class",
@@ -2988,6 +2092,15 @@
         },
         {
           "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 3,
           "score": 39.15238796080488,
           "path": "classes/class_button.md",
           "symbol": "Button",
@@ -2996,7 +2109,7 @@
           "heading": "Button"
         },
         {
-          "rank": 3,
+          "rank": 4,
           "score": 39.073148543855865,
           "path": "classes/class_spinbox.md",
           "symbol": "SpinBox",
@@ -3005,7 +2118,7 @@
           "heading": "SpinBox"
         },
         {
-          "rank": 4,
+          "rank": 5,
           "score": 38.5873342022285,
           "path": "getting_started/first_2d_game/05.the_main_game_scene.md",
           "symbol": "",
@@ -3014,7 +2127,7 @@
           "heading": "Main script"
         },
         {
-          "rank": 5,
+          "rank": 6,
           "score": 38.28650911265171,
           "path": "tutorials/best_practices/scene_organization.md",
           "symbol": "",
@@ -3023,7 +2136,7 @@
           "heading": "How to build relationships effectively"
         },
         {
-          "rank": 6,
+          "rank": 7,
           "score": 38.257705713655774,
           "path": "tutorials/scripting/singletons_autoload.md",
           "symbol": "",
@@ -3032,7 +2145,7 @@
           "heading": "Creating the script"
         },
         {
-          "rank": 7,
+          "rank": 8,
           "score": 38.23166432905963,
           "path": "tutorials/plugins/editor/making_main_screen_plugins.md",
           "symbol": "",
@@ -3041,7 +2154,7 @@
           "heading": "Update the plugin script"
         },
         {
-          "rank": 8,
+          "rank": 9,
           "score": 38.14157124641399,
           "path": "tutorials/plugins/editor/inspector_plugins.md",
           "symbol": "",
@@ -3050,22 +2163,13 @@
           "heading": "A guard against internal changes when the property is updated."
         },
         {
-          "rank": 9,
+          "rank": 10,
           "score": 38.02825364894068,
           "path": "tutorials/io/saving_games.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "is path independent."
-        },
-        {
-          "rank": 10,
-          "score": 37.94049944405159,
-          "path": "tutorials/io/runtime_file_loading_and_saving.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "`GLTFDocument.generate_buffer()` is also available for saving to memory."
         }
       ],
       "diagnostics": null
@@ -3091,7 +2195,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 5.579710144927536,
+          "score": 105.0,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_stopped",
           "doc_type": "class",
@@ -3100,6 +2204,15 @@
         },
         {
           "rank": 2,
+          "score": 25.0,
+          "path": "classes/class_bool.md",
+          "symbol": "bool",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "bool"
+        },
+        {
+          "rank": 3,
           "score": 0.6666666666666666,
           "path": "classes/class_inputeventmousemotion.md",
           "symbol": "InputEventMouseMotion",
@@ -3108,7 +2221,7 @@
           "heading": "InputEventMouseMotion"
         },
         {
-          "rank": 3,
+          "rank": 4,
           "score": 0.6666666666666666,
           "path": "classes/class_timer.md",
           "symbol": "Timer.stop",
@@ -3117,7 +2230,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 4,
+          "rank": 5,
           "score": 0.6557377049180328,
           "path": "classes/class_projectsettings.md",
           "symbol": "ProjectSettings.settings_changed",
@@ -3126,7 +2239,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 5,
+          "rank": 6,
           "score": 0.6557377049180328,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_one_shot",
@@ -3135,7 +2248,7 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 6,
+          "rank": 7,
           "score": 0.6451612903225806,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_paused",
@@ -3144,7 +2257,7 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 7,
+          "rank": 8,
           "score": 0.6349206349206349,
           "path": "classes/class_timer.md",
           "symbol": "Timer.start",
@@ -3153,7 +2266,7 @@
           "heading": "Method Descriptions"
         },
         {
-          "rank": 8,
+          "rank": 9,
           "score": 0.625,
           "path": "classes/class_timer.md",
           "symbol": "Timer.get_time_left",
@@ -3162,22 +2275,13 @@
           "heading": "Property Descriptions"
         },
         {
-          "rank": 9,
+          "rank": 10,
           "score": 0.6153846153846154,
           "path": "classes/class_timer.md",
           "symbol": "Timer.get_wait_time",
           "doc_type": "class",
           "addon": "",
           "heading": "Method Descriptions"
-        },
-        {
-          "rank": 10,
-          "score": 0.6060606060606061,
-          "path": "tutorials/best_practices/godot_notifications.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "every frame (or even every fixed frame)."
         }
       ],
       "diagnostics": null
@@ -3203,7 +2307,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 5.588235294117647,
+          "score": 105.0,
           "path": "classes/class_object.md",
           "symbol": "Object.emit_signal",
           "doc_type": "class",
@@ -3212,6 +2316,33 @@
         },
         {
           "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Object"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_stringname.md",
+          "symbol": "StringName",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "StringName"
+        },
+        {
+          "rank": 4,
+          "score": 25.0,
+          "path": "classes/class_gdscript.md",
+          "symbol": "GDScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDScript"
+        },
+        {
+          "rank": 5,
           "score": 0.6666666666666666,
           "path": "engine_details/engine_api/gdextension/gdextension_c_example.md",
           "symbol": "",
@@ -3220,7 +2351,7 @@
           "heading": "Registering and emitting a signal"
         },
         {
-          "rank": 3,
+          "rank": 6,
           "score": 0.6666666666666666,
           "path": "addons/gdUnit4/documentation/doc/_advanced_testing/signals.md",
           "symbol": "",
@@ -3229,7 +2360,7 @@
           "heading": "Monitor Signals"
         },
         {
-          "rank": 4,
+          "rank": 7,
           "score": 0.6557377049180328,
           "path": "getting_started/first_2d_game/03.coding_the_player.md",
           "symbol": "",
@@ -3238,7 +2369,7 @@
           "heading": "Preparing for collisions"
         },
         {
-          "rank": 5,
+          "rank": 8,
           "score": 0.6557377049180328,
           "path": "addons/gdUnit4/documentation/doc/_advanced_testing/signals.md",
           "symbol": "",
@@ -3247,7 +2378,7 @@
           "heading": "Verify Signals"
         },
         {
-          "rank": 6,
+          "rank": 9,
           "score": 0.6451612903225806,
           "path": "classes/class_signal.md",
           "symbol": "Signal",
@@ -3256,40 +2387,13 @@
           "heading": "Signal"
         },
         {
-          "rank": 7,
+          "rank": 10,
           "score": 0.6451612903225806,
           "path": "tutorials/scripting/gdscript/gdscript_basics.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "`Signal `"
-        },
-        {
-          "rank": 8,
-          "score": 0.6349206349206349,
-          "path": "tutorials/scripting/instancing_with_signals.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Shooting example"
-        },
-        {
-          "rank": 9,
-          "score": 0.6349206349206349,
-          "path": "addons/dialogue_manager/docs/Conditions_Mutations.md",
-          "symbol": "",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "Signals"
-        },
-        {
-          "rank": 10,
-          "score": 0.625,
-          "path": "tutorials/scripting/gdscript/gdscript_documentation_comments.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "BBCode and class reference"
         }
       ],
       "diagnostics": null
@@ -3299,9 +2403,9 @@
       "query": "child node attach",
       "category": "class",
       "required_at": 5,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -3315,6 +2419,24 @@
       "observed": [
         {
           "rank": 1,
+          "score": 105.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.add_child",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Node"
+        },
+        {
+          "rank": 3,
           "score": 39.15238796080488,
           "path": "classes/class_button.md",
           "symbol": "Button",
@@ -3323,7 +2445,7 @@
           "heading": "Button"
         },
         {
-          "rank": 2,
+          "rank": 4,
           "score": 39.073148543855865,
           "path": "classes/class_spinbox.md",
           "symbol": "SpinBox",
@@ -3332,7 +2454,7 @@
           "heading": "SpinBox"
         },
         {
-          "rank": 3,
+          "rank": 5,
           "score": 38.5873342022285,
           "path": "getting_started/first_2d_game/05.the_main_game_scene.md",
           "symbol": "",
@@ -3341,7 +2463,7 @@
           "heading": "Main script"
         },
         {
-          "rank": 4,
+          "rank": 6,
           "score": 38.28650911265171,
           "path": "tutorials/best_practices/scene_organization.md",
           "symbol": "",
@@ -3350,7 +2472,7 @@
           "heading": "How to build relationships effectively"
         },
         {
-          "rank": 5,
+          "rank": 7,
           "score": 38.257705713655774,
           "path": "tutorials/scripting/singletons_autoload.md",
           "symbol": "",
@@ -3359,7 +2481,7 @@
           "heading": "Creating the script"
         },
         {
-          "rank": 6,
+          "rank": 8,
           "score": 38.23166432905963,
           "path": "tutorials/plugins/editor/making_main_screen_plugins.md",
           "symbol": "",
@@ -3368,7 +2490,7 @@
           "heading": "Update the plugin script"
         },
         {
-          "rank": 7,
+          "rank": 9,
           "score": 38.14157124641399,
           "path": "tutorials/plugins/editor/inspector_plugins.md",
           "symbol": "",
@@ -3377,31 +2499,13 @@
           "heading": "A guard against internal changes when the property is updated."
         },
         {
-          "rank": 8,
+          "rank": 10,
           "score": 38.02825364894068,
           "path": "tutorials/io/saving_games.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "is path independent."
-        },
-        {
-          "rank": 9,
-          "score": 37.94049944405159,
-          "path": "tutorials/io/runtime_file_loading_and_saving.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "`GLTFDocument.generate_buffer()` is also available for saving to memory."
-        },
-        {
-          "rank": 10,
-          "score": 37.7294637081801,
-          "path": "tutorials/best_practices/godot_notifications.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "every frame (or even every fixed frame)."
         }
       ],
       "diagnostics": null
@@ -4323,7 +3427,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 5.597014925373134,
+          "score": 105.0,
           "path": "classes/class_object.md",
           "symbol": "Object.emit_signal",
           "doc_type": "class",
@@ -4332,6 +3436,33 @@
         },
         {
           "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_object.md",
+          "symbol": "Object",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Object"
+        },
+        {
+          "rank": 3,
+          "score": 25.0,
+          "path": "classes/class_stringname.md",
+          "symbol": "StringName",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "StringName"
+        },
+        {
+          "rank": 4,
+          "score": 25.0,
+          "path": "classes/class_gdscript.md",
+          "symbol": "GDScript",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "GDScript"
+        },
+        {
+          "rank": 5,
           "score": 0.6666666666666666,
           "path": "tutorials/scripting/gdscript/gdscript_basics.md",
           "symbol": "",
@@ -4340,7 +3471,7 @@
           "heading": "Signals"
         },
         {
-          "rank": 3,
+          "rank": 6,
           "score": 0.6666666666666666,
           "path": "tutorials/scripting/gdscript/gdscript_basics.md",
           "symbol": "",
@@ -4349,7 +3480,7 @@
           "heading": "`Signal `"
         },
         {
-          "rank": 4,
+          "rank": 7,
           "score": 0.6557377049180328,
           "path": "tutorials/best_practices/scene_organization.md",
           "symbol": "",
@@ -4358,7 +3489,7 @@
           "heading": "How to build relationships effectively"
         },
         {
-          "rank": 5,
+          "rank": 8,
           "score": 0.6557377049180328,
           "path": "addons/gdUnit4/documentation/doc/_advanced_testing/signals.md",
           "symbol": "",
@@ -4367,7 +3498,7 @@
           "heading": "Monitor Signals"
         },
         {
-          "rank": 6,
+          "rank": 9,
           "score": 0.6451612903225806,
           "path": "classes/class_upnp.md",
           "symbol": "UPNP",
@@ -4376,40 +3507,13 @@
           "heading": "UPNP"
         },
         {
-          "rank": 7,
+          "rank": 10,
           "score": 0.6451612903225806,
           "path": "addons/gdUnit4/documentation/doc/_testing/assert-signal.md",
           "symbol": "",
           "doc_type": "addon",
           "addon": "gdUnit4",
           "heading": "When provided, verifies the signal was emitted with exactly these values."
-        },
-        {
-          "rank": 8,
-          "score": 0.6349206349206349,
-          "path": "classes/class_projectsettings.md",
-          "symbol": "ProjectSettings.settings_changed",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Method Descriptions"
-        },
-        {
-          "rank": 9,
-          "score": 0.6349206349206349,
-          "path": "addons/gdUnit4/documentation/doc/_testing/assert-signal.md",
-          "symbol": "",
-          "doc_type": "addon",
-          "addon": "gdUnit4",
-          "heading": "Using Signal reference (type-safe)"
-        },
-        {
-          "rank": 10,
-          "score": 0.625,
-          "path": "addons/gdUnit4/documentation/doc/_testing/assert-signal.md",
-          "symbol": "",
-          "doc_type": "addon",
-          "addon": "gdUnit4",
-          "heading": "If omitted, verifies the signal was not emitted at all."
         }
       ],
       "diagnostics": null
@@ -4928,15 +4032,6 @@
         },
         {
           "rank": 6,
-          "score": 0.8181818181818181,
-          "path": "addons/sound_manager/addons/sound_manager/plugin.gd",
-          "symbol": "plugin",
-          "doc_type": "addon",
-          "addon": "sound_manager",
-          "heading": "plugin.gd"
-        },
-        {
-          "rank": 7,
           "score": 0.6666666666666666,
           "path": "tutorials/plugins/running_code_in_the_editor.md",
           "symbol": "",
@@ -4945,7 +4040,7 @@
           "heading": "Running code in the editor"
         },
         {
-          "rank": 8,
+          "rank": 7,
           "score": 0.6557377049180328,
           "path": "tutorials/platform/android/android_plugin.md",
           "symbol": "",
@@ -4954,7 +4049,7 @@
           "heading": "Packaging a v2 Android plugin"
         },
         {
-          "rank": 9,
+          "rank": 8,
           "score": 0.6451612903225806,
           "path": "engine_details/engine_api/vendor_runtime_module.md",
           "symbol": "",
@@ -4963,13 +4058,22 @@
           "heading": "Creating the wrapper editor plugin"
         },
         {
-          "rank": 10,
+          "rank": 9,
           "score": 0.6349206349206349,
           "path": "tutorials/editor/external_editor.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "LSP/DAP support"
+        },
+        {
+          "rank": 10,
+          "score": 0.6349206349206349,
+          "path": "tutorials/plugins/editor/installing_plugins.md",
+          "symbol": "",
+          "doc_type": "tutorial",
+          "addon": "",
+          "heading": "Installing plugins"
         }
       ],
       "diagnostics": null
@@ -5093,9 +4197,9 @@
       "query": "AnimationPlayer.play",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -5109,93 +4213,93 @@
       "observed": [
         {
           "rank": 1,
-          "score": 39.75589373950324,
-          "path": "classes/class_editorsettings.md",
-          "symbol": "EditorSettings.NOTIFICATION_EDITOR_SETTINGS_CHANGED",
+          "score": 102.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play",
           "doc_type": "class",
           "addon": "",
           "heading": "Method Descriptions"
         },
         {
           "rank": 2,
-          "score": 39.65923112961751,
-          "path": "classes/class_springbonesimulator3d.md",
-          "symbol": "SpringBoneSimulator3D",
+          "score": 50.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer",
           "doc_type": "class",
           "addon": "",
-          "heading": "SpringBoneSimulator3D"
+          "heading": "AnimationPlayer"
         },
         {
           "rank": 3,
-          "score": 39.36106909823672,
-          "path": "tutorials/migrating/upgrading_to_godot_4.md",
-          "symbol": "",
-          "doc_type": "tutorial",
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play_backwards",
+          "doc_type": "class",
           "addon": "",
-          "heading": "Updating scripts to take backwards-incompatible changes into account"
+          "heading": "Method Descriptions"
         },
         {
           "rank": 4,
-          "score": 38.959985558750695,
-          "path": "classes/class_animation.md",
-          "symbol": "Animation",
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play_section_backwards",
           "doc_type": "class",
           "addon": "",
-          "heading": "Animation"
+          "heading": "Method Descriptions"
         },
         {
           "rank": 5,
-          "score": 38.066583563901865,
-          "path": "engine_details/file_formats/tscn.md",
-          "symbol": "",
-          "doc_type": "tutorial",
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play_section_with_markers_backwards",
+          "doc_type": "class",
           "addon": "",
-          "heading": "Animation"
+          "heading": "Method Descriptions"
         },
         {
           "rank": 6,
-          "score": 37.96179285995131,
-          "path": "addons/limboai/demo/demo/agents/player/states/attack_state.gd",
-          "symbol": "addons/limboai/demo/demo/agents/player/states/attack_state.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "attack_state.gd"
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play_section_with_markers",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
         },
         {
           "rank": 7,
-          "score": 37.68934414883049,
-          "path": "getting_started/first_3d_game/09.adding_animations.md",
-          "symbol": "",
-          "doc_type": "tutorial",
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.play_section",
+          "doc_type": "class",
           "addon": "",
-          "heading": "Using the animation editor"
+          "heading": "Method Descriptions"
         },
         {
           "rank": 8,
-          "score": 37.4818944118705,
-          "path": "addons/limboai/demo/demo/agents/scripts/agent_base.gd",
-          "symbol": "addons/limboai/demo/demo/agents/scripts/agent_base.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "agent_base.gd"
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.playback_auto_capture",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
         },
         {
           "rank": 9,
-          "score": 37.37269378884241,
-          "path": "addons/limboai/demo/demo/agents/player/states/dodge_state.gd",
-          "symbol": "addons/limboai/demo/demo/agents/player/states/dodge_state.gd",
-          "doc_type": "addon",
-          "addon": "limboai",
-          "heading": "dodge_state.gd"
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.playback_auto_capture_duration",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Property Descriptions"
         },
         {
           "rank": 10,
-          "score": 37.18089782431549,
-          "path": "tutorials/animation/creating_movies.md",
-          "symbol": "",
-          "doc_type": "tutorial",
+          "score": 40.0,
+          "path": "classes/class_animationplayer.md",
+          "symbol": "AnimationPlayer.playback_auto_capture_ease_type",
+          "doc_type": "class",
           "addon": "",
-          "heading": "Quitting Movie Maker mode"
+          "heading": "Property Descriptions"
         }
       ],
       "diagnostics": null
@@ -5221,7 +4325,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D",
           "doc_type": "class",
@@ -5230,7 +4334,7 @@
         },
         {
           "rank": 2,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.get_angular_velocity",
           "doc_type": "class",
@@ -5239,7 +4343,7 @@
         },
         {
           "rank": 3,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.freeze",
           "doc_type": "class",
@@ -5248,7 +4352,7 @@
         },
         {
           "rank": 4,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.sleeping",
           "doc_type": "class",
@@ -5257,7 +4361,7 @@
         },
         {
           "rank": 5,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.mass",
           "doc_type": "class",
@@ -5266,7 +4370,7 @@
         },
         {
           "rank": 6,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.can_sleep",
           "doc_type": "class",
@@ -5275,7 +4379,7 @@
         },
         {
           "rank": 7,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.contact_monitor",
           "doc_type": "class",
@@ -5284,7 +4388,7 @@
         },
         {
           "rank": 8,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.continuous_cd",
           "doc_type": "class",
@@ -5293,7 +4397,7 @@
         },
         {
           "rank": 9,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.custom_integrator",
           "doc_type": "class",
@@ -5302,7 +4406,7 @@
         },
         {
           "rank": 10,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.freeze_mode",
           "doc_type": "class",
@@ -5429,9 +4533,9 @@
       "query": "Input.is_action_pressed",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": null,
-      "passed": false,
-      "failure_classification": "query_normalization",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -5445,6 +4549,24 @@
       "observed": [
         {
           "rank": 1,
+          "score": 102.0,
+          "path": "classes/class_input.md",
+          "symbol": "Input.is_action_pressed",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Method Descriptions"
+        },
+        {
+          "rank": 2,
+          "score": 50.0,
+          "path": "classes/class_input.md",
+          "symbol": "Input",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Input"
+        },
+        {
+          "rank": 3,
           "score": 38.77087588054909,
           "path": "getting_started/first_3d_game/08.score_and_replay.md",
           "symbol": "",
@@ -5453,7 +4575,7 @@
           "heading": "Adding music"
         },
         {
-          "rank": 2,
+          "rank": 4,
           "score": 37.60597204600833,
           "path": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
           "symbol": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
@@ -5462,7 +4584,7 @@
           "heading": "ExampleBalloon.cs"
         },
         {
-          "rank": 3,
+          "rank": 5,
           "score": 37.25959861149888,
           "path": "tutorials/physics/using_character_body_2d.md",
           "symbol": "",
@@ -5471,7 +4593,7 @@
           "heading": "Bouncing/reflecting"
         },
         {
-          "rank": 4,
+          "rank": 6,
           "score": 36.946746585391516,
           "path": "tutorials/2d/2d_sprite_animation.md",
           "symbol": "",
@@ -5480,7 +4602,7 @@
           "heading": "Controlling an AnimationPlayer animation"
         },
         {
-          "rank": 5,
+          "rank": 7,
           "score": 36.83647490924195,
           "path": "getting_started/first_2d_game/03.coding_the_player.md",
           "symbol": "",
@@ -5489,7 +4611,7 @@
           "heading": "Coding the player"
         },
         {
-          "rank": 6,
+          "rank": 8,
           "score": 36.8190433214727,
           "path": "tutorials/physics/kinematic_character_2d.md",
           "symbol": "",
@@ -5498,7 +4620,7 @@
           "heading": "Moving the kinematic character"
         },
         {
-          "rank": 7,
+          "rank": 9,
           "score": 36.63282347530644,
           "path": "getting_started/first_3d_game/03.player_movement_code.md",
           "symbol": "",
@@ -5507,31 +4629,13 @@
           "heading": "The downward acceleration when in the air, in meters per second squared."
         },
         {
-          "rank": 8,
+          "rank": 10,
           "score": 36.57895069580001,
           "path": "getting_started/first_3d_game/08.score_and_replay.md",
           "symbol": "",
           "doc_type": "tutorial",
           "addon": "",
           "heading": "Coding the retry option"
-        },
-        {
-          "rank": 9,
-          "score": 36.44031884890356,
-          "path": "tutorials/inputs/inputevent.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "What is it?"
-        },
-        {
-          "rank": 10,
-          "score": 36.3673655881229,
-          "path": "getting_started/step_by_step/scripting_player_input.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Listening to player input"
         }
       ],
       "diagnostics": null
@@ -5541,9 +4645,9 @@
       "query": "Control.grab_focus",
       "category": "symbol",
       "required_at": 3,
-      "matched_rank": 7,
-      "passed": false,
-      "failure_classification": "low_ranking",
+      "matched_rank": 1,
+      "passed": true,
+      "failure_classification": "",
       "report_only": false,
       "graph_changed": false,
       "expected": {
@@ -5557,6 +4661,15 @@
       "observed": [
         {
           "rank": 1,
+          "score": 102.0,
+          "path": "classes/class_control.md",
+          "symbol": "Control.grab_focus",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Remove the stylebox override."
+        },
+        {
+          "rank": 2,
           "score": 36.74565951034749,
           "path": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
           "symbol": "addons/dialogue_manager/addons/dialogue_manager/example_balloon/ExampleBalloon.cs",
@@ -5565,25 +4678,43 @@
           "heading": "ExampleBalloon.cs"
         },
         {
-          "rank": 2,
-          "score": 9.186414877586872,
-          "path": "addons/dialogue_manager/addons/dialogue_manager/nodes/dialogue_label/dialogue_label.gd",
-          "symbol": "DialogueLabel",
-          "doc_type": "addon",
-          "addon": "dialogue_manager",
-          "heading": "dialogue_label.gd"
-        },
-        {
           "rank": 3,
-          "score": 9.186414877586872,
-          "path": "addons/phantom-camera/addons/phantom_camera/scripts/resources/TweenDirectorResource.cs",
-          "symbol": "Type",
-          "doc_type": "addon",
-          "addon": "phantom-camera",
-          "heading": "TweenDirectorResource.cs"
+          "score": 25.0,
+          "path": "classes/class_bool.md",
+          "symbol": "bool",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "bool"
         },
         {
           "rank": 4,
+          "score": 25.0,
+          "path": "classes/class_node.md",
+          "symbol": "Node.ready",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Signals"
+        },
+        {
+          "rank": 5,
+          "score": 9.186414877586872,
+          "path": "classes/class_input.md",
+          "symbol": "Input",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Input"
+        },
+        {
+          "rank": 6,
+          "score": 9.186414877586872,
+          "path": "addons/dialogue_manager/addons/dialogue_manager/dialogue_resource.gd",
+          "symbol": "DialogueResource",
+          "doc_type": "addon",
+          "addon": "dialogue_manager",
+          "heading": "dialogue_resource.gd"
+        },
+        {
+          "rank": 7,
           "score": 9.186414877586872,
           "path": "classes/class_float.md",
           "symbol": "float",
@@ -5592,7 +4723,7 @@
           "heading": "float"
         },
         {
-          "rank": 5,
+          "rank": 8,
           "score": 9.186414877586872,
           "path": "addons/dialogue_manager/addons/dialogue_manager/dialogue_line.gd",
           "symbol": "DialogueLine",
@@ -5601,7 +4732,7 @@
           "heading": "dialogue_line.gd"
         },
         {
-          "rank": 6,
+          "rank": 9,
           "score": 9.186414877586872,
           "path": "classes/class_inputeventmousebutton.md",
           "symbol": "InputEventMouseButton",
@@ -5610,40 +4741,13 @@
           "heading": "InputEventMouseButton"
         },
         {
-          "rank": 7,
-          "score": 3.1579818031430937,
-          "path": "classes/class_control.md",
-          "symbol": "Control.grab_focus",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Remove the stylebox override."
-        },
-        {
-          "rank": 8,
+          "rank": 10,
           "score": 1.290658339838668,
           "path": "classes/class_control.md",
           "symbol": "Control.get_focus_mode",
           "doc_type": "class",
           "addon": "",
           "heading": "Property Descriptions"
-        },
-        {
-          "rank": 9,
-          "score": 1.280737704918033,
-          "path": "classes/class_control.md",
-          "symbol": "Control.FocusMode",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Enumerations"
-        },
-        {
-          "rank": 10,
-          "score": 1.2307692307692308,
-          "path": "tutorials/ui/gui_navigation.md",
-          "symbol": "",
-          "doc_type": "tutorial",
-          "addon": "",
-          "heading": "Necessary code"
         }
       ],
       "diagnostics": null
@@ -5845,29 +4949,29 @@
         {
           "rank": 8,
           "score": 9.919365032095993,
-          "path": "classes/class_vector3.md",
-          "symbol": "Vector3",
+          "path": "classes/class_packedint32array.md",
+          "symbol": "PackedInt32Array",
           "doc_type": "class",
           "addon": "",
-          "heading": "Vector3"
+          "heading": "PackedInt32Array"
         },
         {
           "rank": 9,
-          "score": 9.919365032095993,
-          "path": "classes/class_vector2.md",
-          "symbol": "Vector2",
-          "doc_type": "class",
-          "addon": "",
-          "heading": "Vector2"
-        },
-        {
-          "rank": 10,
           "score": 9.919365032095993,
           "path": "classes/class_shortcut.md",
           "symbol": "Shortcut",
           "doc_type": "class",
           "addon": "",
           "heading": "Shortcut"
+        },
+        {
+          "rank": 10,
+          "score": 9.919365032095993,
+          "path": "classes/class_array.md",
+          "symbol": "Array",
+          "doc_type": "class",
+          "addon": "",
+          "heading": "Array"
         }
       ],
       "diagnostics": null
@@ -5893,7 +4997,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D",
           "doc_type": "class",
@@ -5902,7 +5006,7 @@
         },
         {
           "rank": 2,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.get_offset",
           "doc_type": "class",
@@ -5911,7 +5015,7 @@
         },
         {
           "rank": 3,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.texture",
           "doc_type": "class",
@@ -5920,7 +5024,7 @@
         },
         {
           "rank": 4,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.centered",
           "doc_type": "class",
@@ -5929,7 +5033,7 @@
         },
         {
           "rank": 5,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.frame",
           "doc_type": "class",
@@ -5938,7 +5042,7 @@
         },
         {
           "rank": 6,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.hframes",
           "doc_type": "class",
@@ -5947,7 +5051,7 @@
         },
         {
           "rank": 7,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.vframes",
           "doc_type": "class",
@@ -5956,7 +5060,7 @@
         },
         {
           "rank": 8,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.flip_h",
           "doc_type": "class",
@@ -5965,7 +5069,7 @@
         },
         {
           "rank": 9,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.flip_v",
           "doc_type": "class",
@@ -5974,7 +5078,7 @@
         },
         {
           "rank": 10,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.region_enabled",
           "doc_type": "class",
@@ -6229,7 +5333,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_shadermaterial.md",
           "symbol": "ShaderMaterial",
           "doc_type": "class",
@@ -6238,7 +5342,7 @@
         },
         {
           "rank": 2,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_resource.md",
           "symbol": "Resource",
           "doc_type": "class",
@@ -6247,7 +5351,7 @@
         },
         {
           "rank": 3,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_refcounted.md",
           "symbol": "RefCounted",
           "doc_type": "class",
@@ -6256,7 +5360,7 @@
         },
         {
           "rank": 4,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -6453,7 +5557,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102,
+          "score": 102.0,
           "path": "classes/class_physicsrayqueryparameters3d.md",
           "symbol": "PhysicsRayQueryParameters3D",
           "doc_type": "class",
@@ -6462,7 +5566,7 @@
         },
         {
           "rank": 2,
-          "score": 40,
+          "score": 40.0,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -6471,7 +5575,7 @@
         },
         {
           "rank": 3,
-          "score": 25,
+          "score": 25.0,
           "path": "classes/class_vector3.md",
           "symbol": "Vector3",
           "doc_type": "class",
@@ -6480,12 +5584,12 @@
         },
         {
           "rank": 4,
-          "score": 25,
-          "path": "classes/class_bool.md",
-          "symbol": "bool",
+          "score": 25.0,
+          "path": "classes/class_array.md",
+          "symbol": "Array",
           "doc_type": "class",
           "addon": "",
-          "heading": "bool"
+          "heading": "Array"
         },
         {
           "rank": 5,
@@ -6669,14 +5773,14 @@
   "report_only_triage": [],
   "latency": {
     "count": 45,
-    "p50_ms": 37.477,
-    "p95_ms": 62.388
+    "p50_ms": 43.144,
+    "p95_ms": 70.704
   },
   "metadata": {
     "query_suite_hash": "62587fe2133c2ec98616930e200fa4caaf7fedec6830ae78ed419a722d6e7006",
     "database": {
       "path": "/Users/jbts6/Site/godot-rag/godot_rag/rag/godot_docs.sqlite",
-      "size_bytes": 56832000,
+      "size_bytes": 56688640,
       "documents": 1517,
       "chunks": 17858,
       "symbols": 28034,
