@@ -818,7 +818,7 @@ Then check off OpenSpec `2.3` (and note `2.4` is now covered across Tasks 2-4) i
 
 **Critical constraint:** Do NOT change `_rerank_bonus` return values, the `elif` between alias/direct, or the additive `doc_type_intent`/`addon_intent` logic. Only ADD `_rerank_signals` and the list-copy in `rerank_results`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `rst2md/tests/test_searcher_module.py` (after `test_rerank_symbol_query_does_not_apply_tutorial_intent`):
 
@@ -965,12 +965,12 @@ def test_rerank_ordering_unchanged_with_signals():
     assert ranked[0].symbol == "Node.add_child", "alias bonus must still promote the alias match"
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest -q rst2md/tests/test_searcher_module.py -v -k "rerank_appends or rerank_preserves or rerank_bonus_equals or rerank_ordering_unchanged"`
 Expected: FAIL — `_rerank_signals` does not exist (ImportError), and `ranked[0].ranking_signals` does not contain rerank signals.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Edit `rst2md/rag/fusion.py`. Add the `RankingSignal` import and a `_rerank_signals` helper that mirrors `_rerank_bonus` exactly (same conditions, same constants), then update `rerank_results` to copy the list and append signals. Final file:
 
@@ -1085,17 +1085,17 @@ def rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchR
     return sorted(boosted, key=lambda result: result.score, reverse=True)
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest -q rst2md/tests/test_searcher_module.py -v -k "rerank_appends or rerank_preserves or rerank_bonus_equals or rerank_ordering_unchanged"`
 Expected: PASS (7 tests).
 
-- [ ] **Step 5: Run regression (rerank behavior unchanged)**
+- [x] **Step 5: Run regression (rerank behavior unchanged)**
 
 Run: `uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py -q`
 Expected: PASS. `test_rerank_promotes_alias_symbol_match` and `test_rerank_symbol_query_does_not_apply_tutorial_intent` still pass — same ordering, same scores.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/fusion.py rst2md/tests/test_searcher_module.py

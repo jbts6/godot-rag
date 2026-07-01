@@ -9,12 +9,12 @@
 - [x] 2.1 Record symbol recall signals for exact, suffix, prefix, and alias-derived matches.
 - [x] 2.2 Record hybrid/RRF and FTS scoring signals during candidate assembly.
 - [x] 2.3 Record graph expansion signals including relation type and distance.
-- [ ] 2.4 Preserve accumulated signals when later ranking stages improve an existing candidate.
+- [x] 2.4 Preserve accumulated signals when later ranking stages improve an existing candidate.
 
 ## 3. Rerank Signal Recording
 
-- [ ] 3.1 Update deterministic reranking to append named non-zero bonus signals.
-- [ ] 3.2 Preserve existing rerank score math and final ordering behavior.
+- [x] 3.1 Update deterministic reranking to append named non-zero bonus signals.
+- [x] 3.2 Preserve existing rerank score math and final ordering behavior.
 
 ## 4. CLI and Diagnostics Output
 
