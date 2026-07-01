@@ -1025,7 +1025,7 @@ git commit -m "chore(eval): promote loop-2 final to baseline"
 
 ### Task 4.5: 准备 verify 阶段材料
 
-- [ ] **Step 1: 整理三个 Open Questions 答案**
+- [x] **Step 1: 整理三个 Open Questions 答案**
 
 写入 `openspec/changes/search-quality-optimization-loop-2/.comet/handoff/verify-answers.md`：
 
