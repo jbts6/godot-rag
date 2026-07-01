@@ -1676,5 +1676,39 @@ class BuildChunkRelationsCoverageTests(unittest.TestCase):
         self.assertAlmostEqual(row["weight"], 0.8)
 
 
+class InheritsGraphTraversalTests(unittest.TestCase):
+    def test_node_inherits_object_reaches_object_class_summary(self):
+        from rag import embeddings
+        from unittest.mock import patch
+        from rag.indexer import build_database
+        from rag.searcher import search_database
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n",
+                encoding="utf-8",
+            )
+            (classes / "class_object.md").write_text(
+                "# Object\n\nRoot of all things.\n\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer.\n", encoding="utf-8",
+            )
+            db_path = Path(tmp) / "t.sqlite"
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "Node inherits Object", limit=10, expand_graph=True)
+            obj = next((r for r in results if r.symbol == "Object"), None)
+            self.assertIsNotNone(obj, "Object class_summary should be reached via inherits traversal")
+            rank = results.index(obj) + 1
+            self.assertLessEqual(rank, 5, f"Object rank {rank} should be <= 5")
+            names = [s.name for s in obj.ranking_signals]
+            self.assertIn("graph.inherits", names)
+
+
 if __name__ == "__main__":
     unittest.main()
