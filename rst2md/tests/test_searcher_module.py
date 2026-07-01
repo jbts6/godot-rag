@@ -242,6 +242,159 @@ def test_rerank_symbol_query_does_not_apply_tutorial_intent():
     assert ranked[0].symbol == "Node.add_child"
 
 
+def test_rerank_appends_alias_symbol_signal():
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import rerank_results
+
+    plan = build_query_plan("attach node to scene tree")
+    weak_alias = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.",
+    )
+    ranked = rerank_results(plan, [weak_alias])
+    assert ranked[0].symbol == "Node.add_child"
+    names = [s.name for s in ranked[0].ranking_signals]
+    assert "rerank.alias_symbol" in names
+    alias_sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.alias_symbol")
+    assert alias_sig.weight == 5.0
+
+
+def test_rerank_appends_direct_symbol_signal():
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import rerank_results
+
+    plan = build_query_plan("Node.add_child")
+    result = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.",
+    )
+    ranked = rerank_results(plan, [result])
+    names = [s.name for s in ranked[0].ranking_signals]
+    assert "rerank.direct_symbol" in names
+    sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.direct_symbol")
+    assert sig.weight == 2.0
+
+
+def test_rerank_appends_doc_type_intent_signal():
+    from rag.models import SearchResult
+    from rag.query_plan import QueryPlan
+    from rag.fusion import rerank_results
+
+    # Construct plan directly: build_query_plan always puts the original query
+    # in symbol_candidates (per QueryPlan docstring), which would block the
+    # doc_type_intent bonus (the `not plan.symbol_candidates` guard). Empty
+    # symbol_candidates exercises the doc_type_intent branch in isolation.
+    plan = QueryPlan(
+        original="how to use scene tree nodes",
+        fts_variants=("how to use scene tree nodes",),
+        symbol_candidates=(),
+        alias_symbol_candidates=(),
+        doc_type_intent="tutorial",
+        addon_intent=None,
+    )
+    tutorial = SearchResult(
+        score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
+        doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+        symbol="", heading="Scene tree", breadcrumb="Tutorial",
+        text="How to use the scene tree.",
+    )
+    ranked = rerank_results(plan, [tutorial])
+    names = [s.name for s in ranked[0].ranking_signals]
+    assert "rerank.doc_type_intent" in names
+    sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.doc_type_intent")
+    assert sig.weight == 0.05
+
+
+def test_rerank_appends_addon_intent_signal():
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import rerank_results
+
+    plan = build_query_plan("dialogue manager addon")
+    addon_result = SearchResult(
+        score=1.0, path="addons/dm/docs.md", start_line=1, end_line=2,
+        doc_type="addon", chunk_type="section", addon="dm", addon_name="DM",
+        symbol="", heading="Dialogue", breadcrumb="Addon",
+        text="A dialogue addon.",
+    )
+    ranked = rerank_results(plan, [addon_result])
+    names = [s.name for s in ranked[0].ranking_signals]
+    assert "rerank.addon_intent" in names
+    sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.addon_intent")
+    assert sig.weight == 0.5
+
+
+def test_rerank_preserves_prior_signals_without_mutating_original():
+    """OpenSpec 2.4 / 3.2: rerank must copy ranking_signals (not share the
+    list) and preserve ordering."""
+    from rag.models import RankingSignal, SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import rerank_results
+
+    plan = build_query_plan("attach node to scene tree")
+    prior = RankingSignal(name="symbol_recall.exact", weight=100.0, value="Node.add_child")
+    original = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.", ranking_signals=[prior],
+    )
+    ranked = rerank_results(plan, [original])
+    names = [s.name for s in ranked[0].ranking_signals]
+    assert "symbol_recall.exact" in names, "prior signal must survive rerank"
+    assert "rerank.alias_symbol" in names, "rerank bonus signal must be appended"
+    # Original must not be mutated (list not shared across replace()).
+    assert len(original.ranking_signals) == 1, (
+        "original result's signal list must not be mutated by rerank"
+    )
+
+
+def test_rerank_bonus_equals_signal_weight_sum():
+    """Guard against drift between _rerank_bonus and _rerank_signals."""
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import _rerank_bonus, _rerank_signals
+
+    plan = build_query_plan("dialogue manager addon how to")
+    addon_tutorial = SearchResult(
+        score=1.0, path="p", start_line=1, end_line=2, doc_type="addon",
+        chunk_type="section", addon="dm", addon_name="DM", symbol="",
+        heading="h", breadcrumb="b", text="t",
+    )
+    assert _rerank_bonus(plan, addon_tutorial) == sum(
+        s.weight for s in _rerank_signals(plan, addon_tutorial)
+    )
+
+
+def test_rerank_ordering_unchanged_with_signals():
+    """OpenSpec 3.2: final ordering must match the pre-change order."""
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import rerank_results
+
+    plan = build_query_plan("attach node to scene tree")
+    weak_alias = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.",
+    )
+    lexical = SearchResult(
+        score=2.0, path="tutorials/scripting/change_scenes_manually.md",
+        start_line=1, end_line=2, doc_type="tutorial", chunk_type="section",
+        addon="", addon_name="", symbol="", heading="Scene tree",
+        breadcrumb="Tutorial", text="Attach scripts to scene nodes.",
+    )
+    ranked = rerank_results(plan, [lexical, weak_alias])
+    assert ranked[0].symbol == "Node.add_child", "alias bonus must still promote the alias match"
+
+
 def test_search_response_metadata_shape_is_stable():
     from rag.models import SearchMetadata
 

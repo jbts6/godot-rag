@@ -6,7 +6,7 @@ Behavior is byte-for-byte identical to the previous searcher.py implementation.
 from dataclasses import replace
 from typing import List
 
-from rag.models import SearchResult
+from rag.models import RankingSignal, SearchResult
 from rag.query_plan import QueryPlan
 
 
@@ -59,9 +59,50 @@ def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
     return bonus
 
 
+def _rerank_signals(plan: QueryPlan, result: SearchResult) -> list[RankingSignal]:
+    """Named, non-zero rerank bonus signals.
+
+    Mirrors the conditions and constants in :func:`_rerank_bonus` exactly so
+    the bonus amounts stay in sync with the recorded signal weights.
+    """
+    signals: list[RankingSignal] = []
+    if result.symbol in plan.alias_symbol_candidates:
+        signals.append(RankingSignal(
+            name="rerank.alias_symbol",
+            weight=5.0,
+            value=result.symbol,
+            details={"source": "alias_symbol_candidates"},
+        ))
+    elif result.symbol in plan.symbol_candidates:
+        signals.append(RankingSignal(
+            name="rerank.direct_symbol",
+            weight=2.0,
+            value=result.symbol,
+            details={"source": "symbol_candidates"},
+        ))
+    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent and not plan.symbol_candidates:
+        signals.append(RankingSignal(
+            name="rerank.doc_type_intent",
+            weight=0.05,
+            value=result.doc_type,
+            details={"intent": plan.doc_type_intent},
+        ))
+    if plan.addon_intent and result.doc_type == "addon":
+        signals.append(RankingSignal(
+            name="rerank.addon_intent",
+            weight=0.5,
+            value=result.doc_type,
+            details={"intent": plan.addon_intent},
+        ))
+    return signals
+
+
 def rerank_results(plan: QueryPlan, results: list[SearchResult]) -> list[SearchResult]:
-    boosted = [
-        replace(result, score=result.score + _rerank_bonus(plan, result))
-        for result in results
-    ]
+    boosted = []
+    for result in results:
+        bonus = _rerank_bonus(plan, result)
+        # Copy the list (items are frozen dataclasses) before appending so the
+        # original result's ranking_signals is not mutated across replace().
+        signals = list(result.ranking_signals) + _rerank_signals(plan, result)
+        boosted.append(replace(result, score=result.score + bonus, ranking_signals=signals))
     return sorted(boosted, key=lambda result: result.score, reverse=True)
