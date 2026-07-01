@@ -248,14 +248,14 @@ Expected: 全部 PASS，无 FAILED
 
 ### Task A.5: 跑 eval 锁定 A 段增量
 
-- [ ] **Step 1: 跑 38 查询 eval**
+- [x] **Step 1: 跑 38 查询 eval**
 
 ```bash
-uv run godot-rag eval-search > /tmp/loop2-stageA.json
+uv run godot-rag eval-search --json > /tmp/loop2-stageA.json
 cp /tmp/loop2-stageA.json docs/search-quality/loop-2-stage-A.json
 ```
 
-- [ ] **Step 2: Commit 基线**
+- [x] **Step 2: Commit 基线**
 
 ```bash
 git add docs/search-quality/loop-2-stage-A.json
