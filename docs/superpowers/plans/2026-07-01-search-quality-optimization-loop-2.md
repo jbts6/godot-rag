@@ -215,7 +215,7 @@ git commit -m "feat(query-rewrite): split dot-notation Class.method into method 
 
 ### Task A.3: 验证 `_symbol_candidates` 去重
 
-- [ ] **Step 1: 写断言测试**
+- [x] **Step 1: 写断言测试**
 
 在 `DotNotationSplitTests` 类中加：
 
@@ -228,7 +228,7 @@ git commit -m "feat(query-rewrite): split dot-notation Class.method into method 
         self.assertIn("connect", plan.symbol_candidates)
 ```
 
-- [ ] **Step 2: 跑测试**
+- [x] **Step 2: 跑测试**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::DotNotationSplitTests::test_symbol_candidates_dedup_dot_split -v
