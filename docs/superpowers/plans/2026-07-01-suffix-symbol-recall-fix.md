@@ -2,6 +2,7 @@
 change: suffix-symbol-recall-fix
 design-doc: docs/superpowers/specs/2026-07-01-suffix-symbol-recall-fix-design.md
 base-ref: 5c63e2c12884eb9bced2db7a5e954a1913879a5f
+archived-with: 2026-07-01-suffix-symbol-recall-fix
 ---
 
 # Implementation Plan: suffix-symbol-recall-fix

@@ -3,6 +3,8 @@ comet_change: suffix-symbol-recall-fix
 role: technical-design
 canonical_spec: openspec
 status: final
+archived-with: 2026-07-01-suffix-symbol-recall-fix
+status: final
 ---
 
 # Suffix Symbol Recall Fix - Technical Design

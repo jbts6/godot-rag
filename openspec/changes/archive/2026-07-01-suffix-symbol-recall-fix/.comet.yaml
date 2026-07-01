@@ -1,5 +1,5 @@
 workflow: full
-phase: verify
+phase: archive
 context_compression: off
 build_mode: executing-plans
 build_pause: null
@@ -12,11 +12,11 @@ auto_transition: true
 base_ref: 5c63e2c12884eb9bced2db7a5e954a1913879a5f
 design_doc: docs/superpowers/specs/2026-07-01-suffix-symbol-recall-fix-design.md
 plan: docs/superpowers/plans/2026-07-01-suffix-symbol-recall-fix.md
-verify_result: pending
+verify_result: pass
 verification_report: docs/superpowers/reports/2026-07-01-suffix-symbol-recall-fix-verify.md
 branch_status: handled
 created_at: 2026-07-01
-verified_at: null
-archived: false
+verified_at: 2026-07-01
+archived: true
 handoff_context: openspec/changes/suffix-symbol-recall-fix/.comet/handoff/design-context.json
 handoff_hash: 8b15e6eab44d8057d52be3c031cc595acdc90de06ee8c85ced90a1f774bd2009
