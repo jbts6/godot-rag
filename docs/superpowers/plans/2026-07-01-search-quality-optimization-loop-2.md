@@ -958,7 +958,7 @@ Expected:
 
 ### Task 4.1: 全套测试通过
 
-- [ ] **Step 1: 跑完整 pytest**
+- [x] **Step 1: 跑完整 pytest**
 
 ```bash
 uv run pytest -q
