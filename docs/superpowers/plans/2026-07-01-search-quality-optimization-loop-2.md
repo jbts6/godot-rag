@@ -410,13 +410,13 @@ def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
         ))
 ```
 
-- [ ] **Step 2: 跑测试确认 PASS**
+- [x] **Step 2: 跑测试确认 PASS**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::TutorialFloorBoostTests -v
 ```
 
-Expected: 4 PASS
+Expected: 4 PASS（注：test 1 需 B.3 退化 `doc_type_boost` 后才 PASS；B.2 实际 3/4 PASS）
 
 ### Task B.3: 退化 `doc_type_boost` 为 0.0
 
@@ -441,16 +441,24 @@ def test_doc_type_boost_prefers_tutorial_for_how_to_query(self):
     assert doc_type_boost("how to use scene tree nodes", "class") == 0.0
 ```
 
-- [ ] **Step 3: 跑测试确认 PASS**
+- [ ] **Step 3: 更新两个硬编码 `0.05` 的 rerank 测试断言**
+
+B.2 改了 `_rerank_bonus` 的 tutorial 分支从 `+0.05` 为 `max(score, FLOOR)*(FACTOR-1)`，两个既有测试硬编码了旧值 `0.05`，需更新为地板公式期望值：
+
+- `test_rerank_appends_doc_type_intent_signal`（约 line 311）：把 `weight == 0.05` 改为 `weight == max(result.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)` 或具体期望值
+- `test_rerank_bonus_equals_signal_weight_sum_doc_type_intent`（约 line 441）：同步更新断言
+
+- [ ] **Step 4: 跑测试确认 PASS**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py -k doc_type_boost -v
 uv run pytest -q rst2md/tests/test_searcher_module.py::TutorialFloorBoostTests -v
+uv run pytest -q rst2md/tests/test_searcher_module.py -k rerank -v
 ```
 
 Expected: 全部 PASS
 
-- [ ] **Step 4: Commit**
+- [ ] **Step 5: Commit**
 
 ```bash
 git add rst2md/rag/fusion.py rst2md/rag/query_rewrite.py rst2md/tests/test_searcher_module.py
