@@ -1,0 +1,14 @@
+{
+  "change": "suffix-symbol-recall-fix",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "8b15e6eab44d8057d52be3c031cc595acdc90de06ee8c85ced90a1f774bd2009",
+  "files": [
+    { "path": "openspec/changes/suffix-symbol-recall-fix/proposal.md", "sha256": "1b8f5427ee9bdb65e6880d549d9bee386996f61e453b5ad4998307e0a1d4d7e8" },
+    { "path": "openspec/changes/suffix-symbol-recall-fix/design.md", "sha256": "28767ffeb9a633360879f7945ed379ea5f98d977d58b4e0f366f53b6dd069548" },
+    { "path": "openspec/changes/suffix-symbol-recall-fix/tasks.md", "sha256": "19646439a594df032ac79acd7e8d75def91daaa6edc9d871275c226bbb08446a" },
+    { "path": "openspec/changes/suffix-symbol-recall-fix/specs/query-rewrite/spec.md", "sha256": "1f0a46e047e00031b5a8587fea04928ee0a24e30677f7a3431bdd0e7c1f8edb8" }
+  ]
+}

@@ -1247,18 +1247,14 @@ class SymbolRecallSignalTests(unittest.TestCase):
             exact = next(s for s in top.ranking_signals if s.name == "symbol_recall.exact")
             self.assertEqual(exact.weight, 100.0)
 
-    @unittest.expectedFailure
     def test_suffix_symbol_match_records_signal(self):
-        """Expected failure: suffix-recall tier is dead code.
+        """Suffix-recall tier fires for dot-notation symbols.
 
-        _canonical_form (rst2md/rag/symbols.py) strips dots from symbol names,
-        so normalized_name never contains a dot. The suffix-recall LIKE pattern
-        '%.{normalized}' requires a dot and therefore matches 0 rows for every
-        query — the suffix tier never fires and no symbol_recall.suffix signal
-        is recorded. Fixing the LIKE would activate dead recall code and change
-        final ordering, which this change's Global Constraint forbids. The
-        symbol_recall.suffix recording code is kept in place (correct but
-        dormant); the suffix-recall bug fix is deferred to a separate change.
+        _canonical_form (rst2md/rag/symbols.py) preserves the dot boundary, so
+        an indexed `Node.add_child` symbol has normalized form `node.addchild`.
+        Querying `add_child` (normalized `addchild`) hits the suffix LIKE
+        pattern `%.addchild`, which matches `node.addchild` — the suffix tier
+        fires and records a `symbol_recall.suffix` signal.
         """
         with tempfile.TemporaryDirectory() as tmp:
             db_path = self._build_db(tmp)
@@ -1567,9 +1563,10 @@ class RankingSignalCoverageTests(unittest.TestCase):
             addon-intent rerank path is not reachable via search_database()
             here. Verified via direct rerank_results() in
             test_addon_intent_signal_observable_via_rerank.
-          - symbol_recall.suffix: dead code (normalize_symbol strips dots, so
-            the suffix LIKE '%.{normalized}' matches 0 rows); see
-            test_suffix_symbol_match_records_signal xfail.
+          - symbol_recall.suffix: fires for the `add_child` query against the
+            indexed `Node.add_child` symbol (normalized `node.addchild` matches
+            the suffix LIKE `%.addchild`); see
+            test_suffix_symbol_match_records_signal.
         """
         observed: set[str] = set()
         with tempfile.TemporaryDirectory() as tmp:
@@ -1599,6 +1596,7 @@ class RankingSignalCoverageTests(unittest.TestCase):
         required = {
             "symbol_recall.exact",
             "symbol_recall.prefix",
+            "symbol_recall.suffix",
             "fts.bm25",
             "graph.expansion",
             "rerank.direct_symbol",

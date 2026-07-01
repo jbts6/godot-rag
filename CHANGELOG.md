@@ -2,6 +2,16 @@
 
 本文件记录已归档的 Comet changes。更细的提案、设计和任务记录保留在 `openspec/changes/archive/`。
 
+## 2026-07-01 (待归档)
+
+### `suffix-symbol-recall-fix` (build 完成，待 verify/archive)
+
+- 修复 `_canonical_form`（`rst2md/rag/symbols.py`）剥离 dot 导致 suffix symbol recall 死代码的 bug：归一化改为保留 dot 边界、只去 underscore，使 suffix LIKE `'%.{normalized}'` 能命中 `Class.method` 形态符号。
+- 转正 `test_suffix_symbol_match_records_signal`（移除 `@expectedFailure`），并把 `symbol_recall.suffix` 加入 `RankingSignalCoverageTests` 的 `required` 集。
+- 全套 273 pass（原 272 + 1 xfail 转正）。本地迁移 DB eval：hit@5 0.895→0.921、mrr@5 0.805→0.818，`scene-tree-tutorial` 不再 failure。
+- **升级注意**：已发布的 DB 必须重建索引（`godot-rag build`）才能恢复 dot-notation 符号查询的 symbol recall。未重建的旧 DB 中 `symbols.normalized_name` 仍是 dot-stripped 形态，而新代码的查询归一化保留 dot → exact/prefix/suffix 三层 symbol recall 对 `Class.method` 形态符号全部失效（FTS5 召回仍可用，但排名丢失 symbol 加分，相对旧状态是 exact/prefix 的退化）。
+- 未解决：`resource-loader`/`node-connect-signal` 仍 `matched=null`（预期目标非 `Class.method` 形态），留待后续 alias/ranking change。
+
 ## 2026-06-30
 
 ### build orchestrator

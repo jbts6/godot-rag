@@ -15,12 +15,18 @@ class Symbol:
 
 
 def _canonical_form(name: str) -> str:
-    """Unified symbol form: split camelCase, strip _ and ., lowercase."""
+    """Unified symbol form: split camelCase, strip _, preserve ., lowercase.
+
+    The dot is kept as a structural boundary so that suffix symbol recall
+    (`LIKE '%.{normalized}'`) can match `Class.method` symbols by their method
+    suffix. Underscores are stripped because they are a naming-style artifact
+    (`add_child` ≡ `addchild`).
+    """
     name = name.rstrip("()")
     # Insert separator at camelCase boundaries
     name = re.sub(r'([a-z])([A-Z])', r'\1_\2', name)
     name = name.lower()
-    name = name.replace("_", "").replace(".", "")
+    name = name.replace("_", "")
     return name
 
 
