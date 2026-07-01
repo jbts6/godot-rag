@@ -379,6 +379,68 @@ def _search_database_impl(
                                 ],
                             }
 
+            # Inheritance-directed traversal: when query signals inheritance
+            # intent, pull parent class_summary chunks via 'inherits' edges.
+            if plan.inheritance_intent:
+                for result in sorted_results[:top_k]:
+                    if result.get("chunk_type") != "class_summary":
+                        continue
+                    inh_rows = conn.execute(
+                        "SELECT c.*, r.weight FROM chunk_relations r "
+                        "JOIN chunks c ON c.id = r.target_id "
+                        "WHERE r.source_id = ? AND r.relation = 'inherits'",
+                        [result["id"]],
+                    ).fetchall()
+                    for rel_row in inh_rows:
+                        rel_id = rel_row["id"]
+                        rel_score = result["score"] * 0.7
+                        if rel_id in expanded_ids:
+                            if rel_id in results:
+                                _record_signal(
+                                    results[rel_id],
+                                    RankingSignal(
+                                        name="graph.inherits",
+                                        weight=rel_score,
+                                        value="inherits",
+                                        details={
+                                            "relation": "inherits",
+                                            "distance": 1,
+                                            "source_score": result["score"],
+                                        },
+                                    ),
+                                )
+                            continue
+                        expanded_ids.add(rel_id)
+                        results[rel_id] = {
+                            "id": rel_id,
+                            "score": rel_score,
+                            "path": rel_row["path"],
+                            "start_line": rel_row["start_line"],
+                            "end_line": rel_row["end_line"],
+                            "doc_type": rel_row["doc_type"],
+                            "chunk_type": rel_row["chunk_type"],
+                            "addon": rel_row["addon"],
+                            "addon_name": rel_row["addon_name"],
+                            "symbol": rel_row["symbol"],
+                            "heading": rel_row["heading"],
+                            "breadcrumb": rel_row["breadcrumb"],
+                            "text": clean_chunk_text(rel_row["text"]),
+                            "relation_type": "inherits",
+                            "distance": 1,
+                            "ranking_signals": [
+                                RankingSignal(
+                                    name="graph.inherits",
+                                    weight=rel_score,
+                                    value="inherits",
+                                    details={
+                                        "relation": "inherits",
+                                        "distance": 1,
+                                        "source_score": result["score"],
+                                    },
+                                )
+                            ],
+                        }
+
             # Re-sort after expansion
             sorted_results = sorted(results.values(), key=lambda r: r["score"], reverse=True)
 
