@@ -35,7 +35,7 @@
 - [x] 3.7 在 `rst2md/tests/test_rag_search.py` 加端到端测试：建小型 fixture DB（含 Node class_summary + Object class_summary + 继承边），搜索 `Node inherits Object`，断言 Object class_summary 出现在结果中且 rank ≤5
 - [x] 3.8 跑 `uv run pytest -q rst2md/tests/` 全套不回归
 - [x] 3.9 跑 `uv run godot-rag eval-search`，把输出存为 `docs/search-quality/loop-2-stage-C.json`
-- [ ] 3.10 验证 `Node inherits Object` 命中 rank ≤5；class 类 hit@5 保持 100%；A/B 段通过的查询不回归
+- [x] 3.10 验证 `Node inherits Object` 命中 rank ≤5；class 类 hit@5 保持 100%；A/B 段通过的查询不回归
 
 ## 4. 收尾验证
 
