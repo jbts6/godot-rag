@@ -664,7 +664,7 @@ Expected: PASS（`build_chunk_relations` 已实现此逻辑 — 本任务是补�
 
 **关键词 4 个（去掉 `extends`）。**
 
-- [ ] **Step 1: 在 `test_searcher_module.py` 加测试类**
+- [x] **Step 1: 在 `test_searcher_module.py` 加测试类**
 
 ```python
 class InheritanceIntentTests(unittest.TestCase):
@@ -695,7 +695,7 @@ class InheritanceIntentTests(unittest.TestCase):
         self.assertFalse(_inheritance_intent("tutorial scene tree"))
 ```
 
-- [ ] **Step 2: 跑测试确认 FAIL**
+- [x] **Step 2: 跑测试确认 FAIL**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::InheritanceIntentTests -v
@@ -809,7 +809,7 @@ class InheritsGraphTraversalTests(unittest.TestCase):
             self.assertIn("graph.inherits", names)
 ```
 
-- [ ] **Step 2: 跑测试确认 FAIL**
+- [x] **Step 2: 跑测试确认 FAIL**
 
 ```bash
 uv run pytest -q rst2md/tests/test_rag_search.py::InheritsGraphTraversalTests -v
