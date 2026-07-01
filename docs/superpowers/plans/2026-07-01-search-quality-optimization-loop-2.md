@@ -166,7 +166,7 @@ Expected: 4 个测试 FAIL（`expand_query_variants("Node.connect")` 当前返�
 
 ### Task A.2: 实现 dot-notation 拆分（Green）
 
-- [ ] **Step 1: 修改 `rst2md/rag/query_rewrite.py` 的 `expand_query_variants`**
+- [x] **Step 1: 修改 `rst2md/rag/query_rewrite.py` 的 `expand_query_variants`**
 
 在现有 alias 追加循环之后、return 之前插入 dot-notation 拆分：
 
@@ -190,7 +190,7 @@ def expand_query_variants(query: str) -> list[str]:
 
 注意：无最小长度守卫 — `Node.get` 拆出 `get` 是预期行为。
 
-- [ ] **Step 2: 跑测试确认 PASS**
+- [x] **Step 2: 跑测试确认 PASS**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::DotNotationSplitTests -v
@@ -198,7 +198,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py::DotNotationSplitTests -v
 
 Expected: 4 PASS
 
-- [ ] **Step 3: 跑现有 expand 测试确认无回归**
+- [x] **Step 3: 跑现有 expand 测试确认无回归**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py -k expand -v
@@ -206,7 +206,7 @@ uv run pytest -q rst2md/tests/test_searcher_module.py -k expand -v
 
 Expected: 全部 PASS（含 `test_expand_query_variants_deduplicates_exact_symbol_query`）
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add rst2md/rag/query_rewrite.py rst2md/tests/test_searcher_module.py
