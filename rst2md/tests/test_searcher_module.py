@@ -298,6 +298,7 @@ def test_rerank_appends_doc_type_intent_signal():
         alias_symbol_candidates=(),
         doc_type_intent="tutorial",
         addon_intent=None,
+        inheritance_intent=False,
     )
     tutorial = SearchResult(
         score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
@@ -430,6 +431,7 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
         alias_symbol_candidates=(),
         doc_type_intent="tutorial",
         addon_intent=None,
+        inheritance_intent=False,
     )
     result = SearchResult(
         score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
