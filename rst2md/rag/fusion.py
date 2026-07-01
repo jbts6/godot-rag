@@ -9,6 +9,9 @@ from typing import List
 from rag.models import RankingSignal, SearchResult
 from rag.query_plan import QueryPlan
 
+TUTORIAL_BOOST_FACTOR = 5.0
+TUTORIAL_SCORE_FLOOR = 3.0
+
 
 def rrf_fusion(fts_results: List[dict], vec_results: List[dict], k: int = 60) -> List[dict]:
     """Fuse FTS5 and vector search results using Reciprocal Rank Fusion.
@@ -52,8 +55,8 @@ def _rerank_bonus(plan: QueryPlan, result: SearchResult) -> float:
         bonus += 5.0
     elif result.symbol in plan.symbol_candidates:
         bonus += 2.0
-    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent and not plan.symbol_candidates:
-        bonus += 0.05
+    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent:
+        bonus += max(result.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
     if plan.addon_intent and result.doc_type == "addon":
         bonus += 0.5
     return bonus
@@ -80,10 +83,10 @@ def _rerank_signals(plan: QueryPlan, result: SearchResult) -> list[RankingSignal
             value=result.symbol,
             details={"source": "symbol_candidates"},
         ))
-    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent and not plan.symbol_candidates:
+    if plan.doc_type_intent and result.doc_type == plan.doc_type_intent:
         signals.append(RankingSignal(
             name="rerank.doc_type_intent",
-            weight=0.05,
+            weight=max(result.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1),
             value=result.doc_type,
             details={"intent": plan.doc_type_intent},
         ))
