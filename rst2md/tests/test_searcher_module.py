@@ -355,21 +355,115 @@ def test_rerank_preserves_prior_signals_without_mutating_original():
     )
 
 
-def test_rerank_bonus_equals_signal_weight_sum():
-    """Guard against drift between _rerank_bonus and _rerank_signals."""
+def test_rerank_bonus_equals_signal_weight_sum_alias_symbol():
+    """Sync guard: alias_symbol branch (5.0).
+
+    _rerank_bonus and _rerank_signals must agree on the bonus for an
+    alias-derived symbol match. Query "attach node to scene tree" triggers
+    the _ALIAS_RULE that maps to Node.add_child, so only the alias branch
+    fires (no doc_type_intent, no addon_intent, and the elif rules out
+    direct_symbol).
+    """
     from rag.models import SearchResult
     from rag.query_plan import build_query_plan
     from rag.fusion import _rerank_bonus, _rerank_signals
 
-    plan = build_query_plan("dialogue manager addon how to")
-    addon_tutorial = SearchResult(
-        score=1.0, path="p", start_line=1, end_line=2, doc_type="addon",
-        chunk_type="section", addon="dm", addon_name="DM", symbol="",
-        heading="h", breadcrumb="b", text="t",
+    plan = build_query_plan("attach node to scene tree")
+    result = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.",
     )
-    assert _rerank_bonus(plan, addon_tutorial) == sum(
-        s.weight for s in _rerank_signals(plan, addon_tutorial)
+    signals = _rerank_signals(plan, result)
+    assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
+    names = [s.name for s in signals]
+    assert "rerank.alias_symbol" in names
+    assert next(s for s in signals if s.name == "rerank.alias_symbol").weight == 5.0
+
+
+def test_rerank_bonus_equals_signal_weight_sum_direct_symbol():
+    """Sync guard: direct_symbol branch (2.0).
+
+    Query "Node.add_child" has no alias-rule match and carries a dot, so
+    doc_type_intent is suppressed and only the direct_symbol branch fires.
+    """
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import _rerank_bonus, _rerank_signals
+
+    plan = build_query_plan("Node.add_child")
+    result = SearchResult(
+        score=1.0, path="classes/class_node.md", start_line=1, end_line=2,
+        doc_type="class", chunk_type="method", addon="", addon_name="",
+        symbol="Node.add_child", heading="add_child", breadcrumb="Node",
+        text="Adds a child node.",
     )
+    signals = _rerank_signals(plan, result)
+    assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
+    names = [s.name for s in signals]
+    assert "rerank.direct_symbol" in names
+    assert next(s for s in signals if s.name == "rerank.direct_symbol").weight == 2.0
+
+
+def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
+    """Sync guard: doc_type_intent branch (0.05).
+
+    build_query_plan always puts the original query string in
+    symbol_candidates, which blocks the doc_type_intent bonus via the
+    `not plan.symbol_candidates` guard. Construct QueryPlan directly with
+    empty symbol_candidates (same pattern as
+    test_rerank_appends_doc_type_intent_signal) to exercise this branch
+    in isolation.
+    """
+    from rag.models import SearchResult
+    from rag.query_plan import QueryPlan
+    from rag.fusion import _rerank_bonus, _rerank_signals
+
+    plan = QueryPlan(
+        original="how to use scene tree nodes",
+        fts_variants=("how to use scene tree nodes",),
+        symbol_candidates=(),
+        alias_symbol_candidates=(),
+        doc_type_intent="tutorial",
+        addon_intent=None,
+    )
+    result = SearchResult(
+        score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
+        doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+        symbol="", heading="Scene tree", breadcrumb="Tutorial",
+        text="How to use the scene tree.",
+    )
+    signals = _rerank_signals(plan, result)
+    assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
+    names = [s.name for s in signals]
+    assert "rerank.doc_type_intent" in names
+    assert next(s for s in signals if s.name == "rerank.doc_type_intent").weight == 0.05
+
+
+def test_rerank_bonus_equals_signal_weight_sum_addon_intent():
+    """Sync guard: addon_intent branch (0.5).
+
+    Query "dialogue manager addon" sets addon_intent="addon" via _addon_intent
+    but carries no alias match and no dot/underscore, so doc_type_intent is
+    None and only the addon_intent branch fires.
+    """
+    from rag.models import SearchResult
+    from rag.query_plan import build_query_plan
+    from rag.fusion import _rerank_bonus, _rerank_signals
+
+    plan = build_query_plan("dialogue manager addon")
+    result = SearchResult(
+        score=1.0, path="addons/dm/docs.md", start_line=1, end_line=2,
+        doc_type="addon", chunk_type="section", addon="dm", addon_name="DM",
+        symbol="", heading="Dialogue", breadcrumb="Addon",
+        text="A dialogue addon.",
+    )
+    signals = _rerank_signals(plan, result)
+    assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
+    names = [s.name for s in signals]
+    assert "rerank.addon_intent" in names
+    assert next(s for s in signals if s.name == "rerank.addon_intent").weight == 0.5
 
 
 def test_rerank_ordering_unchanged_with_signals():

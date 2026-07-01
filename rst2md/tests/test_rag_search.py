@@ -1502,14 +1502,20 @@ class GraphExpansionSignalTests(unittest.TestCase):
 
 
 class RankingSignalCoverageTests(unittest.TestCase):
-    """OpenSpec 5.1: every signal family is observable end-to-end via
-    search_database()."""
+    """OpenSpec 5.1: ranking-signal family coverage guards.
 
-    def _build_db(self, tmp):
+    Each family must be observable somewhere in the suite. The core families
+    reachable via search_database() are checked in
+    test_core_signal_families_observable_via_search_database; families that
+    require a direct rerank_results() call (or are dead code) are verified in
+    their own tests and documented there.
+    """
+
+    def _build_db(self, tmp, with_vectors=False):
         from rag import embeddings
         docs = Path(tmp) / "docs"
         classes = docs / "classes"
-        classes.mkdir(parents=True)
+        classes.mkdir(parents=True, exist_ok=True)
         (classes / "class_node.md").write_text(
             "# Node\n\nBase class. Node has an add_child method.\n\n"
             "**Inherits:** `Object`\n\n"
@@ -1521,56 +1527,95 @@ class RankingSignalCoverageTests(unittest.TestCase):
             "# Object\n\nBase of all classes.\n",
             encoding="utf-8",
         )
-        db_path = Path(tmp) / "test.sqlite"
-        # Disable vectors so fts.bm25 (FTS section-4 fallback) and
-        # graph.expansion (new-chunk branch) are observable. When sqlite-vec
-        # is available, build_database generates real embeddings and hybrid.rrf
-        # returns every fixture chunk, which (a) makes FTS section-4 exclude
-        # them and (b) puts all chunks in the graph top-K so no new chunk is
-        # discovered. Matches test_graph_expansion_preserves_prior_fts_signal;
-        # makes the test deterministic with or without sqlite-vec.
-        with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+        # Empty embeddings (with_vectors=False) → FTS-only mode: fts.bm25
+        # (FTS section-4 fallback) and graph.expansion (new-chunk branch)
+        # are observable. With vectors populated, hybrid.rrf returns every
+        # fixture chunk, which (a) makes FTS section-4 exclude them and (b)
+        # puts all chunks in the graph top-K so no new chunk is discovered.
+        # Zero-vector embeddings (with_vectors=True) populate vec_chunks so
+        # _vector_availability is True and hybrid.rrf fires. A separate
+        # filename avoids clobbering the FTS-only DB. Matches
+        # test_graph_expansion_preserves_prior_fts_signal for determinism.
+        db_path = Path(tmp) / ("test_hybrid.sqlite" if with_vectors else "test.sqlite")
+        emb_fn = (lambda texts: [[0.0] * 256 for _ in texts]) if with_vectors else (lambda texts: [])
+        with patch.object(embeddings, "generate_embeddings", emb_fn):
             build_database(docs, db_path)
         return db_path
 
-    def test_all_signal_families_observable(self):
-        from rag import embeddings
-        from unittest.mock import patch
+    def test_core_signal_families_observable_via_search_database(self):
+        """Coverage guard: signal families reachable via search_database() on
+        this fixture must all appear in the observed set.
 
+        Families in `required` (verified here via search_database):
+          - symbol_recall.exact / .prefix  (symbol-candidate queries)
+          - fts.bm25                        (FTS fallback, FTS-only DB)
+          - graph.expansion                 (expand_graph=True)
+          - rerank.direct_symbol            (query "Node.add_child")
+          - rerank.alias_symbol             (query "attach node to scene tree"
+                                             → _ALIAS_RULE → Node.add_child)
+          - hybrid.rrf                      (separate DB built with vectors)
+
+        Families verified elsewhere (not in `required`):
+          - rerank.doc_type_intent: NOT observable via search_database() —
+            build_query_plan always puts the original query in
+            symbol_candidates, which blocks the `not plan.symbol_candidates`
+            guard in _rerank_bonus. Verified directly via
+            test_rerank_appends_doc_type_intent_signal and
+            test_rerank_bonus_equals_signal_weight_sum_doc_type_intent
+            (test_searcher_module.py).
+          - rerank.addon_intent: the bare fixture has no addon docs, so the
+            addon-intent rerank path is not reachable via search_database()
+            here. Verified via direct rerank_results() in
+            test_addon_intent_signal_observable_via_rerank.
+          - symbol_recall.suffix: dead code (normalize_symbol strips dots, so
+            the suffix LIKE '%.{normalized}' matches 0 rows); see
+            test_suffix_symbol_match_records_signal xfail.
+        """
         observed: set[str] = set()
         with tempfile.TemporaryDirectory() as tmp:
+            # FTS-only DB: symbol recall, FTS fallback, graph expansion,
+            # rerank.direct_symbol + rerank.alias_symbol.
             db_path = self._build_db(tmp)
-            # Symbol recall (exact/suffix/prefix) + rerank.direct_symbol.
             for q in ("Node.add_child", "add_child", "Node"):
                 for r in search_database(db_path, q, limit=10, expand_graph=False):
                     observed.update(s.name for s in r.ranking_signals)
+            # Alias-derived symbol match → rerank.alias_symbol.
+            for r in search_database(db_path, "attach node to scene tree", limit=10, expand_graph=False):
+                observed.update(s.name for s in r.ranking_signals)
             # FTS fallback.
             for r in search_database(db_path, "base class", limit=10, expand_graph=False):
                 observed.update(s.name for s in r.ranking_signals)
             # Graph expansion (new + existing chunk branches).
             for r in search_database(db_path, "add child", limit=10, expand_graph=True):
                 observed.update(s.name for s in r.ranking_signals)
-            # Hybrid RRF + rerank.doc_type_intent.
-            with patch.object(embeddings, "generate_embeddings", side_effect=lambda texts: [[0.0] * 256 for _ in texts]):
-                for r in search_database(db_path, "how to use node", limit=10, expand_graph=False):
-                    observed.update(s.name for s in r.ranking_signals)
+            # Hybrid RRF — needs a DB with vec_chunks populated. The FTS-only
+            # DB above has empty vec_chunks, so _vector_availability is False
+            # and RRF never fires regardless of any search-time embedding patch
+            # (the build-time embedding is what populates vec_chunks).
+            hybrid_db = self._build_db(tmp, with_vectors=True)
+            for r in search_database(hybrid_db, "node add_child", limit=10, expand_graph=False):
+                observed.update(s.name for s in r.ranking_signals)
 
         required = {
             "symbol_recall.exact",
-            # symbol_recall.suffix omitted: suffix-recall tier is dead code
-            # (deferred to a separate change; see
-            # test_suffix_symbol_match_records_signal xfail)
             "symbol_recall.prefix",
             "fts.bm25",
             "graph.expansion",
             "rerank.direct_symbol",
+            "rerank.alias_symbol",
+            "hybrid.rrf",
         }
         missing = required - observed
         self.assertFalse(missing, f"missing signal families: {sorted(missing)}")
 
-    def test_addon_intent_signal_observable_end_to_end(self):
-        # Exercise the addon-intent rerank path via a direct rerank call,
-        # since the bare-fixture FTS path may not surface it deterministically.
+    def test_addon_intent_signal_observable_via_rerank(self):
+        """Verify rerank.addon_intent via a direct rerank_results() call.
+
+        The bare fixture has no addon docs, so the addon-intent rerank path is
+        not reachable via search_database() here. This exercises the signal
+        directly via rerank_results() (the production rerank entry point) with
+        a synthetic addon SearchResult.
+        """
         from rag.models import SearchResult
         from rag.query_plan import build_query_plan
         from rag.fusion import rerank_results
