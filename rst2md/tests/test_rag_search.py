@@ -928,6 +928,114 @@ class RegressionTests(unittest.TestCase):
                 self.assertNotIn("search_mode:", output)
                 self.assertNotIn("vector_available:", output)
 
+    def test_cli_search_debug_json_includes_ranking_signals(self):
+        from rag import embeddings
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            with patch.object(embeddings, "generate_embeddings", return_value=[[0.0] * 256]):
+                db_path = Path(tmp) / "test.db"
+                build_database(docs, db_path)
+                args = MagicMock()
+                args.db = str(db_path)
+                args.query = "Timer.is_stopped"
+                args.limit = 3
+                args.json = True
+                args.no_expand = True
+                args.debug_search = True
+
+                import io
+                from contextlib import redirect_stdout
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    cmd_search(args)
+                output = json.loads(f.getvalue())
+
+            self.assertIn("results", output)
+            self.assertTrue(output["results"], "should have at least one result")
+            top = output["results"][0]
+            self.assertIn("ranking_signals", top)
+            self.assertIsInstance(top["ranking_signals"], list)
+            self.assertTrue(top["ranking_signals"], "top result should have ranking signals")
+            sig = top["ranking_signals"][0]
+            self.assertIn("name", sig)
+            self.assertIn("weight", sig)
+            self.assertIn("details", sig)
+
+    def test_cli_search_debug_text_includes_signal_summary(self):
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.db"
+            build_database(docs, db_path)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "Timer.is_stopped"
+            args.limit = 3
+            args.json = False
+            args.no_expand = True
+            args.debug_search = True
+
+            import io
+            from contextlib import redirect_stdout
+            f = io.StringIO()
+            with redirect_stdout(f):
+                cmd_search(args)
+            output = f.getvalue()
+
+            self.assertIn("signals:", output, "debug text output should include a signals summary line")
+
+    def test_cli_search_default_text_omits_signals(self):
+        """OpenSpec 4.2: default (non-debug) text output must not print signals."""
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.db"
+            build_database(docs, db_path)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "Timer.is_stopped"
+            args.limit = 3
+            args.json = False
+            args.no_expand = True
+            args.debug_search = False
+
+            import io
+            from contextlib import redirect_stdout
+            f = io.StringIO()
+            with redirect_stdout(f):
+                cmd_search(args)
+            output = f.getvalue()
+
+            self.assertNotIn("signals:", output, "default text output must not print signal payload")
+
 
 class IntentBoostTests(unittest.TestCase):
     """Tutorial-intent queries should boost tutorial doc_type results."""

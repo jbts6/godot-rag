@@ -55,6 +55,15 @@ def cmd_build(args):
     print(f"Database built at {db_path}")
 
 
+def _signal_to_dict(s):
+    return {
+        "name": s.name,
+        "weight": s.weight,
+        "value": s.value,
+        "details": dict(s.details),
+    }
+
+
 def _result_to_dict(r):
     return {
         "score": r.score,
@@ -71,6 +80,7 @@ def _result_to_dict(r):
         "text": r.text,
         "relation_type": r.relation_type,
         "distance": r.distance,
+        "ranking_signals": [_signal_to_dict(s) for s in r.ranking_signals],
     }
 
 
@@ -101,6 +111,9 @@ def _print_results(results, as_json: bool, metadata=None, debug_search: bool = F
             print(f"score: {r.score}")
             if r.relation_type:
                 print(f"relation: {r.relation_type} (distance={r.distance})")
+            if debug_search and r.ranking_signals:
+                summary = ", ".join(f"{s.name}={s.weight:+g}" for s in r.ranking_signals)
+                print(f"signals: {summary}")
             print(f"path: {r.path}:{r.start_line}-{r.end_line}")
             print(f"type: {r.chunk_type}")
             if r.addon:
