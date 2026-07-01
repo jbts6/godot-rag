@@ -20,6 +20,14 @@ class Chunk:
 
 
 @dataclass(frozen=True)
+class RankingSignal:
+    name: str
+    weight: float
+    value: float | int | str | None = None
+    details: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class SearchResult:
     score: float
     path: str
@@ -36,6 +44,7 @@ class SearchResult:
     relation_type: str = ''
     distance: int = 0
     snippet: str = ''
+    ranking_signals: List[RankingSignal] = field(default_factory=list)
 
 
 @dataclass(frozen=True)

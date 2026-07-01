@@ -654,6 +654,48 @@ class SnippetTests(unittest.TestCase):
                 self.assertIsInstance(r.snippet, str)
 
 
+class RankingSignalTests(unittest.TestCase):
+    """RankingSignal model and SearchResult additive field."""
+
+    def test_ranking_signal_defaults(self):
+        from rag.models import RankingSignal
+
+        signal = RankingSignal(name="symbol_recall.exact", weight=100.0)
+        self.assertEqual(signal.name, "symbol_recall.exact")
+        self.assertEqual(signal.weight, 100.0)
+        self.assertIsNone(signal.value)
+        self.assertEqual(signal.details, {})
+
+    def test_ranking_signal_details_not_shared_across_instances(self):
+        from rag.models import RankingSignal
+
+        a = RankingSignal(name="x", weight=1.0)
+        b = RankingSignal(name="y", weight=2.0)
+        a.details["k"] = "v"
+        self.assertNotIn("k", b.details, "details dict must not be shared across instances")
+
+    def test_search_result_ranking_signals_default_empty(self):
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            score=1.0, path="p", start_line=1, end_line=2,
+            doc_type="class", chunk_type="method", addon="", addon_name="",
+            symbol="X", heading="h", breadcrumb="b", text="t",
+        )
+        self.assertEqual(result.ranking_signals, [])
+
+    def test_search_result_positional_construction_still_works(self):
+        """Existing positional construction must stay source-compatible."""
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            1.0, "p", 1, 2, "class", "method", "", "", "X", "h", "b", "t",
+        )
+        self.assertEqual(result.score, 1.0)
+        self.assertEqual(result.snippet, "")
+        self.assertEqual(result.ranking_signals, [])
+
+
 class RegressionTests(unittest.TestCase):
     """Regression tests for bug fixes."""
 
