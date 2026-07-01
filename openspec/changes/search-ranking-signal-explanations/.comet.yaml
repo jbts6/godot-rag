@@ -1,5 +1,5 @@
 workflow: full
-phase: build
+phase: verify
 context_compression: off
 build_mode: subagent-driven-development
 build_pause: null
@@ -7,7 +7,7 @@ subagent_dispatch: confirmed
 tdd_mode: tdd
 review_mode: standard
 isolation: branch
-verify_mode: null
+verify_mode: full
 auto_transition: true
 base_ref: fb5491a279abb9c03f90f5e6b7fc25b7bf63a555
 design_doc: docs/superpowers/specs/2026-06-30-search-ranking-signal-explanations-design.md
