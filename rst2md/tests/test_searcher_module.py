@@ -589,5 +589,33 @@ class TutorialFloorBoostTests(unittest.TestCase):
         self.assertNotIn("tutorial", str(_rerank_bonus(plan, result) - 0.0))
 
 
+class InheritanceIntentTests(unittest.TestCase):
+    def test_inherits_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("Node inherits Object"))
+
+    def test_subclass_of_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("what is subclass of Node"))
+
+    def test_parent_class_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("parent class of Timer"))
+
+    def test_derived_from_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("classes derived from Object"))
+
+    def test_extends_does_not_trigger(self):
+        # 修订：去掉 extends，避免 "how to extend Node functionality" 误判
+        from rag.query_plan import _inheritance_intent
+        self.assertFalse(_inheritance_intent("how to extend Node functionality"))
+
+    def test_plain_query_does_not_trigger(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertFalse(_inheritance_intent("Node connect"))
+        self.assertFalse(_inheritance_intent("tutorial scene tree"))
+
+
 if __name__ == "__main__":
     unittest.main()
