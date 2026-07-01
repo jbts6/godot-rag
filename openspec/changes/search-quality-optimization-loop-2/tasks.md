@@ -14,7 +14,7 @@
 
 ## 2. B 段：Tutorial 排序改 multiplicative
 
-- [ ] 2.1 在 `rst2md/rag/fusion.py` 加模块常量 `TUTORIAL_BOOST_FACTOR = 5.0`（初始值，待 eval 二分上调）
+- [x] 2.1 在 `rst2md/rag/fusion.py` 加模块常量 `TUTORIAL_BOOST_FACTOR = 5.0`（初始值，待 eval 二分上调）
 - [ ] 2.2 修改 `_rerank_bonus`（`fusion.py:49`）：当 `plan.doc_type_intent` 非空且 `result.doc_type == plan.doc_type_intent` 且 `not plan.symbol_candidates` 时，bonus 从 `+0.05` 改为 `result.score * (TUTORIAL_BOOST_FACTOR - 1)`
 - [ ] 2.3 同步修改 `_rerank_signals`（`fusion.py:62`）记录 `rerank.doc_type_intent` 信号的 weight 为新的 bonus 值（保持信号名不变，weight 跟随 bonus）
 - [ ] 2.4 修改 `rst2md/rag/query_rewrite.py` 的 `doc_type_boost`：tutorial intent 分支返回 0.0（保留函数签名与守卫逻辑，避免破坏 3 个 caller 与现有测试）

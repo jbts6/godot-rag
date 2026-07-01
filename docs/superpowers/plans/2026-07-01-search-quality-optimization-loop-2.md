@@ -308,7 +308,7 @@ Expected:
 
 ### Task B.1: 写失败测试 — 地板公式（Red）
 
-- [ ] **Step 1: 在 `test_searcher_module.py` 加测试类**
+- [x] **Step 1: 在 `test_searcher_module.py` 加测试类**
 
 ```python
 class TutorialFloorBoostTests(unittest.TestCase):
@@ -363,7 +363,7 @@ class TutorialFloorBoostTests(unittest.TestCase):
         self.assertNotIn("tutorial", str(_rerank_bonus(plan, result) - 0.0))
 ```
 
-- [ ] **Step 2: 跑测试确认 FAIL**
+- [x] **Step 2: 跑测试确认 FAIL**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::TutorialFloorBoostTests -v
