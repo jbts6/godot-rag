@@ -532,5 +532,57 @@ class DotNotationSplitTests(unittest.TestCase):
         self.assertIn("connect", plan.symbol_candidates)
 
 
+class TutorialFloorBoostTests(unittest.TestCase):
+    def test_doc_type_boost_returns_zero_for_tutorial(self):
+        # 修订：doc_type_boost 退化为 0.0，加权移到 _rerank_bonus
+        from rag.query_rewrite import doc_type_boost
+        self.assertEqual(doc_type_boost("how to use scene tree nodes", "tutorial"), 0.0)
+
+    def test_rerank_bonus_floors_low_tutorial_score(self):
+        # score=0.66 < FLOOR=3.0 → bonus = 3.0 * 4 = 12.0
+        from rag.fusion import _rerank_bonus, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("how to use scene tree nodes")
+        result = SearchResult(
+            score=0.66, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        expected = max(0.66, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+        self.assertAlmostEqual(_rerank_bonus(plan, result), expected, places=6)
+
+    def test_rerank_bonus_multiplicative_high_tutorial_score(self):
+        # score=5.0 >= FLOOR=3.0 → bonus = 5.0 * 4 = 20.0（不 overshoot 到 symbol 阈值外）
+        from rag.fusion import _rerank_bonus, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("how to use scene tree nodes")
+        result = SearchResult(
+            score=5.0, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        expected = max(5.0, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+        self.assertAlmostEqual(_rerank_bonus(plan, result), expected, places=6)
+
+    def test_rerank_bonus_no_tutorial_boost_when_symbol_candidates(self):
+        # 守卫：symbol 查询不触发 tutorial boost
+        from rag.fusion import _rerank_bonus
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("Node.add_child")  # 有 symbol_candidates
+        result = SearchResult(
+            score=0.66, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        # 只有 symbol 候选 bonus，无 tutorial bonus
+        self.assertNotIn("tutorial", str(_rerank_bonus(plan, result) - 0.0))
+
+
 if __name__ == "__main__":
     unittest.main()
