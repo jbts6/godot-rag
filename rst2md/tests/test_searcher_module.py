@@ -524,6 +524,13 @@ class DotNotationSplitTests(unittest.TestCase):
         # v2.1 — 前段非大写开头，不拆
         self.assertEqual(expand_query_variants("v2.1"), ["v2.1"])
 
+    def test_symbol_candidates_dedup_dot_split(self):
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("Node.connect")
+        # 两个去重候选：原符号 + 方法后缀
+        self.assertIn("Node.connect", plan.symbol_candidates)
+        self.assertIn("connect", plan.symbol_candidates)
+
 
 if __name__ == "__main__":
     unittest.main()
