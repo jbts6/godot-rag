@@ -658,7 +658,7 @@ Then check off OpenSpec `2.2` in `openspec/changes/search-ranking-signal-explana
 - Consumes: `_make_result`, `_record_signal`, `RankingSignal` (from Task 2). The `parent` relation direction is `source=member → target=class_summary` (confirmed at `rst2md/rag/relations.py:30-36`), so searching a method expands to its class_summary.
 - Produces: `graph.expansion` signal recorded (a) for newly introduced chunks (weight = computed `rel_score`, `details={"relation", "distance", "source_score", "weight"}`) and (b) for already-present chunks whose `relation_type`/`distance` are updated (weight = 0.0, `details={"relation", "distance", "metadata_only": True}`). Prior signals are preserved in the existing-chunk branch (OpenSpec 2.4 for FTS→graph preservation).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `rst2md/tests/test_rag_search.py`:
 
@@ -719,12 +719,12 @@ class GraphExpansionSignalTests(unittest.TestCase):
             self.assertTrue(graph_sig.details.get("metadata_only"), "existing-chunk branch should set metadata_only=True")
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::GraphExpansionSignalTests -v`
 Expected: FAIL — no `graph.expansion` signals recorded; the new-chunk branch builds a dict without `ranking_signals`, and the existing-chunk branch doesn't append a signal.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Edit `rst2md/rag/searcher.py:270-297`. The existing-chunk branch (at `:274-277`) currently only mutates `relation_type` and `distance`; add a `graph.expansion` signal append. The new-chunk branch (at `:281-297`) builds a dict inline; add a `ranking_signals` list with one `graph.expansion` signal. Replace the inner loop body:
 
@@ -785,17 +785,17 @@ Edit `rst2md/rag/searcher.py:270-297`. The existing-chunk branch (at `:274-277`)
                             }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::GraphExpansionSignalTests -v`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Run regression**
+- [x] **Step 5: Run regression**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py -q`
 Expected: PASS. Existing `GraphExpansionTests` (`test_expand_returns_parent_chunk`, `test_expanded_results_have_distance`, `test_expanded_results_have_relation_type`) still pass — relation metadata and scoring unchanged.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py
