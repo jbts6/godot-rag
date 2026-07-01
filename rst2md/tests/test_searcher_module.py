@@ -499,5 +499,31 @@ def test_search_response_metadata_shape_is_stable():
     assert metadata.fallback_reason == "missing_vec_chunks"
 
 
+class DotNotationSplitTests(unittest.TestCase):
+    def test_class_method_splits_to_method_suffix(self):
+        from rag.query_rewrite import expand_query_variants
+        self.assertEqual(
+            expand_query_variants("Node.connect"),
+            ["Node.connect", "connect"],
+        )
+
+    def test_class_method_parens_strips_parens(self):
+        from rag.query_rewrite import expand_query_variants
+        self.assertEqual(
+            expand_query_variants("ResourceLoader.load()"),
+            ["ResourceLoader.load()", "load"],
+        )
+
+    def test_lowercase_dot_not_split(self):
+        from rag.query_rewrite import expand_query_variants
+        # scene_tree.tutorial — 前段非大写开头，不拆
+        self.assertEqual(expand_query_variants("scene_tree.tutorial"), ["scene_tree.tutorial"])
+
+    def test_numeric_dot_not_split(self):
+        from rag.query_rewrite import expand_query_variants
+        # v2.1 — 前段非大写开头，不拆
+        self.assertEqual(expand_query_variants("v2.1"), ["v2.1"])
+
+
 if __name__ == "__main__":
     unittest.main()
