@@ -212,7 +212,7 @@ Then check off OpenSpec `1.1`, `1.2`, `1.3` in `openspec/changes/search-ranking-
 - Consumes: `RankingSignal`, `SearchResult.ranking_signals` (from Task 1).
 - Produces: `_make_result(row, score, ranking_signals=None)` returns a candidate dict with a `ranking_signals` list key; `_record_signal(candidate, signal)` helper that appends to `candidate["ranking_signals"]` preserving prior entries. Symbol-recall stages emit `symbol_recall.exact` (weight 100.0), `symbol_recall.suffix` (80.0), `symbol_recall.prefix` (40.0), with `details={"candidate": <candidate>, "alias_derived": <bool>}`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append to `rst2md/tests/test_rag_search.py`:
 
@@ -289,12 +289,12 @@ class SymbolRecallSignalTests(unittest.TestCase):
             )
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::SymbolRecallSignalTests -v`
 Expected: FAIL — `top.ranking_signals` is `[]` (no signals recorded yet), so `assertIn("symbol_recall.exact", names)` fails.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 Edit `rst2md/rag/searcher.py`.
 
@@ -432,17 +432,17 @@ from rag.models import RankingSignal, SearchMetadata, SearchResponse, SearchResu
 
 Note: do NOT touch the RRF, FTS, or graph stages yet — they still call the old `_make_result(row, score)` form, which now defaults `ranking_signals` to `[]`. That is fine; subsequent tasks add their signals. The `results[cid] = _make_result(row, score)` calls in RRF (line ~157) and FTS (line ~245) will produce entries with empty `ranking_signals` lists until Tasks 3 and 4 fill them in.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py::SymbolRecallSignalTests -v`
 Expected: PASS (4 tests).
 
-- [ ] **Step 5: Run regression**
+- [x] **Step 5: Run regression**
 
 Run: `uv run pytest -q rst2md/tests/test_rag_search.py rst2md/tests/test_searcher_module.py -q`
 Expected: PASS. Existing symbol/recall tests (`test_symbol_query_returns_exact_method_first`, `test_natural_language_alias_returns_expected_symbol`, `test_rerank_promotes_alias_symbol_match`) still pass — ordering unchanged.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py

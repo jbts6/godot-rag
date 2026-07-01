@@ -80,3 +80,7 @@ Rollback is straightforward: remove the additive signal field and signal recordi
 ## Open Questions
 
 - Whether the default human CLI output should show a compact signal summary immediately or only under an existing verbose/debug mode should be finalized during implementation after inspecting current CLI output conventions.
+
+## Deferred Issues
+
+- **Suffix-recall tier is dead code (pre-existing bug, deferred).** `_canonical_form` in `rst2md/rag/symbols.py` strips dots (`name.replace(".", "")`), so `normalized_name` never contains a dot. The suffix-recall LIKE pattern `WHERE s.normalized_name LIKE '%.{normalized}'` therefore matches 0 rows for every query — the suffix tier never fires. Fixing the LIKE (removing the dot) would activate dead recall code and change final ranking/ordering, which this change's Global Constraint and Non-Goal forbid. Decision (Task 2, Option B): the `symbol_recall.suffix` recording code is kept in place (correct but dormant), `test_suffix_symbol_match_records_signal` is marked `@unittest.expectedFailure` with a documented reason, and the actual suffix-recall bug fix is deferred to a separate change (a ranking-behavior change needing its own design and ordering re-verification).
