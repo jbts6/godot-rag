@@ -9,6 +9,10 @@ _ALIAS_RULES: tuple[tuple[frozenset[str], str], ...] = (
     (frozenset({"emit", "signal"}), "Object.emit_signal"),
 )
 
+_ALIAS_FORMS = frozenset(alias for _, alias in _ALIAS_RULES)
+
+_DOT_NOTATION_RE = re.compile(r'^([A-Z][A-Za-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)\(?\)?\s*$')
+
 
 def _tokens(query: str) -> frozenset[str]:
     return frozenset(re.findall(r"[a-z0-9]+", query.lower()))
@@ -35,4 +39,9 @@ def expand_query_variants(query: str) -> list[str]:
     for required_tokens, alias in _ALIAS_RULES:
         if required_tokens.issubset(query_tokens) and alias not in variants:
             variants.append(alias)
+    m = _DOT_NOTATION_RE.match(query.strip())
+    if m and f"{m.group(1)}.{m.group(2)}" not in _ALIAS_FORMS:
+        method_suffix = m.group(2)
+        if method_suffix not in variants:
+            variants.append(method_suffix)
     return variants
