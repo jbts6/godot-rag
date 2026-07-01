@@ -332,6 +332,19 @@ def _search_database_impl(
                             # Chunk already found by vector/FTS search, update relation metadata
                             results[rel_id]["relation_type"] = rel_row["relation"]
                             results[rel_id]["distance"] = 1
+                            _record_signal(
+                                results[rel_id],
+                                RankingSignal(
+                                    name="graph.expansion",
+                                    weight=0.0,
+                                    value=rel_row["relation"],
+                                    details={
+                                        "relation": rel_row["relation"],
+                                        "distance": 1,
+                                        "metadata_only": True,
+                                    },
+                                ),
+                            )
                         else:
                             # New chunk from graph expansion
                             rel_score = result["score"] * rel_row["weight"] * 0.5
@@ -351,6 +364,19 @@ def _search_database_impl(
                                 "text": clean_chunk_text(rel_row["text"]),
                                 "relation_type": rel_row["relation"],
                                 "distance": 1,
+                                "ranking_signals": [
+                                    RankingSignal(
+                                        name="graph.expansion",
+                                        weight=rel_score,
+                                        value=rel_row["relation"],
+                                        details={
+                                            "relation": rel_row["relation"],
+                                            "distance": 1,
+                                            "source_score": result["score"],
+                                            "weight": rel_row["weight"],
+                                        },
+                                    )
+                                ],
                             }
 
             # Re-sort after expansion

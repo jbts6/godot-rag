@@ -1294,5 +1294,104 @@ class HybridRrfSignalTests(unittest.TestCase):
             self.assertIn("symbol_recall.exact", names)
 
 
+class GraphExpansionSignalTests(unittest.TestCase):
+    """Graph expansion should record signals and preserve prior signals."""
+
+    def test_new_graph_chunk_records_expansion_signal(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            # The Node class_summary text contains the query term "node" so FTS
+            # (and exact symbol recall) finds it; its `inherits` edge targets
+            # Object, whose text does NOT contain the query term, so Object is
+            # only reached via graph expansion (new-chunk branch). Timer and
+            # Sprite are unrelated filler so the doc set has >=4 chunks.
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class for scene nodes.\n\n**Inherits:** `Object`\n\n"
+                "## Methods\n\n`void` **add_child**(`Node` node)\n\nAdds a child.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_object.md").write_text(
+                "# Object\n\nRoot of all things.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_sprite.md").write_text(
+                "# Sprite\n\nA 2D texture.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vectors so RRF does not surface every chunk at distance=0;
+            # FTS-only mode keeps Object out of results until graph expansion.
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "node", limit=10, expand_graph=True)
+            # Object class_summary is reached only via graph expansion (inherits).
+            obj = next((r for r in results if r.symbol == "Object"), None)
+            self.assertIsNotNone(obj, "Object should be reached via graph expansion")
+            names = [s.name for s in obj.ranking_signals]
+            self.assertIn("graph.expansion", names)
+            graph_sig = next(s for s in obj.ranking_signals if s.name == "graph.expansion")
+            self.assertEqual(graph_sig.details.get("relation"), "inherits")
+            self.assertEqual(graph_sig.details.get("distance"), 1)
+
+    def test_graph_expansion_preserves_prior_fts_signal(self):
+        """OpenSpec 2.4: a chunk found by FTS and then reached via graph
+        expansion must carry both its fts.bm25 signal and graph.expansion."""
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            # The alias rule {child, node, attach} -> "Node.add_child" makes the
+            # method an exact symbol match (score 100, in top_k). The
+            # class_summaries FTS-match "attach child node" (fts.bm25, ~40);
+            # the short Node summary is the strongest bm25 match so its
+            # inverted fts_score is lowest, landing it OUTSIDE top_k=3 (the
+            # method + Timer + Sprite occupy top_k). The method's `parent`
+            # edge -> Node summary then hits the existing-chunk branch:
+            # graph.expansion (metadata_only=True) is appended while fts.bm25
+            # is preserved.
+            (classes / "class_node.md").write_text(
+                "# Node\n\nAttach child node.\n\n"
+                "## Methods\n\n`void` **add_child**(`Node` node)\n\n"
+                "Adds a child node to the parent.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer that can attach a child node "
+                "for scheduling nested timer callbacks within the scene tree "
+                "management system.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_sprite.md").write_text(
+                "# Sprite\n\nA two dimensional texture that can attach a child "
+                "node for rendering nested sprites within the scene graph "
+                "hierarchy.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vectors so the summaries get fts.bm25 (not hybrid.rrf).
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "attach child node", limit=10, expand_graph=True)
+            summary = next((r for r in results if r.symbol == "Node"), None)
+            self.assertIsNotNone(summary, "Node class_summary should be in results")
+            names = {s.name for s in summary.ranking_signals}
+            self.assertIn("fts.bm25", names, "prior FTS signal must survive graph expansion")
+            self.assertIn("graph.expansion", names, "graph expansion should append its own signal")
+            graph_sig = next(s for s in summary.ranking_signals if s.name == "graph.expansion")
+            self.assertTrue(graph_sig.details.get("metadata_only"), "existing-chunk branch should set metadata_only=True")
+
+
 if __name__ == "__main__":
     unittest.main()
