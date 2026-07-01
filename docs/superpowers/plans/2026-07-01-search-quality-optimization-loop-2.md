@@ -613,7 +613,7 @@ Expected: `extract_inherits` 返回非空列表（如 `['Object']`）。
 
 CodeGraph 标记 `build_chunk_relations` 无直接覆盖测试（现有测试经 `build_database` 间接调用）。本任务补直接单元测试。
 
-- [ ] **Step 1: 在 `test_rag_search.py` 加测试类**
+- [x] **Step 1: 在 `test_rag_search.py` 加测试类**
 
 ```python
 class BuildChunkRelationsCoverageTests(unittest.TestCase):
@@ -652,7 +652,7 @@ class BuildChunkRelationsCoverageTests(unittest.TestCase):
         self.assertAlmostEqual(row["weight"], 0.8)
 ```
 
-- [ ] **Step 2: 跑测试确认结果**
+- [x] **Step 2: 跑测试确认结果**
 
 ```bash
 uv run pytest -q rst2md/tests/test_rag_search.py::BuildChunkRelationsCoverageTests -v

@@ -27,7 +27,7 @@
 ## 3. C 段：继承图扩展（inherits 边定向遍历）
 
 - [x] 3.1 读一份真实 `class_node.md` chunk 文本（用 `sqlite3` 查 chunks 表，path=`classes/class_node.md` 且 chunk_type=`class_summary`），确认 `**Inherits:**` 行格式匹配 `INHERITS_RE`（`rst2md/rag/relations.py:6`）。若不匹配，暂停 C 段，回到 design 补" indexer 阶段解析"决策
-- [ ] 3.2 在 `rst2md/tests/test_rag_search.py` 加 `build_chunk_relations` 覆盖测试：构造 `Node` class_summary chunk（含 `**Inherits:** \`Object\``）+ `Object` class_summary chunk，调用 `build_chunk_relations`，断言 `chunk_relations` 表存在 `(source=Node_id, target=Object_id, relation='inherits', weight=0.8)` 行
+- [x] 3.2 在 `rst2md/tests/test_rag_search.py` 加 `build_chunk_relations` 覆盖测试：构造 `Node` class_summary chunk（含 `**Inherits:** \`Object\``）+ `Object` class_summary chunk，调用 `build_chunk_relations`，断言 `chunk_relations` 表存在 `(source=Node_id, target=Object_id, relation='inherits', weight=0.8)` 行
 - [ ] 3.3 在 `rst2md/rag/query_plan.py` 加 `_inheritance_intent(query: str) -> bool`：检测 `inherits`、`extends`、`subclass of`、`parent class`、`derived from` 关键词（大小写不敏感，整词匹配）
 - [ ] 3.4 在 `QueryPlan` dataclass 加 `inheritance_intent: bool` 字段；`build_query_plan` 调用 `_inheritance_intent` 填充
 - [ ] 3.5 在 `rst2md/tests/test_searcher_module.py` 加测试：`Node inherits Object` → `plan.inheritance_intent == True`；`Node connect` → False；`tutorial scene tree` → False
