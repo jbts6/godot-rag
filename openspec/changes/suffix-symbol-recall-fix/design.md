@@ -54,7 +54,7 @@ Suffix 层的 LIKE 模式是 `f"%.{normalized}"`（`rst2md/rag/searcher.py:211`�
 
 - **[风险] 修 dot 后 prefix LIKE 行为变化**：`Node` 查询的 prefix LIKE 从 `node%`（匹配 `nodeaddchild`）变成 `node%`（匹配 `node.addchild`，仍命中）。`ResourceLoader` 类前缀同理。实测应在 build 阶段跑 45 查询确认无新误匹配。→ 缓解：baseline comparison 把关，hit@1/hit@5/mrr@5 不得下降。
 - **[风险] 两条 gating failure 可能仍未进 `required_at`**：`resource-loader`（query=`ResourceLoader.load`）和 `node-connect-signal`（query=`Node.connect`）当前 `matched=null`。若预期目标在索引里符号名不是 `Class.method` 形态（例如只存了 `load` 或 `connect`），suffix/exact recall 仍可能不命中。→ 缓解：build 阶段先跑 eval 定位预期 chunk 的实际 symbol，再决定是否需追加 alias 或调 query rewrite；若需改 ranking，开下一个 change，不在本 change 内扩范围。
-- **[风险] 已发布 DB 与新代码不兼容**：用户升级 `godot-rag` 后不重建 DB，suffix recall 仍失效（但不会崩）。→ 缓解：在 CHANGELOG/release notes 注明「升级后请重建索引」；代码层面无 schema 变更，旧 DB 行为退化到「suffix 不命中」即原本状态，无回归。
+- **[风险] 已发布 DB 与新代码不兼容**：用户升级 `godot-rag` 后不重建 DB，dot-notation 符号查询的 exact/prefix/suffix 三层 symbol recall 全部失效——旧 DB 的 `normalized_name` 是 dot-stripped，新查询归一化保留 dot，二者不匹配。这相对旧状态是 exact/prefix 的退化（旧状态 exact/prefix 可命中，仅 suffix 死；新代码+旧 DB 三层全失效）。FTS5 召回仍可用，搜索不崩，但排名丢失 symbol 加分。→ 缓解：CHANGELOG 注明「升级后必须 `godot-rag build` 重建」；后续 change 可加 stale-DB 检测器（`SELECT 1 FROM symbols WHERE name LIKE '%.%' AND normalized_name NOT LIKE '%.%' LIMIT 1` 命中则告警）。
 - **[权衡] 保留 dot 使 normalized 形态不再是「纯 token 串」**：下游若有代码假设 `normalized_name` 不含标点会被影响。→ 已核查：`normalized_name` 仅用于 `symbols` 表的 `=`/`LIKE` 查询，无其他消费者。
 
 ## Migration Plan
