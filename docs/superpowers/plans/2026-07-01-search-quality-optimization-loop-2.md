@@ -125,7 +125,7 @@ Expected: 两者 hit@5 / hit@1 / mrr@5 数值一致；6 个失败查询的 `fail
 
 ### Task A.1: 写失败测试 — dot-notation 拆分（Red）
 
-- [ ] **Step 1: 在 `test_searcher_module.py` 加测试**
+- [x] **Step 1: 在 `test_searcher_module.py` 加测试**
 
 在文件末尾追加（unittest.TestCase 风格，与现有 `test_expand_query_variants_*` 同级）：
 
@@ -156,7 +156,7 @@ class DotNotationSplitTests(unittest.TestCase):
         self.assertEqual(expand_query_variants("v2.1"), ["v2.1"])
 ```
 
-- [ ] **Step 2: 跑测试确认 FAIL**
+- [x] **Step 2: 跑测试确认 FAIL**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py::DotNotationSplitTests -v
