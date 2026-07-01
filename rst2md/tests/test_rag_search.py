@@ -654,6 +654,48 @@ class SnippetTests(unittest.TestCase):
                 self.assertIsInstance(r.snippet, str)
 
 
+class RankingSignalTests(unittest.TestCase):
+    """RankingSignal model and SearchResult additive field."""
+
+    def test_ranking_signal_defaults(self):
+        from rag.models import RankingSignal
+
+        signal = RankingSignal(name="symbol_recall.exact", weight=100.0)
+        self.assertEqual(signal.name, "symbol_recall.exact")
+        self.assertEqual(signal.weight, 100.0)
+        self.assertIsNone(signal.value)
+        self.assertEqual(signal.details, {})
+
+    def test_ranking_signal_details_not_shared_across_instances(self):
+        from rag.models import RankingSignal
+
+        a = RankingSignal(name="x", weight=1.0)
+        b = RankingSignal(name="y", weight=2.0)
+        a.details["k"] = "v"
+        self.assertNotIn("k", b.details, "details dict must not be shared across instances")
+
+    def test_search_result_ranking_signals_default_empty(self):
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            score=1.0, path="p", start_line=1, end_line=2,
+            doc_type="class", chunk_type="method", addon="", addon_name="",
+            symbol="X", heading="h", breadcrumb="b", text="t",
+        )
+        self.assertEqual(result.ranking_signals, [])
+
+    def test_search_result_positional_construction_still_works(self):
+        """Existing positional construction must stay source-compatible."""
+        from rag.models import SearchResult
+
+        result = SearchResult(
+            1.0, "p", 1, 2, "class", "method", "", "", "X", "h", "b", "t",
+        )
+        self.assertEqual(result.score, 1.0)
+        self.assertEqual(result.snippet, "")
+        self.assertEqual(result.ranking_signals, [])
+
+
 class RegressionTests(unittest.TestCase):
     """Regression tests for bug fixes."""
 
@@ -886,6 +928,114 @@ class RegressionTests(unittest.TestCase):
                 self.assertNotIn("search_mode:", output)
                 self.assertNotIn("vector_available:", output)
 
+    def test_cli_search_debug_json_includes_ranking_signals(self):
+        from rag import embeddings
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            with patch.object(embeddings, "generate_embeddings", return_value=[[0.0] * 256]):
+                db_path = Path(tmp) / "test.db"
+                build_database(docs, db_path)
+                args = MagicMock()
+                args.db = str(db_path)
+                args.query = "Timer.is_stopped"
+                args.limit = 3
+                args.json = True
+                args.no_expand = True
+                args.debug_search = True
+
+                import io
+                from contextlib import redirect_stdout
+                f = io.StringIO()
+                with redirect_stdout(f):
+                    cmd_search(args)
+                output = json.loads(f.getvalue())
+
+            self.assertIn("results", output)
+            self.assertTrue(output["results"], "should have at least one result")
+            top = output["results"][0]
+            self.assertIn("ranking_signals", top)
+            self.assertIsInstance(top["ranking_signals"], list)
+            self.assertTrue(top["ranking_signals"], "top result should have ranking signals")
+            sig = top["ranking_signals"][0]
+            self.assertIn("name", sig)
+            self.assertIn("weight", sig)
+            self.assertIn("details", sig)
+
+    def test_cli_search_debug_text_includes_signal_summary(self):
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.db"
+            build_database(docs, db_path)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "Timer.is_stopped"
+            args.limit = 3
+            args.json = False
+            args.no_expand = True
+            args.debug_search = True
+
+            import io
+            from contextlib import redirect_stdout
+            f = io.StringIO()
+            with redirect_stdout(f):
+                cmd_search(args)
+            output = f.getvalue()
+
+            self.assertIn("signals:", output, "debug text output should include a signals summary line")
+
+    def test_cli_search_default_text_omits_signals(self):
+        """OpenSpec 4.2: default (non-debug) text output must not print signals."""
+        from rag.cli import cmd_search
+        from unittest.mock import MagicMock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.db"
+            build_database(docs, db_path)
+            args = MagicMock()
+            args.db = str(db_path)
+            args.query = "Timer.is_stopped"
+            args.limit = 3
+            args.json = False
+            args.no_expand = True
+            args.debug_search = False
+
+            import io
+            from contextlib import redirect_stdout
+            f = io.StringIO()
+            with redirect_stdout(f):
+                cmd_search(args)
+            output = f.getvalue()
+
+            self.assertNotIn("signals:", output, "default text output must not print signal payload")
+
 
 class IntentBoostTests(unittest.TestCase):
     """Tutorial-intent queries should boost tutorial doc_type results."""
@@ -1067,6 +1217,419 @@ class RunSearchTests(unittest.TestCase):
                 mock_search.return_value = MagicMock(results=[], metadata=MagicMock(mode="fts", vector_available=False, fallback_reason=None))
                 _run_search(args)
                 mock_search.assert_called_once()
+
+
+class SymbolRecallSignalTests(unittest.TestCase):
+    """Symbol recall stages should record named ranking signals."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        classes = docs / "classes"
+        classes.mkdir(parents=True)
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child node.\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_exact_symbol_match_records_signal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "Node.add_child", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            names = [s.name for s in top.ranking_signals]
+            self.assertIn("symbol_recall.exact", names)
+            exact = next(s for s in top.ranking_signals if s.name == "symbol_recall.exact")
+            self.assertEqual(exact.weight, 100.0)
+
+    @unittest.expectedFailure
+    def test_suffix_symbol_match_records_signal(self):
+        """Expected failure: suffix-recall tier is dead code.
+
+        _canonical_form (rst2md/rag/symbols.py) strips dots from symbol names,
+        so normalized_name never contains a dot. The suffix-recall LIKE pattern
+        '%.{normalized}' requires a dot and therefore matches 0 rows for every
+        query — the suffix tier never fires and no symbol_recall.suffix signal
+        is recorded. Fixing the LIKE would activate dead recall code and change
+        final ordering, which this change's Global Constraint forbids. The
+        symbol_recall.suffix recording code is kept in place (correct but
+        dormant); the suffix-recall bug fix is deferred to a separate change.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            names = [s.name for s in top.ranking_signals]
+            self.assertIn("symbol_recall.suffix", names)
+            suffix = next(s for s in top.ranking_signals if s.name == "symbol_recall.suffix")
+            self.assertEqual(suffix.weight, 80.0)
+
+    def test_prefix_symbol_match_records_signal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "Node", limit=10, expand_graph=False)
+            method = next((r for r in results if r.symbol == "Node.add_child"), None)
+            self.assertIsNotNone(method, "Node.add_child should be found via prefix symbol match")
+            names = [s.name for s in method.ranking_signals]
+            self.assertIn("symbol_recall.prefix", names)
+            prefix = next(s for s in method.ranking_signals if s.name == "symbol_recall.prefix")
+            self.assertEqual(prefix.weight, 40.0)
+
+    def test_alias_derived_match_sets_alias_detail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(
+                db_path, "attach node to scene tree", limit=3, expand_graph=False
+            )
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            exact = next(
+                (s for s in top.ranking_signals if s.name == "symbol_recall.exact"), None
+            )
+            self.assertIsNotNone(
+                exact, "alias-derived exact match should still record symbol_recall.exact"
+            )
+            self.assertTrue(
+                exact.details.get("alias_derived"),
+                "alias-derived match should set details.alias_derived=True",
+            )
+
+
+class HybridRrfSignalTests(unittest.TestCase):
+    """Hybrid RRF and FTS fallback stages should record signals."""
+
+    def test_fts_fallback_records_bm25_signal(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vector support (empty vec_chunks) so FTS is the scoring
+            # path that introduces the candidate, regardless of whether the
+            # embedding model / sqlite-vec happen to be installed locally.
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "stopped timer", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            has_fts = any(
+                s.name == "fts.bm25" for r in results for s in r.ranking_signals
+            )
+            self.assertTrue(has_fts, "FTS fallback should record fts.bm25 signal")
+
+    def test_hybrid_rrf_records_signal_when_vector_available(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Return one zero-vector per input text so vec_chunks row count
+            # matches chunks (parity required for _vector_availability=True).
+            with patch.object(
+                embeddings, "generate_embeddings",
+                lambda texts: [[0.0] * 256 for _ in texts],
+            ):
+                build_database(docs, db_path)
+                results = search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            has_rrf = any(
+                s.name == "hybrid.rrf" for r in results for s in r.ranking_signals
+            )
+            self.assertTrue(has_rrf, "Hybrid mode should record hybrid.rrf signal")
+
+    def test_symbol_recall_preserves_prior_rrf_signal(self):
+        """OpenSpec 2.4: when symbol recall improves an RRF-found candidate,
+        the prior hybrid.rrf signal must survive the replacement."""
+        import sqlite3
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Return one zero-vector per input text so vec_chunks row count
+            # matches chunks (parity required for _vector_availability=True).
+            with patch.object(
+                embeddings, "generate_embeddings",
+                lambda texts: [[0.0] * 256 for _ in texts],
+            ):
+                build_database(docs, db_path)
+                conn = sqlite3.connect(str(db_path))
+                cid = conn.execute(
+                    "SELECT id FROM chunks WHERE symbol='Timer.is_stopped'"
+                ).fetchone()[0]
+                conn.close()
+                # Force RRF to surface the Timer.is_stopped chunk; symbol recall
+                # will then promote it from a low RRF score to exact (100).
+                with patch("rag.searcher.rrf_fusion", return_value=[{"id": cid, "rrf_score": 0.5}]):
+                    results = search_database(
+                        db_path, "Timer.is_stopped", limit=3, expand_graph=False
+                    )
+            top = results[0]
+            self.assertEqual(top.symbol, "Timer.is_stopped")
+            names = {s.name for s in top.ranking_signals}
+            self.assertIn("hybrid.rrf", names, "prior RRF signal must survive symbol-recall replacement")
+            self.assertIn("symbol_recall.exact", names)
+
+
+class GraphExpansionSignalTests(unittest.TestCase):
+    """Graph expansion should record signals and preserve prior signals."""
+
+    def test_new_graph_chunk_records_expansion_signal(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            # The Node class_summary text contains the query term "node" so FTS
+            # (and exact symbol recall) finds it; its `inherits` edge targets
+            # Object, whose text does NOT contain the query term, so Object is
+            # only reached via graph expansion (new-chunk branch). Timer and
+            # Sprite are unrelated filler so the doc set has >=4 chunks.
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class for scene nodes.\n\n**Inherits:** `Object`\n\n"
+                "## Methods\n\n`void` **add_child**(`Node` node)\n\nAdds a child.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_object.md").write_text(
+                "# Object\n\nRoot of all things.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_sprite.md").write_text(
+                "# Sprite\n\nA 2D texture.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vectors so RRF does not surface every chunk at distance=0;
+            # FTS-only mode keeps Object out of results until graph expansion.
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "node", limit=10, expand_graph=True)
+            # Object class_summary is reached only via graph expansion (inherits).
+            obj = next((r for r in results if r.symbol == "Object"), None)
+            self.assertIsNotNone(obj, "Object should be reached via graph expansion")
+            names = [s.name for s in obj.ranking_signals]
+            self.assertIn("graph.expansion", names)
+            graph_sig = next(s for s in obj.ranking_signals if s.name == "graph.expansion")
+            self.assertEqual(graph_sig.details.get("relation"), "inherits")
+            self.assertEqual(graph_sig.details.get("distance"), 1)
+
+    def test_graph_expansion_preserves_prior_fts_signal(self):
+        """OpenSpec 2.4: a chunk found by FTS and then reached via graph
+        expansion must carry both its fts.bm25 signal and graph.expansion."""
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            # The alias rule {child, node, attach} -> "Node.add_child" makes the
+            # method an exact symbol match (score 100, in top_k). The
+            # class_summaries FTS-match "attach child node" (fts.bm25, ~40);
+            # the short Node summary is the strongest bm25 match so its
+            # inverted fts_score is lowest, landing it OUTSIDE top_k=3 (the
+            # method + Timer + Sprite occupy top_k). The method's `parent`
+            # edge -> Node summary then hits the existing-chunk branch:
+            # graph.expansion (metadata_only=True) is appended while fts.bm25
+            # is preserved.
+            (classes / "class_node.md").write_text(
+                "# Node\n\nAttach child node.\n\n"
+                "## Methods\n\n`void` **add_child**(`Node` node)\n\n"
+                "Adds a child node to the parent.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer that can attach a child node "
+                "for scheduling nested timer callbacks within the scene tree "
+                "management system.\n",
+                encoding="utf-8",
+            )
+            (classes / "class_sprite.md").write_text(
+                "# Sprite\n\nA two dimensional texture that can attach a child "
+                "node for rendering nested sprites within the scene graph "
+                "hierarchy.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vectors so the summaries get fts.bm25 (not hybrid.rrf).
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "attach child node", limit=10, expand_graph=True)
+            summary = next((r for r in results if r.symbol == "Node"), None)
+            self.assertIsNotNone(summary, "Node class_summary should be in results")
+            names = {s.name for s in summary.ranking_signals}
+            self.assertIn("fts.bm25", names, "prior FTS signal must survive graph expansion")
+            self.assertIn("graph.expansion", names, "graph expansion should append its own signal")
+            graph_sig = next(s for s in summary.ranking_signals if s.name == "graph.expansion")
+            self.assertTrue(graph_sig.details.get("metadata_only"), "existing-chunk branch should set metadata_only=True")
+
+
+class RankingSignalCoverageTests(unittest.TestCase):
+    """OpenSpec 5.1: ranking-signal family coverage guards.
+
+    Each family must be observable somewhere in the suite. The core families
+    reachable via search_database() are checked in
+    test_core_signal_families_observable_via_search_database; families that
+    require a direct rerank_results() call (or are dead code) are verified in
+    their own tests and documented there.
+    """
+
+    def _build_db(self, tmp, with_vectors=False):
+        from rag import embeddings
+        docs = Path(tmp) / "docs"
+        classes = docs / "classes"
+        classes.mkdir(parents=True, exist_ok=True)
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class. Node has an add_child method.\n\n"
+            "**Inherits:** `Object`\n\n"
+            "## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child.\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nBase of all classes.\n",
+            encoding="utf-8",
+        )
+        # Empty embeddings (with_vectors=False) → FTS-only mode: fts.bm25
+        # (FTS section-4 fallback) and graph.expansion (new-chunk branch)
+        # are observable. With vectors populated, hybrid.rrf returns every
+        # fixture chunk, which (a) makes FTS section-4 exclude them and (b)
+        # puts all chunks in the graph top-K so no new chunk is discovered.
+        # Zero-vector embeddings (with_vectors=True) populate vec_chunks so
+        # _vector_availability is True and hybrid.rrf fires. A separate
+        # filename avoids clobbering the FTS-only DB. Matches
+        # test_graph_expansion_preserves_prior_fts_signal for determinism.
+        db_path = Path(tmp) / ("test_hybrid.sqlite" if with_vectors else "test.sqlite")
+        emb_fn = (lambda texts: [[0.0] * 256 for _ in texts]) if with_vectors else (lambda texts: [])
+        with patch.object(embeddings, "generate_embeddings", emb_fn):
+            build_database(docs, db_path)
+        return db_path
+
+    def test_core_signal_families_observable_via_search_database(self):
+        """Coverage guard: signal families reachable via search_database() on
+        this fixture must all appear in the observed set.
+
+        Families in `required` (verified here via search_database):
+          - symbol_recall.exact / .prefix  (symbol-candidate queries)
+          - fts.bm25                        (FTS fallback, FTS-only DB)
+          - graph.expansion                 (expand_graph=True)
+          - rerank.direct_symbol            (query "Node.add_child")
+          - rerank.alias_symbol             (query "attach node to scene tree"
+                                             → _ALIAS_RULE → Node.add_child)
+          - hybrid.rrf                      (separate DB built with vectors)
+
+        Families verified elsewhere (not in `required`):
+          - rerank.doc_type_intent: NOT observable via search_database() —
+            build_query_plan always puts the original query in
+            symbol_candidates, which blocks the `not plan.symbol_candidates`
+            guard in _rerank_bonus. Verified directly via
+            test_rerank_appends_doc_type_intent_signal and
+            test_rerank_bonus_equals_signal_weight_sum_doc_type_intent
+            (test_searcher_module.py).
+          - rerank.addon_intent: the bare fixture has no addon docs, so the
+            addon-intent rerank path is not reachable via search_database()
+            here. Verified via direct rerank_results() in
+            test_addon_intent_signal_observable_via_rerank.
+          - symbol_recall.suffix: dead code (normalize_symbol strips dots, so
+            the suffix LIKE '%.{normalized}' matches 0 rows); see
+            test_suffix_symbol_match_records_signal xfail.
+        """
+        observed: set[str] = set()
+        with tempfile.TemporaryDirectory() as tmp:
+            # FTS-only DB: symbol recall, FTS fallback, graph expansion,
+            # rerank.direct_symbol + rerank.alias_symbol.
+            db_path = self._build_db(tmp)
+            for q in ("Node.add_child", "add_child", "Node"):
+                for r in search_database(db_path, q, limit=10, expand_graph=False):
+                    observed.update(s.name for s in r.ranking_signals)
+            # Alias-derived symbol match → rerank.alias_symbol.
+            for r in search_database(db_path, "attach node to scene tree", limit=10, expand_graph=False):
+                observed.update(s.name for s in r.ranking_signals)
+            # FTS fallback.
+            for r in search_database(db_path, "base class", limit=10, expand_graph=False):
+                observed.update(s.name for s in r.ranking_signals)
+            # Graph expansion (new + existing chunk branches).
+            for r in search_database(db_path, "add child", limit=10, expand_graph=True):
+                observed.update(s.name for s in r.ranking_signals)
+            # Hybrid RRF — needs a DB with vec_chunks populated. The FTS-only
+            # DB above has empty vec_chunks, so _vector_availability is False
+            # and RRF never fires regardless of any search-time embedding patch
+            # (the build-time embedding is what populates vec_chunks).
+            hybrid_db = self._build_db(tmp, with_vectors=True)
+            for r in search_database(hybrid_db, "node add_child", limit=10, expand_graph=False):
+                observed.update(s.name for s in r.ranking_signals)
+
+        required = {
+            "symbol_recall.exact",
+            "symbol_recall.prefix",
+            "fts.bm25",
+            "graph.expansion",
+            "rerank.direct_symbol",
+            "rerank.alias_symbol",
+            "hybrid.rrf",
+        }
+        missing = required - observed
+        self.assertFalse(missing, f"missing signal families: {sorted(missing)}")
+
+    def test_addon_intent_signal_observable_via_rerank(self):
+        """Verify rerank.addon_intent via a direct rerank_results() call.
+
+        The bare fixture has no addon docs, so the addon-intent rerank path is
+        not reachable via search_database() here. This exercises the signal
+        directly via rerank_results() (the production rerank entry point) with
+        a synthetic addon SearchResult.
+        """
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        from rag.fusion import rerank_results
+
+        plan = build_query_plan("dialogue manager addon")
+        addon_result = SearchResult(
+            score=1.0, path="addons/dm/docs.md", start_line=1, end_line=2,
+            doc_type="addon", chunk_type="section", addon="dm", addon_name="DM",
+            symbol="", heading="Dialogue", breadcrumb="Addon",
+            text="A dialogue addon.",
+        )
+        ranked = rerank_results(plan, [addon_result])
+        names = {s.name for s in ranked[0].ranking_signals}
+        self.assertIn("rerank.addon_intent", names)
 
 
 if __name__ == "__main__":
