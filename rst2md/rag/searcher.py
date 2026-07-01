@@ -160,7 +160,17 @@ def _search_database_impl(
                     if cid not in results or results[cid]["score"] < rrf_score:
                         row = conn.execute("SELECT * FROM chunks WHERE id = ?", (cid,)).fetchone()
                         if row:
-                            results[cid] = _make_result(row, rrf_score)
+                            prior = results[cid].get("ranking_signals", []) if cid in results else []
+                            results[cid] = _make_result(row, rrf_score, ranking_signals=prior)
+                            _record_signal(
+                                results[cid],
+                                RankingSignal(
+                                    name="hybrid.rrf",
+                                    weight=rrf_score,
+                                    value=fused['rrf_score'],
+                                    details={"scale": 40.0},
+                                ),
+                            )
             except Exception:
                 metadata = SearchMetadata(
                     mode="fts_only",
@@ -279,7 +289,17 @@ def _search_database_impl(
                 bm25 = abs(row["score"])
                 fts_score = min(40.0, max(0.0, 40.0 / (1.0 + bm25 * 0.01)))
                 if cid not in results or results[cid]["score"] < fts_score:
-                    results[cid] = _make_result(row["row"], fts_score)
+                    prior = results[cid].get("ranking_signals", []) if cid in results else []
+                    results[cid] = _make_result(row["row"], fts_score, ranking_signals=prior)
+                    _record_signal(
+                        results[cid],
+                        RankingSignal(
+                            name="fts.bm25",
+                            weight=fts_score,
+                            value=bm25,
+                            details={},
+                        ),
+                    )
         except sqlite3.OperationalError:
             # FTS match syntax error, skip
             pass

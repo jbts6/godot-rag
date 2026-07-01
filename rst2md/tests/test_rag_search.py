@@ -1195,5 +1195,104 @@ class SymbolRecallSignalTests(unittest.TestCase):
             )
 
 
+class HybridRrfSignalTests(unittest.TestCase):
+    """Hybrid RRF and FTS fallback stages should record signals."""
+
+    def test_fts_fallback_records_bm25_signal(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Disable vector support (empty vec_chunks) so FTS is the scoring
+            # path that introduces the candidate, regardless of whether the
+            # embedding model / sqlite-vec happen to be installed locally.
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "stopped timer", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            has_fts = any(
+                s.name == "fts.bm25" for r in results for s in r.ranking_signals
+            )
+            self.assertTrue(has_fts, "FTS fallback should record fts.bm25 signal")
+
+    def test_hybrid_rrf_records_signal_when_vector_available(self):
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true if the timer is stopped.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Return one zero-vector per input text so vec_chunks row count
+            # matches chunks (parity required for _vector_availability=True).
+            with patch.object(
+                embeddings, "generate_embeddings",
+                lambda texts: [[0.0] * 256 for _ in texts],
+            ):
+                build_database(docs, db_path)
+                results = search_database(db_path, "timer stopped", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            has_rrf = any(
+                s.name == "hybrid.rrf" for r in results for s in r.ranking_signals
+            )
+            self.assertTrue(has_rrf, "Hybrid mode should record hybrid.rrf signal")
+
+    def test_symbol_recall_preserves_prior_rrf_signal(self):
+        """OpenSpec 2.4: when symbol recall improves an RRF-found candidate,
+        the prior hybrid.rrf signal must survive the replacement."""
+        import sqlite3
+        from rag import embeddings
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\n## Methods\n\n"
+                "`bool` **is_stopped**() `const`\n\nReturns true.\n",
+                encoding="utf-8",
+            )
+            db_path = Path(tmp) / "test.sqlite"
+            # Return one zero-vector per input text so vec_chunks row count
+            # matches chunks (parity required for _vector_availability=True).
+            with patch.object(
+                embeddings, "generate_embeddings",
+                lambda texts: [[0.0] * 256 for _ in texts],
+            ):
+                build_database(docs, db_path)
+                conn = sqlite3.connect(str(db_path))
+                cid = conn.execute(
+                    "SELECT id FROM chunks WHERE symbol='Timer.is_stopped'"
+                ).fetchone()[0]
+                conn.close()
+                # Force RRF to surface the Timer.is_stopped chunk; symbol recall
+                # will then promote it from a low RRF score to exact (100).
+                with patch("rag.searcher.rrf_fusion", return_value=[{"id": cid, "rrf_score": 0.5}]):
+                    results = search_database(
+                        db_path, "Timer.is_stopped", limit=3, expand_graph=False
+                    )
+            top = results[0]
+            self.assertEqual(top.symbol, "Timer.is_stopped")
+            names = {s.name for s in top.ranking_signals}
+            self.assertIn("hybrid.rrf", names, "prior RRF signal must survive symbol-recall replacement")
+            self.assertIn("symbol_recall.exact", names)
+
+
 if __name__ == "__main__":
     unittest.main()
