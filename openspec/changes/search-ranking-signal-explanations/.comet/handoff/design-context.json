@@ -1,0 +1,14 @@
+{
+  "change": "search-ranking-signal-explanations",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "fbcaecbbdd163f07c24a089b946c430f14f810eadc7b986b53bff30f5ee4c0f9",
+  "files": [
+    { "path": "openspec/changes/search-ranking-signal-explanations/proposal.md", "sha256": "3f09e4a2e72ad472187fa156f0a8ac5a27a73efdff6885963172292899adc0f0" },
+    { "path": "openspec/changes/search-ranking-signal-explanations/design.md", "sha256": "e143b6cd5aa74deceb5f08aa08d334efad5676013b86c347f5546f726931e3b2" },
+    { "path": "openspec/changes/search-ranking-signal-explanations/tasks.md", "sha256": "d15b421872918b30a91bff56c62d9d560851865e288a69d14d15ddc6a0d1dbe8" },
+    { "path": "openspec/changes/search-ranking-signal-explanations/specs/intent-ranking/spec.md", "sha256": "db750a381baf77619ca4cad2dd76699b0db0472be122e38f2ea94a0822ff0928" }
+  ]
+}
