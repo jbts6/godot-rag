@@ -479,13 +479,13 @@ Expected: 全部 PASS。重点关注 `test_rerank_bonus_equals_signal_weight_sum
 
 **初始值 FLOOR=3.0、FACTOR=5.0。** 候选集：FLOOR ∈ {2, 3, 5}，FACTOR ∈ {3, 5, 7, 10}（共 12 组）。
 
-- [ ] **Step 1: 跑初始值 eval**
+- [x] **Step 1: 跑初始值 eval**
 
 ```bash
 uv run godot-rag eval-search > /tmp/loop2-stageB-f5-floor3.json
 ```
 
-- [ ] **Step 2: 核对两个 tutorial 查询**
+- [x] **Step 2: 核对两个 tutorial 查询**
 
 ```bash
 uv run python -c "
@@ -499,7 +499,7 @@ for q in s['queries']:
 
 Expected: 两个查询命中 rank ≤5
 
-- [ ] **Step 3: 若未达标则二分上调**
+- [x] **Step 3: 若未达标则二分上调**
 
 若 factor=5.0 未达 rank ≤5：
 1. 改 `fusion.py` 的 `TUTORIAL_BOOST_FACTOR = 10.0`，重跑 eval
@@ -508,7 +508,7 @@ Expected: 两个查询命中 rank ≤5
 
 若低分 tutorial 仍救不起，同步调 `TUTORIAL_SCORE_FLOOR` 到 5.0 重跑。
 
-- [ ] **Step 4: 锁定最终值并写入常量**
+- [x] **Step 4: 锁定最终值并写入常量**
 
 把最终 FLOOR / FACTOR 写回 `fusion.py` 常量定义，并在注释记录 eval 数据。
 
