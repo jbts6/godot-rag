@@ -264,7 +264,7 @@ git commit -m "chore(eval): lock loop-2 stage-A baseline (dot-notation split)"
 
 ### Task A.6: A 段验收
 
-- [ ] **Step 1: 核对指标**
+- [x] **Step 1: 核对指标**
 
 ```bash
 uv run python -c "
@@ -282,7 +282,7 @@ Expected:
 - symbol 类 hit@5 从 80% 提升到 ≥90%
 - 32 个原通过查询 hit@5 不低于 89.5%（即 32 个里至少 31 个仍 hit@5）
 
-- [ ] **Step 2: 回归检查**
+- [x] **Step 2: 回归检查**
 
 若 32 个原通过查询有 ≥1 个退出 hit@5 → 记录是哪个查询（重点查 `*.get` / `*.set` 类短方法名查询），分析是否需给方法后缀加最小长度守卫。若需加守卫，回到 Task A.2 在 `method_suffix` 追加前加 `if len(method_suffix) >= 3:`，重跑 A.4-A.6。**当前修订决策是不加守卫，仅当 eval 实测回归才补。**
 
