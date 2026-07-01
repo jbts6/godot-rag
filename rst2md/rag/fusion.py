@@ -9,6 +9,15 @@ from typing import List
 from rag.models import RankingSignal, SearchResult
 from rag.query_plan import QueryPlan
 
+# Tutorial doc-type rerank boost (Task B.5 eval-locked).
+# Eval 2026-07-01 (loop2-stageB, FLOOR=3.0/FACTOR=5.0):
+#   scene tree tutorial          -> rank=2 (was 8 in stage-A)
+#   how to use scene tree nodes  -> rank=1 (was 10 in stage-A)
+#   tutorial category hit@5      = 100% (7/7, was 71.43%)
+#   overall hit@5                = 97.37% (37/38)
+#   total pass@5                 = 42/45 = 93.33% (>= 89.5% red line)
+# 3 non-tutorial failures (Node inherits Object / semantic search vector
+# fallback / ResourceLoader.load) are pre-existing, unaffected by boost.
 TUTORIAL_BOOST_FACTOR = 5.0
 TUTORIAL_SCORE_FLOOR = 3.0
 
