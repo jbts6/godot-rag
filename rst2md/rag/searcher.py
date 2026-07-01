@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from rag.db import clean_chunk_text, get_connection
-from rag.models import SearchMetadata, SearchResponse, SearchResult
+from rag.models import RankingSignal, SearchMetadata, SearchResponse, SearchResult
 from rag.query_plan import build_query_plan
 from rag.symbols import normalize_symbol
 from rag.fusion import (  # noqa: F401 — rrf_fusion re-exported for store.py facade; rerank_results used by _search_database_impl
@@ -96,7 +96,7 @@ def _search_database_impl(
             addon_filter = " AND c.addon = ?"
             addon_params = [addon]
 
-        def _make_result(row, score):
+        def _make_result(row, score, ranking_signals=None):
             return {
                 "id": row["id"],
                 "score": score,
@@ -113,7 +113,13 @@ def _search_database_impl(
                 "text": clean_chunk_text(row["text"]),
                 "relation_type": "",
                 "distance": 0,
+                "ranking_signals": list(ranking_signals or []),
             }
+
+        def _record_signal(candidate: dict, signal: RankingSignal) -> None:
+            """Append a ranking signal to a candidate dict, preserving prior signals."""
+            candidate.setdefault("ranking_signals", []).append(signal)
+
 
         # 0. Vector search + RRF fusion (respects doc_type and addon filters)
         fused_ids = set()
@@ -165,6 +171,7 @@ def _search_database_impl(
         # 1-3. Symbol recall: iterate over plan.symbol_candidates and alias_symbol_candidates
         for candidate in plan.symbol_candidates + plan.alias_symbol_candidates:
             normalized = normalize_symbol(candidate)
+            alias_derived = candidate in plan.alias_symbol_candidates
 
             # Exact symbol match (+100)
             rows = conn.execute(
@@ -175,7 +182,17 @@ def _search_database_impl(
             for row in rows:
                 cid = row["id"]
                 if cid not in results or results[cid]["score"] < 100:
-                    results[cid] = _make_result(row, 100.0)
+                    prior = results[cid].get("ranking_signals", []) if cid in results else []
+                    results[cid] = _make_result(row, 100.0, ranking_signals=prior)
+                    _record_signal(
+                        results[cid],
+                        RankingSignal(
+                            name="symbol_recall.exact",
+                            weight=100.0,
+                            value=candidate,
+                            details={"alias_derived": alias_derived},
+                        ),
+                    )
 
             # Suffix symbol match (+80)
             rows = conn.execute(
@@ -186,7 +203,17 @@ def _search_database_impl(
             for row in rows:
                 cid = row["id"]
                 if cid not in results or results[cid]["score"] < 80:
-                    results[cid] = _make_result(row, 80.0)
+                    prior = results[cid].get("ranking_signals", []) if cid in results else []
+                    results[cid] = _make_result(row, 80.0, ranking_signals=prior)
+                    _record_signal(
+                        results[cid],
+                        RankingSignal(
+                            name="symbol_recall.suffix",
+                            weight=80.0,
+                            value=candidate,
+                            details={"alias_derived": alias_derived},
+                        ),
+                    )
 
             # Prefix symbol match (+40)
             rows = conn.execute(
@@ -197,7 +224,17 @@ def _search_database_impl(
             for row in rows:
                 cid = row["id"]
                 if cid not in results or results[cid]["score"] < 40:
-                    results[cid] = _make_result(row, 40.0)
+                    prior = results[cid].get("ranking_signals", []) if cid in results else []
+                    results[cid] = _make_result(row, 40.0, ranking_signals=prior)
+                    _record_signal(
+                        results[cid],
+                        RankingSignal(
+                            name="symbol_recall.prefix",
+                            weight=40.0,
+                            value=candidate,
+                            details={"alias_derived": alias_derived},
+                        ),
+                    )
 
         # 4. FTS5 search (bm25 → 0-40 score, skip chunks already in fused results)
         try:
@@ -316,6 +353,7 @@ def _search_database_impl(
                 relation_type=r.get("relation_type", ""),
                 distance=r.get("distance", 0),
                 snippet=_extract_snippet(r["text"], query),
+                ranking_signals=r.get("ranking_signals", []),
             )
             for r in sorted_results
         ]

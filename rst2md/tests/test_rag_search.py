@@ -1111,5 +1111,89 @@ class RunSearchTests(unittest.TestCase):
                 mock_search.assert_called_once()
 
 
+class SymbolRecallSignalTests(unittest.TestCase):
+    """Symbol recall stages should record named ranking signals."""
+
+    def _build_db(self, tmp):
+        docs = Path(tmp) / "docs"
+        classes = docs / "classes"
+        classes.mkdir(parents=True)
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class.\n\n## Methods\n\n"
+            "`void` **add_child**(`Node` node)\n\nAdds a child node.\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "test.sqlite"
+        build_database(docs, db_path)
+        return db_path
+
+    def test_exact_symbol_match_records_signal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "Node.add_child", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            names = [s.name for s in top.ranking_signals]
+            self.assertIn("symbol_recall.exact", names)
+            exact = next(s for s in top.ranking_signals if s.name == "symbol_recall.exact")
+            self.assertEqual(exact.weight, 100.0)
+
+    @unittest.expectedFailure
+    def test_suffix_symbol_match_records_signal(self):
+        """Expected failure: suffix-recall tier is dead code.
+
+        _canonical_form (rst2md/rag/symbols.py) strips dots from symbol names,
+        so normalized_name never contains a dot. The suffix-recall LIKE pattern
+        '%.{normalized}' requires a dot and therefore matches 0 rows for every
+        query — the suffix tier never fires and no symbol_recall.suffix signal
+        is recorded. Fixing the LIKE would activate dead recall code and change
+        final ordering, which this change's Global Constraint forbids. The
+        symbol_recall.suffix recording code is kept in place (correct but
+        dormant); the suffix-recall bug fix is deferred to a separate change.
+        """
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "add_child", limit=3, expand_graph=False)
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            names = [s.name for s in top.ranking_signals]
+            self.assertIn("symbol_recall.suffix", names)
+            suffix = next(s for s in top.ranking_signals if s.name == "symbol_recall.suffix")
+            self.assertEqual(suffix.weight, 80.0)
+
+    def test_prefix_symbol_match_records_signal(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(db_path, "Node", limit=10, expand_graph=False)
+            method = next((r for r in results if r.symbol == "Node.add_child"), None)
+            self.assertIsNotNone(method, "Node.add_child should be found via prefix symbol match")
+            names = [s.name for s in method.ranking_signals]
+            self.assertIn("symbol_recall.prefix", names)
+            prefix = next(s for s in method.ranking_signals if s.name == "symbol_recall.prefix")
+            self.assertEqual(prefix.weight, 40.0)
+
+    def test_alias_derived_match_sets_alias_detail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db(tmp)
+            results = search_database(
+                db_path, "attach node to scene tree", limit=3, expand_graph=False
+            )
+            self.assertTrue(results)
+            top = results[0]
+            self.assertEqual(top.symbol, "Node.add_child")
+            exact = next(
+                (s for s in top.ranking_signals if s.name == "symbol_recall.exact"), None
+            )
+            self.assertIsNotNone(
+                exact, "alias-derived exact match should still record symbol_recall.exact"
+            )
+            self.assertTrue(
+                exact.details.get("alias_derived"),
+                "alias-derived match should set details.alias_derived=True",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()
