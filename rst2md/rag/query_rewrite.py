@@ -19,17 +19,8 @@ def _tokens(query: str) -> frozenset[str]:
 
 
 def doc_type_boost(query: str, doc_type: str) -> float:
-    lowered = query.lower()
-    if "." in query or "_" in query:
-        return 0.0
-    tutorial_intent = (
-        lowered.startswith("how to ")
-        or " tutorial" in lowered
-        or " guide" in lowered
-        or "learn " in lowered
-    )
-    if tutorial_intent and doc_type == "tutorial":
-        return 0.05
+    # 修订：tutorial 加权移至 fusion._rerank_bonus 地板公式；本函数保留签名
+    # 供 3 个 caller 调用，统一返回 0.0。
     return 0.0
 
 

@@ -122,8 +122,9 @@ from rag.query_rewrite import doc_type_boost
 
 
 def test_doc_type_boost_prefers_tutorial_for_how_to_query():
-    assert doc_type_boost("how to use scene tree nodes", "tutorial") > 0
-    assert doc_type_boost("how to use scene tree nodes", "class") == 0
+    # 修订：doc_type_boost 退化为 0.0，加权移到 _rerank_bonus
+    assert doc_type_boost("how to use scene tree nodes", "tutorial") == 0.0
+    assert doc_type_boost("how to use scene tree nodes", "class") == 0.0
 
 
 def test_doc_type_boost_does_not_boost_symbol_query():
@@ -284,7 +285,7 @@ def test_rerank_appends_direct_symbol_signal():
 def test_rerank_appends_doc_type_intent_signal():
     from rag.models import SearchResult
     from rag.query_plan import QueryPlan
-    from rag.fusion import rerank_results
+    from rag.fusion import rerank_results, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
 
     # Construct plan directly: build_query_plan always puts the original query
     # in symbol_candidates (per QueryPlan docstring), which would block the
@@ -308,7 +309,9 @@ def test_rerank_appends_doc_type_intent_signal():
     names = [s.name for s in ranked[0].ranking_signals]
     assert "rerank.doc_type_intent" in names
     sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.doc_type_intent")
-    assert sig.weight == 0.05
+    # B.2 floor 公式：weight = max(score, FLOOR) * (FACTOR - 1) = max(1.0, 3.0) * 4 = 12.0
+    expected_weight = max(tutorial.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+    assert sig.weight == expected_weight
 
 
 def test_rerank_appends_addon_intent_signal():
@@ -407,7 +410,7 @@ def test_rerank_bonus_equals_signal_weight_sum_direct_symbol():
 
 
 def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
-    """Sync guard: doc_type_intent branch (0.05).
+    """Sync guard: doc_type_intent branch (B.2 floor 公式).
 
     build_query_plan always puts the original query string in
     symbol_candidates, which blocks the doc_type_intent bonus via the
@@ -418,7 +421,7 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
     """
     from rag.models import SearchResult
     from rag.query_plan import QueryPlan
-    from rag.fusion import _rerank_bonus, _rerank_signals
+    from rag.fusion import _rerank_bonus, _rerank_signals, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
 
     plan = QueryPlan(
         original="how to use scene tree nodes",
@@ -438,7 +441,9 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
     assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
     names = [s.name for s in signals]
     assert "rerank.doc_type_intent" in names
-    assert next(s for s in signals if s.name == "rerank.doc_type_intent").weight == 0.05
+    # B.2 floor 公式：weight = max(score, FLOOR) * (FACTOR - 1) = max(1.0, 3.0) * 4 = 12.0
+    expected_weight = max(result.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+    assert next(s for s in signals if s.name == "rerank.doc_type_intent").weight == expected_weight
 
 
 def test_rerank_bonus_equals_signal_weight_sum_addon_intent():
