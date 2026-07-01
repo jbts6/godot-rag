@@ -21,7 +21,7 @@
 - [x] 2.5 更新 `rst2md/tests/test_searcher_module.py` 中 `doc_type_boost_prefers_tutorial_for_how_to_query` 测试，断言新返回值为 0.0；新增测试断言 `_rerank_bonus` 对 tutorial 命中返回 `result.score * (TUTORIAL_BOOST_FACTOR - 1)`
 - [x] 2.6 跑 `uv run pytest -q rst2md/tests/` 全套不回归
 - [x] 2.7 跑 `uv run godot-rag eval-search`，factor=5.0 时若两个 tutorial 查询未达 rank ≤5，把 factor 上调到 10.0 重跑；仍未达则上调到 20.0；找到最小可行值后向下微调（如 15.0、12.0）。把最终值写入 `fusion.py` 常量与 spec 注释
-- [ ] 2.8 把 eval 输出存为 `docs/search-quality/loop-2-stage-B.json`
+- [x] 2.8 把 eval 输出存为 `docs/search-quality/loop-2-stage-B.json`
 - [ ] 2.9 验证 `scene tree tutorial` 与 `how to use scene tree nodes` 命中 rank ≤5；tutorial 类 hit@5 71%→100%；A 段通过的查询不回归
 
 ## 3. C 段：继承图扩展（inherits 边定向遍历）

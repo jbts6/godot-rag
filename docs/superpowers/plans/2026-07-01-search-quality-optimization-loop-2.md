@@ -514,14 +514,14 @@ Expected: 两个查询命中 rank ≤5
 
 ### Task B.6: 锁定 B 段基线
 
-- [ ] **Step 1: 跑最终值 eval 并存档**
+- [x] **Step 1: 跑最终值 eval 并存档**
 
 ```bash
 uv run godot-rag eval-search > /tmp/loop2-stageB.json
 cp /tmp/loop2-stageB.json docs/search-quality/loop-2-stage-B.json
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add rst2md/rag/fusion.py docs/search-quality/loop-2-stage-B.json
@@ -975,7 +975,7 @@ uv run godot-rag eval-search > /tmp/loop2-final.json
 cp /tmp/loop2-final.json docs/search-quality/loop-2-final.json
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/search-quality/loop-2-final.json
@@ -1016,7 +1016,7 @@ Expected:
 cp docs/search-quality/loop-2-final.json docs/search-quality/baseline.json
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add docs/search-quality/baseline.json
@@ -1033,7 +1033,7 @@ git commit -m "chore(eval): promote loop-2 final to baseline"
 2. **`class_node.md` `**Inherits:**` 行格式**：记录 C.1 确认的格式（如 `**Inherits:** \`Object\``）+ `INHERITS_RE` 是否匹配
 3. **A 段 `*.get`/`*.set` 回归检查**：记录 A.6 的结果（是否回归、是否加了守卫）
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add openspec/changes/search-quality-optimization-loop-2/.comet/handoff/verify-answers.md
