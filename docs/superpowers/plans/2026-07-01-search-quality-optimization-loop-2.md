@@ -576,7 +576,7 @@ Expected:
 
 ### Task C.1: 确认真实 chunk 文本格式（前置门禁）
 
-- [ ] **Step 1: 查真实 class_node.md chunk**
+- [x] **Step 1: 查真实 class_node.md chunk**
 
 ```bash
 uv run python -c "
@@ -590,7 +590,7 @@ print('text (first 300):', row['text'][:300])
 "
 ```
 
-- [ ] **Step 2: 确认 `**Inherits:**` 行匹配 `INHERITS_RE`**
+- [x] **Step 2: 确认 `**Inherits:**` 行匹配 `INHERITS_RE`**
 
 ```bash
 uv run python -c "
