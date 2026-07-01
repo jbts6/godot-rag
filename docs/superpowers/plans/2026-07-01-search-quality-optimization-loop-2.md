@@ -984,7 +984,7 @@ git commit -m "chore(eval): lock loop-2 final baseline"
 
 ### Task 4.3: 对比 stage-0 与 final
 
-- [ ] **Step 1: 跑对比脚本**
+- [x] **Step 1: 跑对比脚本**
 
 ```bash
 uv run python -c "
