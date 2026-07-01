@@ -8,7 +8,7 @@ class SymbolTests(unittest.TestCase):
     def test_normalizes_method_symbols(self):
         self.assertEqual(
             normalize_symbol("StringName.is_valid_filename()"),
-            "stringnameisvalidfilename",
+            "stringname.isvalidfilename",
         )
 
     def test_canonical_camelcase(self):
@@ -21,7 +21,7 @@ class SymbolTests(unittest.TestCase):
         self.assertEqual(normalize_symbol("_add_child"), "addchild")
 
     def test_canonical_dotted(self):
-        self.assertEqual(normalize_symbol("Node.add_child"), "nodeaddchild")
+        self.assertEqual(normalize_symbol("Node.add_child"), "node.addchild")
 
     def test_canonical_mixed(self):
         self.assertEqual(normalize_symbol("GDExtension"), "gdextension")
