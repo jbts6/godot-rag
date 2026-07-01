@@ -467,7 +467,7 @@ git commit -m "feat(fusion): floor+multiplicative tutorial boost, retire doc_typ
 
 ### Task B.4: 全套不回归
 
-- [ ] **Step 1: 跑全套**
+- [x] **Step 1: 跑全套**
 
 ```bash
 uv run pytest -q rst2md/tests/
@@ -900,7 +900,7 @@ git commit -m "feat(searcher): directed inherits traversal for inheritance_inten
 
 ### Task C.7: 全套不回归
 
-- [ ] **Step 1: 跑全套**
+- [x] **Step 1: 跑全套**
 
 ```bash
 uv run pytest -q rst2md/tests/
