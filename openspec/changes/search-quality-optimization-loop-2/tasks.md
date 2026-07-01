@@ -8,7 +8,7 @@
 - [x] 1.1 在 `rst2md/rag/query_rewrite.py` 的 `expand_query_variants` 增加点号拆分逻辑：query 匹配 `^[A-Z][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*\(?\s*$` 时，追加方法后缀变体（最后一个 `.` 之后的部分，去掉末尾 `()`）。保留原 query 作为第一个变体
 - [x] 1.2 在 `rst2md/tests/test_searcher_module.py` 加单元测试：`Node.connect` → `["Node.connect", "connect"]`；`ResourceLoader.load()` → `["ResourceLoader.load()", "load"]`；`scene_tree.tutorial` → 单元素（不拆分）；`v2.1` → 单元素（不拆分）
 - [x] 1.3 验证 `_symbol_candidates`（`query_plan.py:30`）对 `["Node.connect", "connect"]` 输出两个去重候选 `("Node.connect", "connect")`
-- [ ] 1.4 跑 `uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py` 确认 A 段单元测试通过且无回归
+- [x] 1.4 跑 `uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py` 确认 A 段单元测试通过且无回归
 - [ ] 1.5 跑 `uv run godot-rag eval-search`，把输出存为 `docs/search-quality/loop-2-stage-A.json`
 - [ ] 1.6 验证 `ResourceLoader.load` 与 `Node.connect` 命中 rank ≤3；symbol 类 hit@5 80%→90%+；32 个原通过查询 hit@5 不低于 89.5%。若有回归，记录是哪个查询、分析是否需要给方法后缀加最小长度守卫
 

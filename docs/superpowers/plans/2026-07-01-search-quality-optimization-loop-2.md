@@ -238,7 +238,7 @@ Expected: PASS（`_symbol_candidates` 走 `normalize_symbol` 去重，`Node.conn
 
 ### Task A.4: A 段单元 + 集成不回归
 
-- [ ] **Step 1: 跑 searcher + rag_search 全套**
+- [x] **Step 1: 跑 searcher + rag_search 全套**
 
 ```bash
 uv run pytest -q rst2md/tests/test_searcher_module.py rst2md/tests/test_rag_search.py
