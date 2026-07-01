@@ -819,7 +819,7 @@ Expected: FAIL（`graph.inherits` 信号不存在 — 当前图扩展用通用 `
 
 ### Task C.6: 实现图扩展 inherits 定向遍历分支（Green）
 
-- [ ] **Step 1: 修改 `rst2md/rag/searcher.py` `_search_database_impl` 图扩展段**
+- [x] **Step 1: 修改 `rst2md/rag/searcher.py` `_search_database_impl` 图扩展段**
 
 在现有 `if expand_graph:` 块（约 line 310-390）的通用 graph expansion 循环**之后**、`sorted_results = sorted(...)` 重排**之前**，加 inherits 定向分支：
 
@@ -875,7 +875,7 @@ Expected: FAIL（`graph.inherits` 信号不存在 — 当前图扩展用通用 `
 
 注意：`plan` 变量在 `_search_database_impl` 内已由 `build_query_plan(query)` 构造，可直接访问 `plan.inheritance_intent`。`expanded_ids` 复用通用分支的集合，避免重复加入。
 
-- [ ] **Step 2: 跑端到端测试确认 PASS**
+- [x] **Step 2: 跑端到端测试确认 PASS**
 
 ```bash
 uv run pytest -q rst2md/tests/test_rag_search.py::InheritsGraphTraversalTests -v
@@ -883,7 +883,7 @@ uv run pytest -q rst2md/tests/test_rag_search.py::InheritsGraphTraversalTests -v
 
 Expected: PASS
 
-- [ ] **Step 3: 跑图扩展现有测试确认无回归**
+- [x] **Step 3: 跑图扩展现有测试确认无回归**
 
 ```bash
 uv run pytest -q rst2md/tests/test_rag_search.py -k graph -v
@@ -891,7 +891,7 @@ uv run pytest -q rst2md/tests/test_rag_search.py -k graph -v
 
 Expected: 全部 PASS（`test_new_graph_chunk_records_expansion_signal` 等不受影响 — 它们 `inheritance_intent=False`，不走新分支）
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py
