@@ -42,5 +42,5 @@
 - [x] 4.1 跑完整 `uv run pytest -q` 全套测试通过
 - [x] 4.2 跑 `uv run godot-rag eval-search`，把最终输出存为 `docs/search-quality/loop-2-final.json`
 - [x] 4.3 对比 `loop-2-stage-0-baseline.json` 与 `loop-2-final.json`：6 个原失败查询至少 5 个进入 rank ≤5（最后一个允许仍失败但需记录原因）；整体 Hit@5 ≥ 94%；MRR@5 ≥ 85%
-- [ ] 4.4 更新 `docs/search-quality/baseline.json` 为 loop-2-final 的内容（成为新基线）
+- [x] 4.4 更新 `docs/search-quality/baseline.json` 为 loop-2-final 的内容（成为新基线）
 - [ ] 4.5 准备 verify 阶段所需材料：design.md 中三个 Open Questions 的答案（factor 最终值、Inherits 行格式确认、A 段回归检查结果）

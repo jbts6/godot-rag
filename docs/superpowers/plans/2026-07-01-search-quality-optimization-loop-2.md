@@ -1010,7 +1010,7 @@ Expected:
 
 ### Task 4.4: 更新 baseline.json
 
-- [ ] **Step 1: 替换 baseline**
+- [x] **Step 1: 替换 baseline**
 
 ```bash
 cp docs/search-quality/loop-2-final.json docs/search-quality/baseline.json
