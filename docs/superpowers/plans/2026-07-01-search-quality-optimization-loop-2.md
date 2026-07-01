@@ -772,7 +772,7 @@ git commit -m "feat(query-plan): add inheritance_intent (4 keywords, no extends)
 
 ### Task C.5: 写图扩展 inherits 定向遍历端到端测试（Red）
 
-- [ ] **Step 1: 在 `test_rag_search.py` 加端到端测试**
+- [x] **Step 1: 在 `test_rag_search.py` 加端到端测试**
 
 ```python
 class InheritsGraphTraversalTests(unittest.TestCase):
