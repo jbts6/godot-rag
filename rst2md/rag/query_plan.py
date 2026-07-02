@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from rag.query_rewrite import _ALIAS_RULES, _tokens, expand_query_variants
@@ -25,6 +26,17 @@ def _addon_intent(query: str) -> str | None:
     if "addon" in tokens or "plugin" in tokens:
         return "addon"
     return None
+
+
+_INHERITANCE_KEYWORDS = ("inherits", "subclass of", "parent class", "derived from")
+_INHERITANCE_RE = re.compile(
+    r'\b(?:' + '|'.join(re.escape(k) for k in _INHERITANCE_KEYWORDS) + r')\b',
+    re.IGNORECASE,
+)
+
+
+def _inheritance_intent(query: str) -> bool:
+    return bool(_INHERITANCE_RE.search(query))
 
 
 def _symbol_candidates(variants: tuple[str, ...]) -> tuple[str, ...]:
@@ -65,6 +77,7 @@ class QueryPlan:
     alias_symbol_candidates: tuple[str, ...]
     doc_type_intent: str | None
     addon_intent: str | None
+    inheritance_intent: bool
 
 
 def build_query_plan(query: str) -> QueryPlan:
@@ -76,4 +89,5 @@ def build_query_plan(query: str) -> QueryPlan:
         alias_symbol_candidates=_alias_symbol_candidates(query),
         doc_type_intent=_doc_type_intent(query),
         addon_intent=_addon_intent(query),
+        inheritance_intent=_inheritance_intent(query),
     )

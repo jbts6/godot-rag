@@ -5437,8 +5437,8 @@
   "report_only_triage": [],
   "latency": {
     "count": 45,
-    "p50_ms": 44.355,
-    "p95_ms": 68.551
+    "p50_ms": 44.014,
+    "p95_ms": 68.012
   },
   "metadata": {
     "query_suite_hash": "62587fe2133c2ec98616930e200fa4caaf7fedec6830ae78ed419a722d6e7006",

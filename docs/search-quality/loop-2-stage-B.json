@@ -9,23 +9,23 @@
   "categories": {
     "addon": {
       "count": 0,
-      "hit@1": 0.0,
-      "hit@3": 0.0,
-      "hit@5": 0.0,
-      "mrr@5": 0.0
+      "hit@1": 0,
+      "hit@3": 0,
+      "hit@5": 0,
+      "mrr@5": 0
     },
     "class": {
       "count": 18,
       "hit@1": 0.8333333333333334,
       "hit@3": 0.9444444444444444,
-      "hit@5": 1.0,
+      "hit@5": 1,
       "mrr@5": 0.8842592592592593
     },
     "engine": {
       "count": 3,
       "hit@1": 0.6666666666666666,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
+      "hit@3": 1,
+      "hit@5": 1,
       "mrr@5": 0.7777777777777777
     },
     "symbol": {
@@ -38,8 +38,8 @@
     "tutorial": {
       "count": 7,
       "hit@1": 0.8571428571428571,
-      "hit@3": 1.0,
-      "hit@5": 1.0,
+      "hit@3": 1,
+      "hit@5": 1,
       "mrr@5": 0.9285714285714286
     }
   },
@@ -289,7 +289,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_@gdscript.md",
           "symbol": "@GDScript.load",
           "doc_type": "class",
@@ -298,7 +298,7 @@
         },
         {
           "rank": 2,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_image.md",
           "symbol": "Image.load",
           "doc_type": "class",
@@ -307,7 +307,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/dialogue_manager/addons/dialogue_manager/views/main_view.gd",
           "symbol": "main_view",
           "doc_type": "addon",
@@ -316,7 +316,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitRunnerConfig.gd",
           "symbol": "GdUnitRunnerConfig",
           "doc_type": "addon",
@@ -325,7 +325,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTestResourceLoader.gd",
           "symbol": "GdUnitTestResourceLoader",
           "doc_type": "addon",
@@ -334,7 +334,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTestSuiteScanner.gd",
           "symbol": "GdUnitTestSuiteScanner",
           "doc_type": "addon",
@@ -343,7 +343,7 @@
         },
         {
           "rank": 7,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/hooks/GdUnitTestSessionHookService.gd",
           "symbol": "GdUnitTestSessionHookService",
           "doc_type": "addon",
@@ -352,7 +352,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdFunctionParameterSetResolver.gd",
           "symbol": "GdFunctionParameterSetResolver",
           "doc_type": "addon",
@@ -361,7 +361,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdUnitTestParameterSetResolver.gd",
           "symbol": "GdUnitTestParameterSetResolver",
           "doc_type": "addon",
@@ -370,7 +370,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/runners/GdUnitTestCIRunner.gd",
           "symbol": "GdUnitTestCIRunner",
           "doc_type": "addon",
@@ -403,7 +403,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_node.md",
           "symbol": "Node.add_child",
           "doc_type": "class",
@@ -412,7 +412,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_node.md",
           "symbol": "Node",
           "doc_type": "class",
@@ -515,7 +515,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_timer.md",
           "symbol": "Timer.start",
           "doc_type": "class",
@@ -524,7 +524,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/dialogue_manager/addons/dialogue_manager/compiler/resolved_line_data.gd",
           "symbol": "DMResolvedLineData",
           "doc_type": "addon",
@@ -533,7 +533,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/dialogue_manager/addons/dialogue_manager/views/debugger_view.gd",
           "symbol": "DMDebuggerView",
           "doc_type": "addon",
@@ -542,7 +542,7 @@
         },
         {
           "rank": 4,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/doctor/addons/godot_doctor/core/primitives/godot_doctor_range_float.gd",
           "symbol": "GodotDoctorRangeFloat",
           "doc_type": "addon",
@@ -551,7 +551,7 @@
         },
         {
           "rank": 5,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/doctor/addons/godot_doctor/core/primitives/godot_doctor_range_int.gd",
           "symbol": "GodotDoctorRangeInt",
           "doc_type": "addon",
@@ -560,7 +560,7 @@
         },
         {
           "rank": 6,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitMonitor.gd",
           "symbol": "GdUnitMonitor",
           "doc_type": "addon",
@@ -569,7 +569,7 @@
         },
         {
           "rank": 7,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitOrphanNodesMonitor.gd",
           "symbol": "GdUnitOrphanNodesMonitor",
           "doc_type": "addon",
@@ -578,7 +578,7 @@
         },
         {
           "rank": 8,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GodotGdErrorMonitor.gd",
           "symbol": "GodotGdErrorMonitor",
           "doc_type": "addon",
@@ -587,7 +587,7 @@
         },
         {
           "rank": 9,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/network/GdUnitTcpClient.gd",
           "symbol": "GdUnitTcpClient",
           "doc_type": "addon",
@@ -596,7 +596,7 @@
         },
         {
           "rank": 10,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/network/GdUnitTcpServer.gd",
           "symbol": "GdUnitTcpServer",
           "doc_type": "addon",
@@ -627,7 +627,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_timer.md",
           "symbol": "Timer.stop",
           "doc_type": "class",
@@ -636,7 +636,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/dialogue_manager/addons/dialogue_manager/views/debugger_view.gd",
           "symbol": "DMDebuggerView",
           "doc_type": "addon",
@@ -645,7 +645,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/command/GdUnitCommandTestSession.gd",
           "symbol": "GdUnitCommandTestSession",
           "doc_type": "addon",
@@ -654,7 +654,7 @@
         },
         {
           "rank": 4,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitMonitor.gd",
           "symbol": "GdUnitMonitor",
           "doc_type": "addon",
@@ -663,7 +663,7 @@
         },
         {
           "rank": 5,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitOrphanNodesMonitor.gd",
           "symbol": "GdUnitOrphanNodesMonitor",
           "doc_type": "addon",
@@ -672,7 +672,7 @@
         },
         {
           "rank": 6,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GodotGdErrorMonitor.gd",
           "symbol": "GodotGdErrorMonitor",
           "doc_type": "addon",
@@ -681,7 +681,7 @@
         },
         {
           "rank": 7,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/network/GdUnitTcpClient.gd",
           "symbol": "GdUnitTcpClient",
           "doc_type": "addon",
@@ -690,7 +690,7 @@
         },
         {
           "rank": 8,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/network/GdUnitTcpServer.gd",
           "symbol": "GdUnitTcpServer",
           "doc_type": "addon",
@@ -699,7 +699,7 @@
         },
         {
           "rank": 9,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/phantom-camera/addons/phantom_camera/scripts/phantom_camera/PhantomCameraNoiseEmitter2D.cs",
           "symbol": "PhantomCameraNoiseEmitter2D",
           "doc_type": "addon",
@@ -708,7 +708,7 @@
         },
         {
           "rank": 10,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/phantom-camera/addons/phantom_camera/scripts/phantom_camera/PhantomCameraNoiseEmitter3D.cs",
           "symbol": "PhantomCameraNoiseEmitter3D",
           "doc_type": "addon",
@@ -739,7 +739,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_stopped",
           "doc_type": "class",
@@ -748,7 +748,7 @@
         },
         {
           "rank": 2,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_bool.md",
           "symbol": "bool",
           "doc_type": "class",
@@ -851,7 +851,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_object.md",
           "symbol": "Object.emit_signal",
           "doc_type": "class",
@@ -860,7 +860,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -878,7 +878,7 @@
         },
         {
           "rank": 4,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_stringname.md",
           "symbol": "StringName",
           "doc_type": "class",
@@ -887,7 +887,7 @@
         },
         {
           "rank": 5,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_gdscript.md",
           "symbol": "GDScript",
           "doc_type": "class",
@@ -963,7 +963,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_node.md",
           "symbol": "Node",
           "doc_type": "class",
@@ -972,7 +972,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/dialogue_manager/addons/dialogue_manager/components/code_edit.gd",
           "symbol": "DMCodeEdit",
           "doc_type": "addon",
@@ -981,7 +981,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/doctor/addons/godot_doctor/cli/primitives/godot_doctor_report_printer.gd",
           "symbol": "GodotDoctorReportPrinter",
           "doc_type": "addon",
@@ -990,7 +990,7 @@
         },
         {
           "rank": 4,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdObjects.gd",
           "symbol": "GdObjects",
           "doc_type": "addon",
@@ -999,7 +999,7 @@
         },
         {
           "rank": 5,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTools.gd",
           "symbol": "GdUnitTools",
           "doc_type": "addon",
@@ -1008,7 +1008,7 @@
         },
         {
           "rank": 6,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/monitor/GdUnitOrphanNodesMonitor.gd",
           "symbol": "GdUnitOrphanNodesMonitor",
           "doc_type": "addon",
@@ -1017,7 +1017,7 @@
         },
         {
           "rank": 7,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/phantom-camera/addons/phantom_camera/scripts/phantom_camera_host/PhantomCameraHost.cs",
           "symbol": "InterpolationMode",
           "doc_type": "addon",
@@ -1026,7 +1026,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_node.md",
           "symbol": "Node.get_node_or_null",
           "doc_type": "class",
@@ -1035,7 +1035,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_node.md",
           "symbol": "Node.replacing_by",
           "doc_type": "class",
@@ -1044,7 +1044,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_node.md",
           "symbol": "Node.editor_description_changed",
           "doc_type": "class",
@@ -1075,7 +1075,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_timer.md",
           "symbol": "Timer",
           "doc_type": "class",
@@ -1084,7 +1084,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/dialogue_manager/addons/dialogue_manager/components/update_button.gd",
           "symbol": "update_button",
           "doc_type": "addon",
@@ -1093,7 +1093,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/doctor/addons/godot_doctor/godot_doctor_plugin.gd",
           "symbol": "GodotDoctorPlugin",
           "doc_type": "addon",
@@ -1102,7 +1102,7 @@
         },
         {
           "rank": 4,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/GdUnitAwaiter.gd",
           "symbol": "GdUnitAwaiter",
           "doc_type": "addon",
@@ -1111,7 +1111,7 @@
         },
         {
           "rank": 5,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/asserts/GdUnitFuncAssertImpl.gd",
           "symbol": "GdUnitFuncAssertImpl",
           "doc_type": "addon",
@@ -1120,7 +1120,7 @@
         },
         {
           "rank": 6,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/asserts/GdUnitSignalAssertImpl.gd",
           "symbol": "GdUnitSignalAssertImpl",
           "doc_type": "addon",
@@ -1129,7 +1129,7 @@
         },
         {
           "rank": 7,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitSignalAwaiter.gd",
           "symbol": "GdUnitSignalAwaiter",
           "doc_type": "addon",
@@ -1138,7 +1138,7 @@
         },
         {
           "rank": 8,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTools.gd",
           "symbol": "GdUnitTools",
           "doc_type": "addon",
@@ -1147,7 +1147,7 @@
         },
         {
           "rank": 9,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/command/GdUnitCommandHandler.gd",
           "symbol": "GdUnitCommandHandler",
           "doc_type": "addon",
@@ -1156,7 +1156,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_timer.md",
           "symbol": "Timer.get_timer_process_callback",
           "doc_type": "class",
@@ -1187,7 +1187,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -1196,7 +1196,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/statecharts/addons/gut/signal_watcher.gd",
           "symbol": "signal_watcher",
           "doc_type": "addon",
@@ -1205,7 +1205,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdUnitExpressionRunner.gd",
           "symbol": "GdUnitExpressionRunner",
           "doc_type": "addon",
@@ -1214,7 +1214,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_APPEND_SOURCE_OBJECT",
           "doc_type": "class",
@@ -1223,7 +1223,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.to_string",
           "doc_type": "class",
@@ -1232,7 +1232,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.property_list_changed",
           "doc_type": "class",
@@ -1241,7 +1241,7 @@
         },
         {
           "rank": 7,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.script_changed",
           "doc_type": "class",
@@ -1250,7 +1250,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_DEFERRED",
           "doc_type": "class",
@@ -1259,7 +1259,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_PERSIST",
           "doc_type": "class",
@@ -1268,7 +1268,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object.CONNECT_ONE_SHOT",
           "doc_type": "class",
@@ -1747,7 +1747,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_node.md",
           "symbol": "Node.add_child",
           "doc_type": "class",
@@ -1756,7 +1756,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_node.md",
           "symbol": "Node",
           "doc_type": "class",
@@ -1859,7 +1859,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_timer.md",
           "symbol": "Timer.is_stopped",
           "doc_type": "class",
@@ -1868,7 +1868,7 @@
         },
         {
           "rank": 2,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_bool.md",
           "symbol": "bool",
           "doc_type": "class",
@@ -1971,7 +1971,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_object.md",
           "symbol": "Object.emit_signal",
           "doc_type": "class",
@@ -1980,7 +1980,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -1989,7 +1989,7 @@
         },
         {
           "rank": 3,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_stringname.md",
           "symbol": "StringName",
           "doc_type": "class",
@@ -1998,7 +1998,7 @@
         },
         {
           "rank": 4,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_gdscript.md",
           "symbol": "GDScript",
           "doc_type": "class",
@@ -2083,7 +2083,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_node.md",
           "symbol": "Node.add_child",
           "doc_type": "class",
@@ -2092,7 +2092,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_node.md",
           "symbol": "Node",
           "doc_type": "class",
@@ -3091,7 +3091,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 105.0,
+          "score": 105,
           "path": "classes/class_object.md",
           "symbol": "Object.emit_signal",
           "doc_type": "class",
@@ -3100,7 +3100,7 @@
         },
         {
           "rank": 2,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -3109,7 +3109,7 @@
         },
         {
           "rank": 3,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_stringname.md",
           "symbol": "StringName",
           "doc_type": "class",
@@ -3118,7 +3118,7 @@
         },
         {
           "rank": 4,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_gdscript.md",
           "symbol": "GDScript",
           "doc_type": "class",
@@ -3877,7 +3877,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_animationplayer.md",
           "symbol": "AnimationPlayer.play",
           "doc_type": "class",
@@ -3886,7 +3886,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/sound_manager/addons/sound_manager/ambient_sounds.gd",
           "symbol": "ambient_sounds",
           "doc_type": "addon",
@@ -3895,7 +3895,7 @@
         },
         {
           "rank": 3,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/sound_manager/addons/sound_manager/music.gd",
           "symbol": "music",
           "doc_type": "addon",
@@ -3904,7 +3904,7 @@
         },
         {
           "rank": 4,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/sound_manager/addons/sound_manager/sound_effects.gd",
           "symbol": "sound_effects",
           "doc_type": "addon",
@@ -3913,7 +3913,7 @@
         },
         {
           "rank": 5,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_animatedsprite2d.md",
           "symbol": "AnimatedSprite2D.play",
           "doc_type": "class",
@@ -3922,7 +3922,7 @@
         },
         {
           "rank": 6,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_animatedsprite3d.md",
           "symbol": "AnimatedSprite3D.play",
           "doc_type": "class",
@@ -3931,7 +3931,7 @@
         },
         {
           "rank": 7,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_audiostreamplayer.md",
           "symbol": "AudioStreamPlayer.play",
           "doc_type": "class",
@@ -3940,7 +3940,7 @@
         },
         {
           "rank": 8,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_audiostreamplayer2d.md",
           "symbol": "AudioStreamPlayer2D.play",
           "doc_type": "class",
@@ -3949,7 +3949,7 @@
         },
         {
           "rank": 9,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_audiostreamplayer3d.md",
           "symbol": "AudioStreamPlayer3D.play",
           "doc_type": "class",
@@ -3958,7 +3958,7 @@
         },
         {
           "rank": 10,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_tween.md",
           "symbol": "Tween.play",
           "doc_type": "class",
@@ -3989,7 +3989,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D",
           "doc_type": "class",
@@ -3998,7 +3998,7 @@
         },
         {
           "rank": 2,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.get_angular_velocity",
           "doc_type": "class",
@@ -4007,7 +4007,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.freeze",
           "doc_type": "class",
@@ -4016,7 +4016,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.sleeping",
           "doc_type": "class",
@@ -4025,7 +4025,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.mass",
           "doc_type": "class",
@@ -4034,7 +4034,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.can_sleep",
           "doc_type": "class",
@@ -4043,7 +4043,7 @@
         },
         {
           "rank": 7,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.contact_monitor",
           "doc_type": "class",
@@ -4052,7 +4052,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.continuous_cd",
           "doc_type": "class",
@@ -4061,7 +4061,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.custom_integrator",
           "doc_type": "class",
@@ -4070,7 +4070,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_rigidbody3d.md",
           "symbol": "RigidBody3D.freeze_mode",
           "doc_type": "class",
@@ -4101,7 +4101,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_@gdscript.md",
           "symbol": "@GDScript.load",
           "doc_type": "class",
@@ -4110,7 +4110,7 @@
         },
         {
           "rank": 2,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_image.md",
           "symbol": "Image.load",
           "doc_type": "class",
@@ -4119,7 +4119,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/dialogue_manager/addons/dialogue_manager/views/main_view.gd",
           "symbol": "main_view",
           "doc_type": "addon",
@@ -4128,7 +4128,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitRunnerConfig.gd",
           "symbol": "GdUnitRunnerConfig",
           "doc_type": "addon",
@@ -4137,7 +4137,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTestResourceLoader.gd",
           "symbol": "GdUnitTestResourceLoader",
           "doc_type": "addon",
@@ -4146,7 +4146,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/GdUnitTestSuiteScanner.gd",
           "symbol": "GdUnitTestSuiteScanner",
           "doc_type": "addon",
@@ -4155,7 +4155,7 @@
         },
         {
           "rank": 7,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/hooks/GdUnitTestSessionHookService.gd",
           "symbol": "GdUnitTestSessionHookService",
           "doc_type": "addon",
@@ -4164,7 +4164,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdFunctionParameterSetResolver.gd",
           "symbol": "GdFunctionParameterSetResolver",
           "doc_type": "addon",
@@ -4173,7 +4173,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/parse/GdUnitTestParameterSetResolver.gd",
           "symbol": "GdUnitTestParameterSetResolver",
           "doc_type": "addon",
@@ -4182,7 +4182,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/runners/GdUnitTestCIRunner.gd",
           "symbol": "GdUnitTestCIRunner",
           "doc_type": "addon",
@@ -4213,7 +4213,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_input.md",
           "symbol": "Input.is_action_pressed",
           "doc_type": "class",
@@ -4222,7 +4222,7 @@
         },
         {
           "rank": 2,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/statecharts/addons/gut/input_sender.gd",
           "symbol": "input_sender",
           "doc_type": "addon",
@@ -4231,7 +4231,7 @@
         },
         {
           "rank": 3,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_inputevent.md",
           "symbol": "InputEvent.is_action_pressed",
           "doc_type": "class",
@@ -4240,7 +4240,7 @@
         },
         {
           "rank": 4,
-          "score": 50.0,
+          "score": 50,
           "path": "classes/class_input.md",
           "symbol": "Input",
           "doc_type": "class",
@@ -4249,7 +4249,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_inputevent.md",
           "symbol": "InputEvent",
           "doc_type": "class",
@@ -4325,7 +4325,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_control.md",
           "symbol": "Control.grab_focus",
           "doc_type": "class",
@@ -4334,7 +4334,7 @@
         },
         {
           "rank": 2,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_window.md",
           "symbol": "Window.grab_focus",
           "doc_type": "class",
@@ -4343,7 +4343,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_window.md",
           "symbol": "Window",
           "doc_type": "class",
@@ -4370,7 +4370,7 @@
         },
         {
           "rank": 6,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_bool.md",
           "symbol": "bool",
           "doc_type": "class",
@@ -4379,7 +4379,7 @@
         },
         {
           "rank": 7,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_node.md",
           "symbol": "Node.ready",
           "doc_type": "class",
@@ -4661,7 +4661,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D",
           "doc_type": "class",
@@ -4670,7 +4670,7 @@
         },
         {
           "rank": 2,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.get_offset",
           "doc_type": "class",
@@ -4679,7 +4679,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.texture",
           "doc_type": "class",
@@ -4688,7 +4688,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.centered",
           "doc_type": "class",
@@ -4697,7 +4697,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.frame",
           "doc_type": "class",
@@ -4706,7 +4706,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.hframes",
           "doc_type": "class",
@@ -4715,7 +4715,7 @@
         },
         {
           "rank": 7,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.vframes",
           "doc_type": "class",
@@ -4724,7 +4724,7 @@
         },
         {
           "rank": 8,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.flip_h",
           "doc_type": "class",
@@ -4733,7 +4733,7 @@
         },
         {
           "rank": 9,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.flip_v",
           "doc_type": "class",
@@ -4742,7 +4742,7 @@
         },
         {
           "rank": 10,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_sprite2d.md",
           "symbol": "Sprite2D.region_enabled",
           "doc_type": "class",
@@ -4773,7 +4773,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 100.0,
+          "score": 100,
           "path": "addons/statecharts/addons/godot_state_charts/csharp/NodeWrapper.cs",
           "symbol": "NodeWrapper",
           "doc_type": "addon",
@@ -4782,7 +4782,7 @@
         },
         {
           "rank": 2,
-          "score": 80.0,
+          "score": 80,
           "path": "classes/class_object.md",
           "symbol": "Object.connect",
           "doc_type": "class",
@@ -4791,7 +4791,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/core/command/GdUnitCommandTestSession.gd",
           "symbol": "GdUnitCommandTestSession",
           "doc_type": "addon",
@@ -4800,7 +4800,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/gdUnit4/addons/gdUnit4/src/network/GdUnitTcpClient.gd",
           "symbol": "GdUnitTcpClient",
           "doc_type": "addon",
@@ -4809,7 +4809,7 @@
         },
         {
           "rank": 5,
-          "score": 40.0,
+          "score": 40,
           "path": "addons/statecharts/addons/gut/test.gd",
           "symbol": "GutTest",
           "doc_type": "addon",
@@ -4818,7 +4818,7 @@
         },
         {
           "rank": 6,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -4997,7 +4997,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_shadermaterial.md",
           "symbol": "ShaderMaterial",
           "doc_type": "class",
@@ -5006,7 +5006,7 @@
         },
         {
           "rank": 2,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_resource.md",
           "symbol": "Resource",
           "doc_type": "class",
@@ -5015,7 +5015,7 @@
         },
         {
           "rank": 3,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_refcounted.md",
           "symbol": "RefCounted",
           "doc_type": "class",
@@ -5024,7 +5024,7 @@
         },
         {
           "rank": 4,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -5221,7 +5221,7 @@
       "observed": [
         {
           "rank": 1,
-          "score": 102.0,
+          "score": 102,
           "path": "classes/class_physicsrayqueryparameters3d.md",
           "symbol": "PhysicsRayQueryParameters3D",
           "doc_type": "class",
@@ -5230,7 +5230,7 @@
         },
         {
           "rank": 2,
-          "score": 40.0,
+          "score": 40,
           "path": "classes/class_object.md",
           "symbol": "Object",
           "doc_type": "class",
@@ -5239,7 +5239,7 @@
         },
         {
           "rank": 3,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_vector3.md",
           "symbol": "Vector3",
           "doc_type": "class",
@@ -5248,7 +5248,7 @@
         },
         {
           "rank": 4,
-          "score": 25.0,
+          "score": 25,
           "path": "classes/class_array.md",
           "symbol": "Array",
           "doc_type": "class",
@@ -5437,8 +5437,8 @@
   "report_only_triage": [],
   "latency": {
     "count": 45,
-    "p50_ms": 44.355,
-    "p95_ms": 68.551
+    "p50_ms": 43.876,
+    "p95_ms": 69.206
   },
   "metadata": {
     "query_suite_hash": "62587fe2133c2ec98616930e200fa4caaf7fedec6830ae78ed419a722d6e7006",

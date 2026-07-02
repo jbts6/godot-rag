@@ -122,8 +122,9 @@ from rag.query_rewrite import doc_type_boost
 
 
 def test_doc_type_boost_prefers_tutorial_for_how_to_query():
-    assert doc_type_boost("how to use scene tree nodes", "tutorial") > 0
-    assert doc_type_boost("how to use scene tree nodes", "class") == 0
+    # 修订：doc_type_boost 退化为 0.0，加权移到 _rerank_bonus
+    assert doc_type_boost("how to use scene tree nodes", "tutorial") == 0.0
+    assert doc_type_boost("how to use scene tree nodes", "class") == 0.0
 
 
 def test_doc_type_boost_does_not_boost_symbol_query():
@@ -284,7 +285,7 @@ def test_rerank_appends_direct_symbol_signal():
 def test_rerank_appends_doc_type_intent_signal():
     from rag.models import SearchResult
     from rag.query_plan import QueryPlan
-    from rag.fusion import rerank_results
+    from rag.fusion import rerank_results, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
 
     # Construct plan directly: build_query_plan always puts the original query
     # in symbol_candidates (per QueryPlan docstring), which would block the
@@ -297,6 +298,7 @@ def test_rerank_appends_doc_type_intent_signal():
         alias_symbol_candidates=(),
         doc_type_intent="tutorial",
         addon_intent=None,
+        inheritance_intent=False,
     )
     tutorial = SearchResult(
         score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
@@ -308,7 +310,9 @@ def test_rerank_appends_doc_type_intent_signal():
     names = [s.name for s in ranked[0].ranking_signals]
     assert "rerank.doc_type_intent" in names
     sig = next(s for s in ranked[0].ranking_signals if s.name == "rerank.doc_type_intent")
-    assert sig.weight == 0.05
+    # B.2 floor 公式：weight = max(score, FLOOR) * (FACTOR - 1) = max(1.0, 3.0) * 4 = 12.0
+    expected_weight = max(tutorial.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+    assert sig.weight == expected_weight
 
 
 def test_rerank_appends_addon_intent_signal():
@@ -407,7 +411,7 @@ def test_rerank_bonus_equals_signal_weight_sum_direct_symbol():
 
 
 def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
-    """Sync guard: doc_type_intent branch (0.05).
+    """Sync guard: doc_type_intent branch (B.2 floor 公式).
 
     build_query_plan always puts the original query string in
     symbol_candidates, which blocks the doc_type_intent bonus via the
@@ -418,7 +422,7 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
     """
     from rag.models import SearchResult
     from rag.query_plan import QueryPlan
-    from rag.fusion import _rerank_bonus, _rerank_signals
+    from rag.fusion import _rerank_bonus, _rerank_signals, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
 
     plan = QueryPlan(
         original="how to use scene tree nodes",
@@ -427,6 +431,7 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
         alias_symbol_candidates=(),
         doc_type_intent="tutorial",
         addon_intent=None,
+        inheritance_intent=False,
     )
     result = SearchResult(
         score=1.0, path="tutorials/scene_tree.md", start_line=1, end_line=2,
@@ -438,7 +443,9 @@ def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
     assert _rerank_bonus(plan, result) == sum(s.weight for s in signals)
     names = [s.name for s in signals]
     assert "rerank.doc_type_intent" in names
-    assert next(s for s in signals if s.name == "rerank.doc_type_intent").weight == 0.05
+    # B.2 floor 公式：weight = max(score, FLOOR) * (FACTOR - 1) = max(1.0, 3.0) * 4 = 12.0
+    expected_weight = max(result.score, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+    assert next(s for s in signals if s.name == "rerank.doc_type_intent").weight == expected_weight
 
 
 def test_rerank_bonus_equals_signal_weight_sum_addon_intent():
@@ -497,6 +504,119 @@ def test_search_response_metadata_shape_is_stable():
     assert metadata.mode == "fts_only"
     assert metadata.vector_available is False
     assert metadata.fallback_reason == "missing_vec_chunks"
+
+
+class DotNotationSplitTests(unittest.TestCase):
+    def test_class_method_splits_to_method_suffix(self):
+        from rag.query_rewrite import expand_query_variants
+        self.assertEqual(
+            expand_query_variants("Node.connect"),
+            ["Node.connect", "connect"],
+        )
+
+    def test_class_method_parens_strips_parens(self):
+        from rag.query_rewrite import expand_query_variants
+        self.assertEqual(
+            expand_query_variants("ResourceLoader.load()"),
+            ["ResourceLoader.load()", "load"],
+        )
+
+    def test_lowercase_dot_not_split(self):
+        from rag.query_rewrite import expand_query_variants
+        # scene_tree.tutorial — 前段非大写开头，不拆
+        self.assertEqual(expand_query_variants("scene_tree.tutorial"), ["scene_tree.tutorial"])
+
+    def test_numeric_dot_not_split(self):
+        from rag.query_rewrite import expand_query_variants
+        # v2.1 — 前段非大写开头，不拆
+        self.assertEqual(expand_query_variants("v2.1"), ["v2.1"])
+
+    def test_symbol_candidates_dedup_dot_split(self):
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("Node.connect")
+        # 两个去重候选：原符号 + 方法后缀
+        self.assertIn("Node.connect", plan.symbol_candidates)
+        self.assertIn("connect", plan.symbol_candidates)
+
+
+class TutorialFloorBoostTests(unittest.TestCase):
+    def test_doc_type_boost_returns_zero_for_tutorial(self):
+        # 修订：doc_type_boost 退化为 0.0，加权移到 _rerank_bonus
+        from rag.query_rewrite import doc_type_boost
+        self.assertEqual(doc_type_boost("how to use scene tree nodes", "tutorial"), 0.0)
+
+    def test_rerank_bonus_floors_low_tutorial_score(self):
+        # score=0.66 < FLOOR=3.0 → bonus = 3.0 * 4 = 12.0
+        from rag.fusion import _rerank_bonus, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("how to use scene tree nodes")
+        result = SearchResult(
+            score=0.66, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        expected = max(0.66, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+        self.assertAlmostEqual(_rerank_bonus(plan, result), expected, places=6)
+
+    def test_rerank_bonus_multiplicative_high_tutorial_score(self):
+        # score=5.0 >= FLOOR=3.0 → bonus = 5.0 * 4 = 20.0（不 overshoot 到 symbol 阈值外）
+        from rag.fusion import _rerank_bonus, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("how to use scene tree nodes")
+        result = SearchResult(
+            score=5.0, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        expected = max(5.0, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
+        self.assertAlmostEqual(_rerank_bonus(plan, result), expected, places=6)
+
+    def test_rerank_bonus_no_tutorial_boost_when_symbol_candidates(self):
+        # 守卫：symbol 查询不触发 tutorial boost
+        from rag.fusion import _rerank_bonus
+        from rag.models import SearchResult
+        from rag.query_plan import build_query_plan
+        plan = build_query_plan("Node.add_child")  # 有 symbol_candidates
+        result = SearchResult(
+            score=0.66, path="tut.md", start_line=1, end_line=10,
+            doc_type="tutorial", chunk_type="section", addon="", addon_name="",
+            symbol="", heading="", breadcrumb="", text="", relation_type="",
+            distance=0, snippet="", ranking_signals=[],
+        )
+        # 只有 symbol 候选 bonus，无 tutorial bonus
+        self.assertNotIn("tutorial", str(_rerank_bonus(plan, result) - 0.0))
+
+
+class InheritanceIntentTests(unittest.TestCase):
+    def test_inherits_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("Node inherits Object"))
+
+    def test_subclass_of_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("what is subclass of Node"))
+
+    def test_parent_class_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("parent class of Timer"))
+
+    def test_derived_from_keyword_triggers(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertTrue(_inheritance_intent("classes derived from Object"))
+
+    def test_extends_does_not_trigger(self):
+        # 修订：去掉 extends，避免 "how to extend Node functionality" 误判
+        from rag.query_plan import _inheritance_intent
+        self.assertFalse(_inheritance_intent("how to extend Node functionality"))
+
+    def test_plain_query_does_not_trigger(self):
+        from rag.query_plan import _inheritance_intent
+        self.assertFalse(_inheritance_intent("Node connect"))
+        self.assertFalse(_inheritance_intent("tutorial scene tree"))
 
 
 if __name__ == "__main__":

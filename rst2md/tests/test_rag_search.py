@@ -1630,5 +1630,85 @@ class RankingSignalCoverageTests(unittest.TestCase):
         self.assertIn("rerank.addon_intent", names)
 
 
+class BuildChunkRelationsCoverageTests(unittest.TestCase):
+    """Direct unit coverage for rag.relations.build_chunk_relations.
+
+    Existing ChunkRelationTests exercise build_chunk_relations indirectly via
+    build_database; this class calls it directly on a hand-built DB to pin the
+    exact inherits row (source, target, relation, weight=0.8).
+    """
+
+    def _build_db(self, docs_text_map):
+        import sqlite3
+        import tempfile
+        from rag.db import SCHEMA
+        tmp = tempfile.mkdtemp()
+        db_path = os.path.join(tmp, "t.sqlite")
+        conn = sqlite3.connect(str(db_path))
+        conn.row_factory = sqlite3.Row
+        conn.executescript(SCHEMA)
+        for path, (doc_type, chunk_type, symbol, parent_symbol, text) in docs_text_map.items():
+            cur = conn.execute(
+                "INSERT INTO documents (path, doc_type, title) VALUES (?, ?, ?)",
+                (path, doc_type, symbol or path),
+            )
+            doc_id = cur.lastrowid
+            conn.execute(
+                "INSERT INTO chunks (document_id, path, doc_type, chunk_type, symbol, parent_symbol, text, start_line, end_line) "
+                "VALUES (?,?,?,?,?,?,?,1,10)",
+                (doc_id, path, doc_type, chunk_type, symbol, parent_symbol, text),
+            )
+        conn.commit()
+        return conn
+
+    def test_inherits_relation_created_for_class_summary(self):
+        from rag.relations import build_chunk_relations
+        conn = self._build_db({
+            "classes/class_node.md": ("class", "class_summary", "Node", "", "**Inherits:** `Object`"),
+            "classes/class_object.md": ("class", "class_summary", "Object", "", "Root of all things."),
+        })
+        build_chunk_relations(conn)
+        row = conn.execute(
+            "SELECT source_id, target_id, relation, weight FROM chunk_relations WHERE relation='inherits'"
+        ).fetchone()
+        self.assertIsNotNone(row, "inherits relation should exist")
+        self.assertEqual(row["relation"], "inherits")
+        self.assertAlmostEqual(row["weight"], 0.8)
+
+
+class InheritsGraphTraversalTests(unittest.TestCase):
+    def test_node_inherits_object_reaches_object_class_summary(self):
+        from rag import embeddings
+        from unittest.mock import patch
+        from rag.indexer import build_database
+        from rag.searcher import search_database
+
+        with tempfile.TemporaryDirectory() as tmp:
+            docs = Path(tmp) / "docs"
+            classes = docs / "classes"
+            classes.mkdir(parents=True)
+            (classes / "class_node.md").write_text(
+                "# Node\n\nBase class.\n\n**Inherits:** `Object`\n\n",
+                encoding="utf-8",
+            )
+            (classes / "class_object.md").write_text(
+                "# Object\n\nRoot of all things.\n\n",
+                encoding="utf-8",
+            )
+            (classes / "class_timer.md").write_text(
+                "# Timer\n\nA countdown timer.\n", encoding="utf-8",
+            )
+            db_path = Path(tmp) / "t.sqlite"
+            with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+                build_database(docs, db_path)
+                results = search_database(db_path, "Node inherits Object", limit=10, expand_graph=True)
+            obj = next((r for r in results if r.symbol == "Object"), None)
+            self.assertIsNotNone(obj, "Object class_summary should be reached via inherits traversal")
+            rank = results.index(obj) + 1
+            self.assertLessEqual(rank, 5, f"Object rank {rank} should be <= 5")
+            names = [s.name for s in obj.ranking_signals]
+            self.assertIn("graph.inherits", names)
+
+
 if __name__ == "__main__":
     unittest.main()
