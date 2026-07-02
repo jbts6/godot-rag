@@ -1,0 +1,14 @@
+{
+  "change": "inheritance-traversal-source-recall",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "99da9570f1faddbccc38c4a574f4fcfa474e9634462f94bde80a91a7605848df",
+  "files": [
+    { "path": "openspec/changes/inheritance-traversal-source-recall/proposal.md", "sha256": "ae9650869c5d6b40e154695688fbdf00eee32e765b1cdbdbc201be03bb207338" },
+    { "path": "openspec/changes/inheritance-traversal-source-recall/design.md", "sha256": "8b639ef5323b75c4a7e5c9ba328e8ffaaf3a28aa2b9a2c1fe828913675a1fb78" },
+    { "path": "openspec/changes/inheritance-traversal-source-recall/tasks.md", "sha256": "75abd5bc881ed35755af2fb07acdb6172cc5f524c6c07ca0b343bf365e324f2c" },
+    { "path": "openspec/changes/inheritance-traversal-source-recall/specs/intent-ranking/spec.md", "sha256": "ba5d787a66acb57c9dbc3aebcfa601c302d892f609ecac38f46242af67efd41c" }
+  ]
+}
