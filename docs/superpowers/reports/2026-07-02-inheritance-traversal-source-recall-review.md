@@ -90,7 +90,6 @@
 
 ### 下次改进
 
-- **Plan 中 `rtk` 前缀**：plan 命令使用 `rtk` 前缀，subagent 需要自行判断是否使用。建议 plan 统一使用裸命令或明确标注 `rtk` 用途
 - **Task 3 subagent 首次失败**：返回空结果，report 文件残留旧变更内容。原因可能是 subagent 上下文不足或超时。建议为操作型任务（eval + commit）提供更简洁的 dispatch prompt
 
 ### 模式识别
