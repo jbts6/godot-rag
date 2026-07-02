@@ -1,0 +1,13 @@
+{
+  "change": "flatten-test-rag-search",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "f5ad475a2c04f0046f3502b8267e1972bdc0cda39a4df532a5515943308590bf",
+  "files": [
+    { "path": "openspec/changes/flatten-test-rag-search/proposal.md", "sha256": "26bcb6ea35e40f8e28384d9f850fd932f15654f79c865ade6590f6ac49207a93" },
+    { "path": "openspec/changes/flatten-test-rag-search/design.md", "sha256": "ef2bc03b7458920282a45830e90e173c470484202a34917c679ad9dedc6a53cc" },
+    { "path": "openspec/changes/flatten-test-rag-search/tasks.md", "sha256": "c994a9f4a2c0eb20acd4bad1415306822f3caf08e82f382eaf9bd0d8ef17bee2" }
+  ]
+}

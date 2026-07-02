@@ -1,0 +1,13 @@
+{
+  "change": "subtractive-slimdown",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "11cbf95473b6e7d597e3bb3c78d3a9a2aae6fdb0df076902014d515890a41d40",
+  "files": [
+    { "path": "openspec/changes/subtractive-slimdown/proposal.md", "sha256": "02187a6a59784d3c362629a49e4dc05c213ebd1a4e1304126c5b570df9389100" },
+    { "path": "openspec/changes/subtractive-slimdown/design.md", "sha256": "dffbfc62451f87d194f4a2560ebc116cdb86e940d750a1238de74df759e588be" },
+    { "path": "openspec/changes/subtractive-slimdown/tasks.md", "sha256": "eee46f4b3c19547aeb5d3b76ac373663150957234b43c4a72ea6fb27559f0c04" }
+  ]
+}
