@@ -2,6 +2,7 @@
 change: inheritance-traversal-source-recall
 design-doc: docs/superpowers/specs/2026-07-02-inheritance-traversal-source-recall-design.md
 base-ref: 9137b74a1bae4b6160b725b919728121c7fa82c0
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 # Inheritance Traversal Source Recall 实施计划
@@ -32,6 +33,7 @@ base-ref: 9137b74a1bae4b6160b725b919728121c7fa82c0
 - **源代码导入风格**：源码用 `from rag.module import ...`（构建时重写为 `from godot_rag.rag.module`），测试同。
 - **运行环境**：`uv run pytest -q`（全量）、`uv run godot-rag eval-search`（评估）。
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## File Structure
@@ -46,6 +48,7 @@ base-ref: 9137b74a1bae4b6160b725b919728121c7fa82c0
 
 **不动的文件**：`rst2md/rag/query_plan.py`（`_inheritance_intent` / `QueryPlan.inheritance_intent` 已就绪）、`rst2md/rag/relations.py`（`extract_inherits` / `build_chunk_relations` 已就绪）、`rst2md/rag/fusion.py`（RRF / rerank 不动）、`rst2md/rag/models.py`（`RankingSignal` 不动）。
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## Task 0: 锁定 stage-0 基线与 DB 事实
@@ -101,6 +104,7 @@ rtk git add docs/search-quality/inheritance-recall-stage-0.json
 rtk git commit -m "chore(search-quality): lock stage-0 baseline for inheritance-traversal-source-recall"
 ```
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## Task 1: TDD Red — 复现 inheritance-recall gap
@@ -234,6 +238,7 @@ rtk git add rst2md/tests/test_rag_search.py
 rtk git commit -m "test(searcher): add failing test for inheritance class_summary recall gap"
 ```
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## Task 2: TDD Green — 实现 step 3.5 召回逻辑
@@ -470,6 +475,7 @@ rtk git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py
 rtk git commit -m "feat(searcher): recall class_summary for inheritance-intent queries (step 3.5)"
 ```
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## Task 3: eval-search 验证 + 锁定 final 基线 + 收尾
@@ -553,6 +559,7 @@ rtk git add docs/search-quality/inheritance-recall-final.json docs/search-qualit
 rtk git commit -m "chore(search-quality): lock final baseline after inheritance-traversal-source-recall"
 ```
 
+archived-with: 2026-07-02-inheritance-traversal-source-recall
 ---
 
 ## Self-Review

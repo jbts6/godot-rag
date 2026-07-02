@@ -2,6 +2,8 @@
 comet_change: inheritance-traversal-source-recall
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-02-inheritance-traversal-source-recall
+status: final
 ---
 
 # Design Doc: Inheritance Traversal Source Recall
