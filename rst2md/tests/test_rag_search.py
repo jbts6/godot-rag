@@ -1552,11 +1552,9 @@ class RankingSignalCoverageTests(unittest.TestCase):
           - hybrid.rrf                      (separate DB built with vectors)
 
         Families verified elsewhere (not in `required`):
-          - rerank.doc_type_intent: NOT observable via search_database() —
-            build_query_plan always puts the original query in
-            symbol_candidates, which blocks the `not plan.symbol_candidates`
-            guard in _rerank_bonus. Verified directly via
-            test_rerank_appends_doc_type_intent_signal and
+          - rerank.doc_type_intent: not exercised by this test's query set
+            (no "how to..." / tutorial-intent queries here). Verified directly
+            via test_rerank_appends_doc_type_intent_signal and
             test_rerank_bonus_equals_signal_weight_sum_doc_type_intent
             (test_searcher_module.py).
           - rerank.addon_intent: the bare fixture has no addon docs, so the
@@ -1708,6 +1706,83 @@ class InheritsGraphTraversalTests(unittest.TestCase):
             self.assertLessEqual(rank, 5, f"Object rank {rank} should be <= 5")
             names = [s.name for s in obj.ranking_signals]
             self.assertIn("graph.inherits", names)
+
+
+class InheritanceRecallTests(unittest.TestCase):
+    """Step 3.5 inheritance-directed class_summary recall.
+
+    Reproduces the production gap: query ``Node inherits Object`` floods FTS
+    top_k with noise class_summary chunks (each inheritance chain mentions
+    Node and Object), leaving Node's class_summary out of the candidate set
+    so the inherits traversal at searcher.py:384 never fires and Object is
+    never recalled. Step 3.5 recalls Node's class_summary directly so it
+    enters top_k and the traversal can pull Object via the inherits edge.
+    """
+
+    def _build_db_with_noise(self, tmp):
+        from rag import embeddings
+        from unittest.mock import patch
+        from rag.indexer import build_database
+
+        docs = Path(tmp) / "docs"
+        classes = docs / "classes"
+        classes.mkdir(parents=True)
+        (classes / "class_node.md").write_text(
+            "# Node\n\nBase class for scene nodes.\n\n**Inherits:** `Object`\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_object.md").write_text(
+            "# Object\n\nRoot of all things.\n\n",
+            encoding="utf-8",
+        )
+        # Noise class_summary chunks whose inheritance-chain text mentions both
+        # Node and Object, so they match the FTS query "Node inherits Object"
+        # and flood top_k=3, reproducing the production gap.
+        (classes / "class_scrollbar.md").write_text(
+            "# ScrollBar\n\nA scrollbar control.\n\n"
+            "**Inherits:** `Range` **<** `Control` **<** `CanvasItem` **<** `Node` **<** `Object`\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_slider.md").write_text(
+            "# Slider\n\nA slider control.\n\n"
+            "**Inherits:** `Range` **<** `Control` **<** `CanvasItem` **<** `Node` **<** `Object`\n\n",
+            encoding="utf-8",
+        )
+        (classes / "class_popuppanel.md").write_text(
+            "# PopupPanel\n\nA popup container.\n\n"
+            "**Inherits:** `Window` **<** `Viewport` **<** `Node` **<** `Object`\n\n",
+            encoding="utf-8",
+        )
+        db_path = Path(tmp) / "t.sqlite"
+        # Disable vectors (empty embeddings list) so the search runs in
+        # FTS-only mode and the FTS-cap-at-40 tie dynamics match the gap.
+        with patch.object(embeddings, "generate_embeddings", lambda texts: []):
+            build_database(docs, db_path)
+        return db_path
+
+    def test_inheritance_recall_pulls_class_summary_into_top_k(self):
+        from rag.searcher import search_database
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db_with_noise(tmp)
+            results = search_database(
+                db_path, "Node inherits Object", limit=5, expand_graph=True,
+            )
+        symbols = [r.symbol for r in results]
+        self.assertIn(
+            "Node", symbols,
+            "Node class_summary should be recalled into top-5 by step 3.5",
+        )
+        self.assertIn(
+            "Object", symbols,
+            "Object class_summary should be reached (via step 3.5 recall or inherits traversal)",
+        )
+        node = next(r for r in results if r.symbol == "Node")
+        names = [s.name for s in node.ranking_signals]
+        self.assertIn(
+            "inheritance_recall.class_summary", names,
+            "Node must carry the inheritance_recall.class_summary signal (D3)",
+        )
 
 
 if __name__ == "__main__":
