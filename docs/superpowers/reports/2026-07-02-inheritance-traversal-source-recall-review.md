@@ -90,7 +90,7 @@
 
 ### 下次改进
 
-- **Task 3 subagent 首次失败**：返回空结果，report 文件残留旧变更内容。原因可能是 subagent 上下文不足或超时。建议为操作型任务（eval + commit）提供更简洁的 dispatch prompt
+- **Task 3 subagent 首次失败**：模型额度耗尽导致 subagent 返回空结果，report 文件残留旧变更内容。重新派发后顺利完成。建议在长会话中监控额度消耗，或为后续 task 预留足够额度
 
 ### 模式识别
 
