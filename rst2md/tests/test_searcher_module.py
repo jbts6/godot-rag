@@ -287,10 +287,10 @@ def test_rerank_appends_doc_type_intent_signal():
     from rag.query_plan import QueryPlan
     from rag.fusion import rerank_results, TUTORIAL_SCORE_FLOOR, TUTORIAL_BOOST_FACTOR
 
-    # Construct plan directly: build_query_plan always puts the original query
-    # in symbol_candidates (per QueryPlan docstring), which would block the
-    # doc_type_intent bonus (the `not plan.symbol_candidates` guard). Empty
-    # symbol_candidates exercises the doc_type_intent branch in isolation.
+    # Construct plan directly to isolate the doc_type_intent branch:
+    # control doc_type_intent precisely and avoid symbol-candidate bonus
+    # interference. (The legacy `not plan.symbol_candidates` guard was
+    # removed in loop-2; tutorial boost is now gated by doc_type_intent.)
     plan = QueryPlan(
         original="how to use scene tree nodes",
         fts_variants=("how to use scene tree nodes",),
@@ -413,12 +413,12 @@ def test_rerank_bonus_equals_signal_weight_sum_direct_symbol():
 def test_rerank_bonus_equals_signal_weight_sum_doc_type_intent():
     """Sync guard: doc_type_intent branch (B.2 floor 公式).
 
-    build_query_plan always puts the original query string in
-    symbol_candidates, which blocks the doc_type_intent bonus via the
-    `not plan.symbol_candidates` guard. Construct QueryPlan directly with
-    empty symbol_candidates (same pattern as
-    test_rerank_appends_doc_type_intent_signal) to exercise this branch
-    in isolation.
+    Construct QueryPlan directly with empty symbol_candidates (same
+    pattern as test_rerank_appends_doc_type_intent_signal) to isolate
+    the doc_type_intent branch: control doc_type_intent precisely and
+    avoid symbol-candidate bonus interference. (The legacy
+    `not plan.symbol_candidates` guard was removed in loop-2; tutorial
+    boost is now gated by doc_type_intent.)
     """
     from rag.models import SearchResult
     from rag.query_plan import QueryPlan
@@ -575,20 +575,21 @@ class TutorialFloorBoostTests(unittest.TestCase):
         expected = max(5.0, TUTORIAL_SCORE_FLOOR) * (TUTORIAL_BOOST_FACTOR - 1)
         self.assertAlmostEqual(_rerank_bonus(plan, result), expected, places=6)
 
-    def test_rerank_bonus_no_tutorial_boost_when_symbol_candidates(self):
-        # 守卫：symbol 查询不触发 tutorial boost
+    def test_rerank_bonus_no_tutorial_boost_for_dotted_symbol_query(self):
+        # "Node.add_child" 含点号 → _doc_type_intent 返回 None → tutorial boost 不触发
+        # （tutorial 加权由 doc_type_intent 门控，而非 symbol_candidates 守卫）
         from rag.fusion import _rerank_bonus
         from rag.models import SearchResult
         from rag.query_plan import build_query_plan
-        plan = build_query_plan("Node.add_child")  # 有 symbol_candidates
+        plan = build_query_plan("Node.add_child")
         result = SearchResult(
             score=0.66, path="tut.md", start_line=1, end_line=10,
             doc_type="tutorial", chunk_type="section", addon="", addon_name="",
             symbol="", heading="", breadcrumb="", text="", relation_type="",
             distance=0, snippet="", ranking_signals=[],
         )
-        # 只有 symbol 候选 bonus，无 tutorial bonus
-        self.assertNotIn("tutorial", str(_rerank_bonus(plan, result) - 0.0))
+        # result.symbol="" 不匹配任何候选；doc_type_intent=None → bonus 为 0
+        self.assertEqual(_rerank_bonus(plan, result), 0.0)
 
 
 class InheritanceIntentTests(unittest.TestCase):
