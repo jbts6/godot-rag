@@ -248,7 +248,7 @@ rtk git commit -m "test(searcher): add failing test for inheritance class_summar
 - Consumes: `rag.query_plan.QueryPlan`（`plan.inheritance_intent: bool`、`plan.original: str`）、`rag.models.RankingSignal`、`rag.db.get_connection` 的 `conn`、`_make_result` / `_record_signal` 闭包、`type_filter` / `type_params` / `addon_filter` / `addon_params`
 - Produces: 在 `results` dict 中写入/更新 class_summary 候选（score=90.0、信号 `inheritance_recall.class_summary`），供后续 sort（line 308）→ top_k=3（line 312）→ inherits 遍历（line 384-442）消费
 
-- [ ] **Step 1: 加 `import re` 到 searcher.py 顶部**
+- [x] **Step 1: 加 `import re` 到 searcher.py 顶部**
 
 Edit `rst2md/rag/searcher.py`：
 
@@ -267,7 +267,7 @@ from pathlib import Path
 from typing import List, Optional
 ```
 
-- [ ] **Step 2: 加模块级 PascalCase regex 常量（D1）**
+- [x] **Step 2: 加模块级 PascalCase regex 常量（D1）**
 
 Edit `rst2md/rag/searcher.py`——在 retrieval import 块结束（`vector_search,` + `)`）与 `def search_database_with_metadata(` 之间插入常量。
 
@@ -309,7 +309,7 @@ _INHERITANCE_CLASS_NAME_RE = re.compile(r'^[A-Z][a-zA-Z0-9_]+$')
 def search_database_with_metadata(
 ```
 
-- [ ] **Step 3: 插入 step 3.5 召回块（D2 + D3 + D4）**
+- [x] **Step 3: 插入 step 3.5 召回块（D2 + D3 + D4）**
 
 Edit `rst2md/rag/searcher.py`——在 step 1-3 symbol recall 的 prefix 匹配块结束（`symbol_recall.prefix` 信号 `_record_signal` 闭合）与 step 4 FTS 注释之间插入 step 3.5。
 
@@ -387,7 +387,7 @@ Edit `rst2md/rag/searcher.py`——在 step 1-3 symbol recall 的 prefix 匹配�
 
 **注意 `c.*` / `c.symbol` 别名**：`type_filter` / `addon_filter` 用 `c.doc_type` / `c.addon` 别名（见 line 89/96），所以 step 3.5 查询必须用 `FROM chunks c` + `c.*` / `c.symbol` / `c.chunk_type`，否则 SQL 报 `no such column: c.doc_type`。
 
-- [ ] **Step 4: 运行 Task 1 测试，确认 Green**
+- [x] **Step 4: 运行 Task 1 测试，确认 Green**
 
 Run:
 ```bash
@@ -395,7 +395,7 @@ rtk uv run pytest -q rst2md/tests/test_rag_search.py::InheritanceRecallTests::te
 ```
 Expected: **PASS**。Node 以 90 分进 top_k=3 → inherits 遍历触发 → Object 被 `graph.inherits` 拉入（或被 step 3.5 直接召回），三者断言全过。
 
-- [ ] **Step 5: 追加 D4 门控回归测试**
+- [x] **Step 5: 追加 D4 门控回归测试**
 
 在 `rst2md/tests/test_rag_search.py` 的 `InheritanceRecallTests` 类中、`test_inheritance_recall_pulls_class_summary_into_top_k` 方法之后追加（在类内、`if __name__` 之前）。
 
@@ -447,7 +447,7 @@ if __name__ == "__main__":
 
 **验证 query 选择**：`"Node add_child"` 不含 `inherits`/`subclass of`/`parent class`/`derived from`（见 `query_plan._INHERITANCE_KEYWORDS`），故 `plan.inheritance_intent=False`，step 3.5 整体跳过。
 
-- [ ] **Step 6: 运行新测试，确认 Green**
+- [x] **Step 6: 运行新测试，确认 Green**
 
 Run:
 ```bash
@@ -455,7 +455,7 @@ rtk uv run pytest -q rst2md/tests/test_rag_search.py::InheritanceRecallTests -v
 ```
 Expected: 2 passed（`test_inheritance_recall_pulls_class_summary_into_top_k` + `test_non_inheritance_query_does_not_trigger_inheritance_recall`）。
 
-- [ ] **Step 7: 全套 pytest 回归（tasks.md 1.3）**
+- [x] **Step 7: 全套 pytest 回归（tasks.md 1.3）**
 
 Run:
 ```bash
@@ -463,7 +463,7 @@ rtk uv run pytest -q
 ```
 Expected: 全绿（基线 290 测试通过，0 失败）。重点关注 `test_rag_search.py`、`test_searcher_module.py`、`test_semantic_search.py`、`test_search_eval.py` 无回归。若任何测试失败，**不要提交**——回到 Step 3 检查 step 3.5 是否破坏了既有候选集聚合逻辑（特别留意 `results[cid]["score"] < recall_score` 的比较是否覆盖了既有高分候选）。
 
-- [ ] **Step 8: Commit Green 实现**
+- [x] **Step 8: Commit Green 实现**
 
 ```bash
 rtk git add rst2md/rag/searcher.py rst2md/tests/test_rag_search.py

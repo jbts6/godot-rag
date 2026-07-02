@@ -15,11 +15,17 @@ TDD mode: tdd
 - RED evidence: AssertionError: 'inheritance_recall.class_summary' not found in ['fts.bm25', 'graph.expansion', 'graph.inherits', ...]
 - Test: InheritanceRecallTests.test_inheritance_recall_pulls_class_summary_into_top_k
 
-## Current Task: Task 2
-- Plan task: Task 2: TDD Green — 实现 step 3.5 召回逻辑
-- OpenSpec tasks: 1.2 (Green 阶段), 1.3 (pytest 回归)
+## Task 2: COMPLETE (Green)
+- Commits: e2e5170
+- GREEN evidence: InheritanceRecallTests 2/2 passed, full suite 292/0
+- Implementation: searcher.py step 3.5 (import re + _INHERITANCE_CLASS_NAME_RE + inheritance_intent gated recall, score=90.0, signal=inheritance_recall.class_summary)
+- D4 gating test: test_non_inheritance_query_does_not_trigger_inheritance_recall
+
+## Current Task: Task 3
+- Plan task: Task 3: eval-search 验证 + 锁定 final 基线 + 收尾
+- OpenSpec tasks: 2.1, 2.2, 2.3, 3.1, 3.2
 - Phase: implementing
 - Implementer: dispatching
-- BASE commit: 21779eb
+- BASE commit: (pending)
 - Commits: (none yet)
-- RED/GREEN evidence: RED already confirmed (Task 1), expecting GREEN
+- RED/GREEN evidence: N/A (verification task)

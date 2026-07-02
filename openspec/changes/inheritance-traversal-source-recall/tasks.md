@@ -8,8 +8,8 @@
 ## 1. 实现召回修复（方案待 design brainstorming 确认）
 
 - [x] 1.1 设计 brainstorming 确认召回方案（候选 1-4 中选一个或组合）
-- [ ] 1.2 实现召回逻辑：inheritance-intent 查询时确保目标 `class_summary` 进入候选集（TDD：Red 测试复现生产 gap — class_summary 不在默认 top-K 时仍被召回）
-- [ ] 1.3 跑 `uv run pytest -q` 全套不回归
+- [x] 1.2 实现召回逻辑：inheritance-intent 查询时确保目标 `class_summary` 进入候选集（TDD：Red 测试复现生产 gap — class_summary 不在默认 top-K 时仍被召回）
+- [x] 1.3 跑 `uv run pytest -q` 全套不回归
 
 ## 2. 评估验证
 
