@@ -24,10 +24,16 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 All search commands have long aliases: `search`, `search-class`, `search-tutorial`, `search-engine`, `search-addon`.
 
+**Default behavior**: `s`, `s-class`, `s-tutorial`, `s-engine` exclude addon results. Use `s-addon` to search addons.
+
 ```bash
-# Search class reference (API docs only)
+# Search class reference (API docs only, no addon results)
 godot-rag s-class "Node.add_child"
 godot-rag s-class "Signal.emit" --limit 3
+
+# class.method queries work — finds the class
+godot-rag s-class "ResourceLoader.load"    # finds ResourceLoader class
+godot-rag s-class "Input.is_action_pressed" # finds Input class
 
 # Tutorials + getting started guides
 godot-rag s-tutorial "how to use signals"
@@ -37,12 +43,12 @@ godot-rag s-tutorial "2D pathfinding" --limit 5
 godot-rag s-engine "GDExtension"
 godot-rag s-engine "IDE debugging" --limit 3
 
-# Addon docs and examples
+# Addon docs and examples (must use s-addon)
 godot-rag s-addon "state machine"
 godot-rag s-addon "state machine" --addon statecharts
 godot-rag s-addon "dialogue" --limit 3
 
-# Search all docs (no type filter)
+# Search all docs (no type filter, excludes addons)
 godot-rag s "Timer"
 
 # Fuzzy symbol matching (camelCase/snake_case/dotted all work)
@@ -154,6 +160,16 @@ godot-rag diagnostics --no-model
 ```
 
 ## Search Quality Evaluation
+
+Current metrics (44 queries, gating=38, report_only=6):
+
+| Metric | Value |
+|--------|-------|
+| hit@1 | 86.8% |
+| hit@3 | 97.4% |
+| hit@5 | 100% |
+| mrr@5 | 0.914 |
+| Failures | 0 |
 
 Run deterministic evaluator tests during development:
 

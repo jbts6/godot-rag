@@ -24,10 +24,16 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 所有搜索命令都有长别名：`search`、`search-class`、`search-tutorial`、`search-engine`、`search-addon`。
 
+**默认行为**：`s`、`s-class`、`s-tutorial`、`s-engine` 排除 addon 结果。使用 `s-addon` 搜索 addon。
+
 ```bash
-# 搜索类参考（仅 API 文档）
+# 搜索类参考（仅 API 文档，无 addon 结果）
 godot-rag s-class "Node.add_child"
 godot-rag s-class "Signal.emit" --limit 3
+
+# class.method 查询可用 — 自动找到类
+godot-rag s-class "ResourceLoader.load"    # 找到 ResourceLoader 类
+godot-rag s-class "Input.is_action_pressed" # 找到 Input 类
 
 # 搜索教程（教程 + 入门指南）
 godot-rag s-tutorial "how to use signals"
@@ -37,12 +43,12 @@ godot-rag s-tutorial "2D pathfinding" --limit 5
 godot-rag s-engine "GDExtension"
 godot-rag s-engine "IDE debugging" --limit 3
 
-# 搜索 addon 文档和示例
+# 搜索 addon 文档和示例（必须使用 s-addon）
 godot-rag s-addon "state machine"
 godot-rag s-addon "state machine" --addon statecharts
 godot-rag s-addon "dialogue" --limit 3
 
-# 搜索全部文档（无类型过滤）
+# 搜索全部文档（无类型过滤，排除 addon）
 godot-rag s "Timer"
 
 # 模糊符号匹配（camelCase/snake_case/带点号 都能匹配）
@@ -154,6 +160,18 @@ godot-rag diagnostics --no-model
 ```
 
 ## 示例
+
+## 搜索质量评估
+
+当前指标（44 个查询，gating=38，report_only=6）：
+
+| 指标 | 值 |
+|------|-----|
+| hit@1 | 86.8% |
+| hit@3 | 97.4% |
+| hit@5 | 100% |
+| mrr@5 | 0.914 |
+| 失败数 | 0 |
 
 ```bash
 # AI 工作流：先查教程，再查 API 细节
