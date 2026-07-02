@@ -2,6 +2,7 @@
 change: project-slimdown
 design-doc: docs/superpowers/specs/2026-07-02-project-slimdown-design.md
 base-ref: fd88afb9b65b78e504255a868635b7db51ba9106
+archived-with: 2026-07-02-project-slimdown
 ---
 
 # 项目瘦身实施计划

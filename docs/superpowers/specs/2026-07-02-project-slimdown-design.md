@@ -2,6 +2,8 @@
 comet_change: project-slimdown
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-02-project-slimdown
+status: final
 ---
 
 # 项目瘦身技术设计
