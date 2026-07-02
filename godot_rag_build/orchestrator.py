@@ -145,9 +145,21 @@ def _stage_docs_md(ctx: StageContext) -> list[str]:
     return ["godot_rag/docs-md"]
 
 
+def _wiki_dir(ctx: StageContext) -> Path:
+    """Return the wiki directory — prefer submodule over cloned copy."""
+    submodule = ctx.root / "addons/scene_manager_wiki"
+    if submodule.is_dir() and any(submodule.glob("*.md")):
+        return submodule
+    return ctx.root / "addons/scene_manager/docs_wiki"
+
+
 def _stage_wiki(ctx: StageContext) -> list[str]:
     if not ctx.options["with_wiki"]:
         return []
+    # If submodule already provides wiki content, skip clone/copy.
+    submodule = ctx.root / "addons/scene_manager_wiki"
+    if submodule.is_dir() and any(submodule.glob("*.md")):
+        return ["addons/scene_manager_wiki"]
     cache = ctx.root / ".cache/addon-wikis/scene_manager"
     if (cache / ".git").exists():
         ctx.runner.run(["git", "-C", str(cache.relative_to(ctx.root)), "pull", "--ff-only"], cwd=ctx.root, check=False)
@@ -181,7 +193,10 @@ def _stage_diagnostics(ctx: StageContext) -> list[str]:
 
 def _stage_cleanup_wiki(ctx: StageContext) -> list[str]:
     if ctx.options["with_wiki"]:
-        shutil.rmtree(ctx.root / "addons/scene_manager/docs_wiki", ignore_errors=True)
+        # Only clean up cloned copy, never the submodule.
+        cloned = ctx.root / "addons/scene_manager/docs_wiki"
+        if cloned.exists():
+            shutil.rmtree(cloned)
     return []
 
 
@@ -228,7 +243,8 @@ def _fingerprint_common(ctx: StageContext, stage: str) -> str:
         inputs["rst2md"] = fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml"))
 
     if stage in {"wiki", "rag-db"}:
-        inputs["wiki_cache"] = fingerprint_tree(ctx.root / ".cache/addon-wikis/scene_manager", exclude_dirs=(".git",))
+        wiki_source = _wiki_dir(ctx)
+        inputs["wiki_cache"] = fingerprint_tree(wiki_source, exclude_dirs=(".git",)) if wiki_source.exists() else "missing"
 
     if stage in {"rag-db", "package-tree"}:
         inputs["addons"] = fingerprint_tree(ctx.root / "addons", include_suffixes=(".md", ".rst", ".gd", ".cs", ".json", ".yaml", ".yml", ".cfg"), exclude_dirs=(".git", ".godot", "__pycache__"))
@@ -250,7 +266,7 @@ def create_build_stages(options: BuildOptions) -> list[StageSpec]:
         StageSpec("submodule", _stage_submodule),
         StageSpec("version", _stage_version, dependencies=("submodule",)),
         StageSpec("docs-md", _stage_docs_md, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "docs-md"), output_check=lambda ctx: (ctx.root / "godot_rag/docs-md").exists(), dependencies=("version",)),
-        StageSpec("wiki", _stage_wiki, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "wiki"), output_check=lambda ctx: (not ctx.options["with_wiki"]) or (ctx.root / "addons/scene_manager/docs_wiki").exists(), dependencies=("docs-md",)),
+        StageSpec("wiki", _stage_wiki, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "wiki"), output_check=lambda ctx: (not ctx.options["with_wiki"]) or _wiki_dir(ctx).exists(), dependencies=("docs-md",)),
         StageSpec("rag-db", _stage_rag_db, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "rag-db"), output_check=lambda ctx: (ctx.root / "godot_rag/rag/godot_docs.sqlite").exists(), dependencies=("wiki",)),
         StageSpec("diagnostics", _stage_diagnostics, dependencies=("rag-db",)),
         StageSpec("cleanup-wiki", _stage_cleanup_wiki, dependencies=("diagnostics",)),

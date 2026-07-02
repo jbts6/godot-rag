@@ -25,6 +25,7 @@ class AddonConfig:
     custom_doc_dirs: List[str] = field(default_factory=list)            # Relative to addon root
     custom_example_dirs: List[str] = field(default_factory=list)
     skip_doc_dirs: List[str] = field(default_factory=list)
+    skip_doc_patterns: List[str] = field(default_factory=list)  # Glob patterns to skip
 
 
 _REGISTRY: dict[str, AddonConfig] = {}

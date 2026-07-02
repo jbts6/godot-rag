@@ -190,6 +190,12 @@ def discover_addon(addon_dir: Path) -> AddonLayout:
 
 def collect_doc_files(layout: AddonLayout) -> List[Path]:
     """Collect all documentation .md/.rst files from doc_dirs and doc_files."""
+    from fnmatch import fnmatch
+    from rag.addon_configs import get_config
+
+    config = get_config(layout.name)
+    skip_patterns = config.skip_doc_patterns if config else []
+
     files = []
     for doc_dir in layout.doc_dirs:
         for ext in _DOC_EXTENSIONS:
@@ -197,8 +203,11 @@ def collect_doc_files(layout: AddonLayout) -> List[Path]:
                 if not doc.is_file():
                     continue
                 rel = str(doc.relative_to(layout.root))
-                if not _is_excluded(rel):
-                    files.append(doc)
+                if _is_excluded(rel):
+                    continue
+                if skip_patterns and any(fnmatch(doc.name, p) for p in skip_patterns):
+                    continue
+                files.append(doc)
     for f in layout.doc_files:
         files.append(f)
     return files

@@ -30,3 +30,6 @@
 	path = addons/scene_manager
 	url = https://github.com/glass-brick/Scene-Manager.git
 	branch = main
+[submodule "addons/scene_manager_wiki"]
+	path = addons/scene_manager_wiki
+	url = https://github.com/glass-brick/Scene-Manager.wiki.git

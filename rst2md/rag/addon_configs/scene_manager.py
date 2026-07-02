@@ -9,5 +9,6 @@ register(AddonConfig(
         ("SceneManager", "scene_manager"),
         ("fade pattern", "scene_manager"),
     ],
-    custom_doc_dirs=["docs_wiki"],
+    custom_doc_dirs=["../scene_manager_wiki"],
+    skip_doc_patterns=["*Godot-3*"],
 ))
