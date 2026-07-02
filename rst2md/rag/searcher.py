@@ -1,3 +1,4 @@
+import re
 import sqlite3
 from pathlib import Path
 from typing import List, Optional
@@ -22,6 +23,12 @@ from rag.retrieval import (  # noqa: F401
     _vector_availability,
     vector_search,
 )
+
+# PascalCase class-name candidates for inheritance-directed recall (D1).
+# Godot class names follow PascalCase; the subsequent DB validation
+# (symbol=? AND chunk_type='class_summary') filters non-class PascalCase
+# tokens like the keyword "Inherits".
+_INHERITANCE_CLASS_NAME_RE = re.compile(r'^[A-Z][a-zA-Z0-9_]+$')
 
 
 def search_database_with_metadata(
@@ -245,6 +252,48 @@ def _search_database_impl(
                             details={"alias_derived": alias_derived},
                         ),
                     )
+
+        # 3.5. Inheritance-directed class_summary recall (D2). When the query
+        # signals inheritance intent (D4), pull class_summary chunks for
+        # PascalCase tokens so they enter the candidate set before top_k
+        # selection. Without this, FTS floods top_k with noise class_summary
+        # chunks and the inherits traversal at line 384 has no class_summary
+        # source to traverse. Score 90.0 (D3): below symbol_recall.exact=100,
+        # above FTS cap=40 / RRF~36.8 — guarantees entry into top_k=3.
+        if plan.inheritance_intent:
+            seen_classes: set[str] = set()
+            for token in plan.original.split():
+                if not _INHERITANCE_CLASS_NAME_RE.match(token):
+                    continue
+                if token in seen_classes:
+                    continue
+                seen_classes.add(token)
+                rows = conn.execute(
+                    "SELECT c.* FROM chunks c "
+                    "WHERE c.symbol = ? AND c.chunk_type = 'class_summary'"
+                    + type_filter + addon_filter,
+                    [token] + type_params + addon_params,
+                ).fetchall()
+                for row in rows:
+                    cid = row["id"]
+                    recall_score = 90.0
+                    if cid not in results or results[cid]["score"] < recall_score:
+                        prior = (
+                            results[cid].get("ranking_signals", [])
+                            if cid in results else []
+                        )
+                        results[cid] = _make_result(
+                            row, recall_score, ranking_signals=prior,
+                        )
+                        _record_signal(
+                            results[cid],
+                            RankingSignal(
+                                name="inheritance_recall.class_summary",
+                                weight=recall_score,
+                                value=token,
+                                details={"source": "inheritance_intent_recall"},
+                            ),
+                        )
 
         # 4. FTS5 search (bm25 → 0-40 score, skip chunks already in fused results)
         try:

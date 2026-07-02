@@ -1784,6 +1784,24 @@ class InheritanceRecallTests(unittest.TestCase):
             "Node must carry the inheritance_recall.class_summary signal (D3)",
         )
 
+    def test_non_inheritance_query_does_not_trigger_inheritance_recall(self):
+        """D4 gating: a non-inheritance query must never produce the
+        inheritance_recall.class_summary signal (protects 32 baseline queries)."""
+        from rag.searcher import search_database
+
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = self._build_db_with_noise(tmp)
+            results = search_database(
+                db_path, "Node add_child", limit=5, expand_graph=True,
+            )
+        for r in results:
+            for sig in r.ranking_signals:
+                self.assertNotEqual(
+                    sig.name, "inheritance_recall.class_summary",
+                    "inheritance_recall signal must not fire for non-inheritance "
+                    "queries (D4 gating)",
+                )
+
 
 if __name__ == "__main__":
     unittest.main()
