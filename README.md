@@ -18,6 +18,8 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 ## Usage
 
+> **Language note**: Queries must be in English. For non-English queries, translate to English first (e.g., "怎么做二段跳" → "how to double jump"). The embedding model is English-only.
+
 ### Search by type
 
 All search commands have long aliases: `search`, `search-class`, `search-tutorial`, `search-engine`, `search-addon`.

@@ -18,6 +18,8 @@ uv pip install godot_rag-4.7.0-py3-none-any.whl
 
 ## 使用方法
 
+> **语言说明**：查询必须使用英文。非英文查询请先翻译为英文（例如："怎么做二段跳" → "how to double jump"）。Embedding 模型仅支持英文。
+
 ### 按类型搜索
 
 所有搜索命令都有长别名：`search`、`search-class`、`search-tutorial`、`search-engine`、`search-addon`。
