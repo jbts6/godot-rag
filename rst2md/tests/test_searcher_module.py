@@ -425,11 +425,11 @@ def test_search_response_metadata_shape_is_stable():
 # --- Dot notation split tests ---
 
 def test_class_method_splits_to_method_suffix():
-    assert expand_query_variants("Node.connect") == ["Node.connect", "connect"]
+    assert expand_query_variants("Node.connect") == ["Node.connect", "Node", "connect"]
 
 
 def test_class_method_parens_strips_parens():
-    assert expand_query_variants("ResourceLoader.load()") == ["ResourceLoader.load()", "load"]
+    assert expand_query_variants("ResourceLoader.load()") == ["ResourceLoader.load()", "ResourceLoader", "load"]
 
 
 def test_lowercase_dot_not_split():

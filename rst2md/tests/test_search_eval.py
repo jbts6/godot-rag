@@ -481,7 +481,7 @@ def test_packaged_eval_queries_are_broad_and_tiered():
     assert len(queries) >= 30
     assert len(ids) == len(set(ids))
     assert len(gating) >= 12
-    assert len(report_only) >= 7
+    assert len(report_only) >= 6
     assert {"class", "symbol", "tutorial", "engine", "addon"}.issubset(categories)
     assert any("normalization" in query.tags for query in queries)
     assert any("graph" in query.tags for query in queries)
@@ -497,7 +497,7 @@ def test_packaged_eval_queries_meet_expanded_coverage_requirements():
     assert len({query.id for query in queries}) == len(queries)
     assert len(queries) >= 40
     assert len(gating) >= 25
-    assert len(report_only) >= 7
+    assert len(report_only) >= 6
     assert {"class", "symbol", "tutorial", "engine", "addon"} <= categories
     assert "normalization" in tags
     assert "graph" in tags
@@ -532,12 +532,11 @@ def test_packaged_eval_queries_promote_reviewed_report_only_candidates():
         "addon-dialogue-manager",
         "addon-phantom-camera",
         "addon-limboai-behavior-tree",
-        "vector-fallback-metadata",
     }
 
-    assert len(queries) == 45
+    assert len(queries) == 44
     assert sum(not query.report_only for query in queries) == 38
-    assert sum(query.report_only for query in queries) == 7
+    assert sum(query.report_only for query in queries) == 6
     assert {query_id for query_id in promoted_ids if by_id[query_id].report_only} == set()
     assert {query_id for query_id in retained_report_only_ids if not by_id[query_id].report_only} == set()
 

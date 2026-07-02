@@ -32,7 +32,10 @@ def expand_query_variants(query: str) -> list[str]:
             variants.append(alias)
     m = _DOT_NOTATION_RE.match(query.strip())
     if m and f"{m.group(1)}.{m.group(2)}" not in _ALIAS_FORMS:
+        class_name = m.group(1)
         method_suffix = m.group(2)
+        if class_name not in variants:
+            variants.append(class_name)
         if method_suffix not in variants:
             variants.append(method_suffix)
     return variants

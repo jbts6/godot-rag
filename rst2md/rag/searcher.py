@@ -34,7 +34,7 @@ _INHERITANCE_CLASS_NAME_RE = re.compile(r'^[A-Z][a-zA-Z0-9_]+$')
 def search_database_with_metadata(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
-    expand_graph: bool = True,
+    expand_graph: bool = True, exclude_addons: bool = False,
 ) -> SearchResponse:
     results, metadata = _search_database_impl(
         db_path=db_path,
@@ -43,6 +43,7 @@ def search_database_with_metadata(
         doc_types=doc_types,
         addon=addon,
         expand_graph=expand_graph,
+        exclude_addons=exclude_addons,
     )
     return SearchResponse(results=results, metadata=metadata)
 
@@ -50,7 +51,7 @@ def search_database_with_metadata(
 def search_database(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
-    expand_graph: bool = True,
+    expand_graph: bool = True, exclude_addons: bool = False,
 ) -> List[SearchResult]:
     return search_database_with_metadata(
         db_path,
@@ -59,6 +60,7 @@ def search_database(
         doc_types=doc_types,
         addon=addon,
         expand_graph=expand_graph,
+        exclude_addons=exclude_addons,
     ).results
 
 
@@ -66,7 +68,7 @@ def search_database(
 def _search_database_impl(
     db_path: Path, query: str, limit: int = 8,
     doc_types: Optional[List[str]] = None, addon: Optional[str] = None,
-    expand_graph: bool = True,
+    expand_graph: bool = True, exclude_addons: bool = False,
 ) -> tuple[List[SearchResult], SearchMetadata]:
     """Search the RAG database.
 
@@ -77,6 +79,7 @@ def _search_database_impl(
         doc_types: If provided, only search chunks whose doc_type is in this list.
         addon: If provided, only search chunks belonging to this addon.
         expand_graph: If True, expand top results via chunk_relations graph.
+        exclude_addons: If True, exclude all addon results (addon != '').
     """
     with get_connection(db_path) as conn:
         plan = build_query_plan(query)
@@ -96,12 +99,14 @@ def _search_database_impl(
             type_filter = f" AND c.doc_type IN ({placeholders})"
             type_params = list(doc_types)
 
-        # Build optional addon filter
+        # Build addon filter
         addon_filter = ""
         addon_params: list = []
         if addon:
             addon_filter = " AND c.addon = ?"
             addon_params = [addon]
+        elif exclude_addons:
+            addon_filter = " AND c.addon = ''"
 
         def _make_result(row, score, ranking_signals=None):
             return {
@@ -309,6 +314,8 @@ def _search_database_impl(
             if addon:
                 fts_addon_filter = " AND c.addon = ?"
                 fts_addon_params = [addon]
+            elif exclude_addons:
+                fts_addon_filter = " AND c.addon = ''"
 
             # Exclude chunks already in fused results
             fused_exclude = ""

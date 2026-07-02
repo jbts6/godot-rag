@@ -124,7 +124,7 @@ def _print_results(results, as_json: bool, metadata=None, debug_search: bool = F
             print(f"text:\n{r.text}")
 
 
-def _run_search(args, doc_types=None, addon=None):
+def _run_search(args, doc_types=None, addon=None, exclude_addons=False):
     db_path = _require_db(args)
     expand = not getattr(args, "no_expand", False)
     if args.debug_search:
@@ -135,6 +135,7 @@ def _run_search(args, doc_types=None, addon=None):
             doc_types=doc_types,
             addon=addon,
             expand_graph=expand,
+            exclude_addons=exclude_addons,
         )
         _print_results(response.results, args.json, response.metadata, debug_search=True)
         return
@@ -146,28 +147,29 @@ def _run_search(args, doc_types=None, addon=None):
         doc_types=doc_types,
         addon=addon,
         expand_graph=expand,
+        exclude_addons=exclude_addons,
     )
     _print_results(results, args.json)
 
 
 def cmd_search(args):
     """Search the RAG database (all doc types)."""
-    _run_search(args)
+    _run_search(args, exclude_addons=True)
 
 
 def cmd_search_class(args):
     """Search class reference docs only."""
-    _run_search(args, doc_types=["class"])
+    _run_search(args, doc_types=["class"], exclude_addons=True)
 
 
 def cmd_search_tutorial(args):
     """Search tutorial and getting-started docs only."""
-    _run_search(args, doc_types=["tutorial", "getting_started"])
+    _run_search(args, doc_types=["tutorial", "getting_started"], exclude_addons=True)
 
 
 def cmd_search_engine(args):
     """Search engine detail docs only."""
-    _run_search(args, doc_types=["engine_detail"])
+    _run_search(args, doc_types=["engine_detail"], exclude_addons=True)
 
 
 def cmd_addons(args):

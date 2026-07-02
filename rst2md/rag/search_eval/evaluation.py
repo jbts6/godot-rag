@@ -309,7 +309,11 @@ def evaluate_database(
     diagnostic_window = max(required_window, diagnostic_limit or 0)
     for query in queries:
         started = time.perf_counter()
-        response = search_database_with_metadata(db_path, query.query, limit=diagnostic_window, expand_graph=True)
+        is_addon_query = query.category == "addon"
+        response = search_database_with_metadata(
+            db_path, query.query, limit=diagnostic_window, expand_graph=True,
+            exclude_addons=not is_addon_query,
+        )
         results = response.results
         elapsed_seconds.append(time.perf_counter() - started)
         evaluated = evaluate_results(query, results, required_window=required_window)
