@@ -118,7 +118,7 @@ rtk git commit -m "chore(search-quality): lock stage-0 baseline for inheritance-
 
 **注意**：已有的 `InheritsGraphTraversalTests.test_node_inherits_object_reaches_object_class_summary`（`test_rag_search.py:1677`）在无 noise 的小 DB 上**已通过**——它不复现生产 gap，本任务新增的 noise DB 才是真正的 Red。
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `rst2md/tests/test_rag_search.py` 中定位 `InheritsGraphTraversalTests` 类的结尾（约 line 1708，`self.assertIn("graph.inherits", names)` 行之后）与 `if __name__ == "__main__":`（line 1711）之间的空行。用 Edit 在该位置插入新类。
 
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     unittest.main()
 ```
 
-- [ ] **Step 2: 运行新测试，确认 Red**
+- [x] **Step 2: 运行新测试，确认 Red**
 
 Run:
 ```bash
@@ -227,7 +227,7 @@ rtk uv run pytest -q rst2md/tests/test_rag_search.py::InheritanceRecallTests::te
 ```
 Expected: **FAIL**。失败原因含 `AssertionError: 'inheritance_recall.class_summary' not found in [...]`（第 3 条断言失败——可靠 Red 锚点）。前两条断言（`"Node"` / `"Object"` in symbols）在该 noise DB 上可能通过也可能失败——只要整体测试 FAIL 即为合格 Red。
 
-- [ ] **Step 3: Commit Red 测试**
+- [x] **Step 3: Commit Red 测试**
 
 ```bash
 rtk git add rst2md/tests/test_rag_search.py
