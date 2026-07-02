@@ -35,3 +35,23 @@ def sample_db(sample_docs, tmp_dir):
     db_path = tmp_dir / "test.sqlite"
     build_database(sample_docs, db_path)
     return db_path
+
+
+@pytest.fixture
+def build_db(tmp_dir):
+    """返回构建数据库的工厂函数"""
+    def _build(doc_path, db_path=None):
+        from rag.store import build_database
+
+        if db_path is None:
+            db_path = tmp_dir / "test.sqlite"
+        build_database(doc_path, db_path)
+        return db_path
+    return _build
+
+
+@pytest.fixture
+def tmp_db(tmp_dir, sample_docs, build_db):
+    """一步到位：tmp目录 + 示例文档 + 构建数据库"""
+    db_path = build_db(sample_docs)
+    return db_path
