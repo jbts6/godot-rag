@@ -1,3 +1,8 @@
+---
+name: comet-review
+description: "Comet archive 后，用 /comet-review 调用。回顾整个变更弧线：从提案到设计、实施、验证、spec 合并。目标是提取经验教训、验证 spec 合并完整性、评估过程质量。"
+---
+
 # Skill: comet-review
 
 # Comet 归档后回顾（Post-Archive Review）
