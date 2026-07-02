@@ -1,0 +1,13 @@
+{
+  "change": "project-slimdown",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "d8f35f2540548b24929296bf975fb871f80a14ebe0d76feb639c5e03ee1442cb",
+  "files": [
+    { "path": "openspec/changes/project-slimdown/proposal.md", "sha256": "2b2f5632fd50d2deb833926814c6c56517f56af85c9b1b9090fdf6f513d8fdfc" },
+    { "path": "openspec/changes/project-slimdown/design.md", "sha256": "e0639ccdfe339503cb1ee82b5dcd5aad9c9d6c50d46dc02f34600cdb3463cc55" },
+    { "path": "openspec/changes/project-slimdown/tasks.md", "sha256": "b5db8e61adc674e0cf7ad11d549921c7443ec3fb025d7f19244fd65b86b0f770" }
+  ]
+}
