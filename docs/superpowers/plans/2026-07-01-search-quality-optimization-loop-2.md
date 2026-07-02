@@ -2,6 +2,7 @@
 change: search-quality-optimization-loop-2
 design-doc: docs/superpowers/specs/2026-07-01-search-quality-optimization-loop-2-design.md
 base-ref: 5b5161c4873961c679b8e81084f4237f938d6c02
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 # Search Quality Optimization Loop 2 Implementation Plan
@@ -61,6 +62,7 @@ base-ref: 5b5161c4873961c679b8e81084f4237f938d6c02
 
 非代码任务（eval 跑分、读 chunk 确认格式）无 Red 步，直接执行命令并核对期望输出。
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## 段 0：前置基线锁定
@@ -108,6 +110,7 @@ print('stage0   hit@5:', s.get('summary',{}).get('hit_at_5'))
 
 Expected: 两者 hit@5 / hit@1 / mrr@5 数值一致；6 个失败查询的 `failure_classification` 与 `matched_rank` 一致。若不一致 → 停止，先排查环境差异。
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## 段 A：符号查询归一化（dot-notation 拆分）
@@ -286,6 +289,7 @@ Expected:
 
 若 32 个原通过查询有 ≥1 个退出 hit@5 → 记录是哪个查询（重点查 `*.get` / `*.set` 类短方法名查询），分析是否需给方法后缀加最小长度守卫。若需加守卫，回到 Task A.2 在 `method_suffix` 追加前加 `if len(method_suffix) >= 3:`，重跑 A.4-A.6。**当前修订决策是不加守卫，仅当 eval 实测回归才补。**
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## 段 B：Tutorial 排序改地板 + multiplicative
@@ -552,6 +556,7 @@ Expected:
 
 若 32 原通过查询有 ≥1 退出 → 回滚 FLOOR/FACTOR 到上一组可行值，或回到 design 补"高分 tutorial overshoot"决策。
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## 段 C：继承图扩展（inherits 边定向遍历）
@@ -948,6 +953,7 @@ Expected:
 
 若有 ≥1 退出 → 检查 `inheritance_intent` 是否在非继承查询上误亮（如 `extends` 误判），回到 Task C.4 关键词集。
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## 段 4：收尾验证
@@ -1040,6 +1046,7 @@ git add openspec/changes/search-quality-optimization-loop-2/.comet/handoff/verif
 git commit -m "docs(comet): record loop-2 verify answers for Open Questions"
 ```
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## Self-Review
@@ -1077,6 +1084,7 @@ git commit -m "docs(comet): record loop-2 verify answers for Open Questions"
 
 无 TBD / TODO / "implement later" / "add appropriate error handling"。所有代码步骤含完整可运行代码。
 
+archived-with: 2026-07-02-search-quality-optimization-loop-2
 ---
 
 ## Execution Handoff
