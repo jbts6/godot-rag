@@ -13,11 +13,11 @@
 
 ## 2. 评估验证
 
-- [ ] 2.1 跑 `uv run godot-rag eval-search`，`Node inherits Object` rank ≤ 5；Hit@5 ≥ 97.37%；MRR@5 ≥ 87.50%
-- [ ] 2.2 对比 stage-0 基线：32 个原通过查询无回归
-- [ ] 2.3 锁定 final 基线到 `docs/search-quality/inheritance-recall-final.json`，更新 `baseline.json`
+- [x] 2.1 跑 `uv run godot-rag eval-search`，`Node inherits Object` rank ≤ 5；Hit@5 ≥ 97.37%；MRR@5 ≥ 87.50%
+- [x] 2.2 对比 stage-0 基线：32 个原通过查询无回归
+- [x] 2.3 锁定 final 基线到 `docs/search-quality/inheritance-recall-final.json`，更新 `baseline.json`
 
 ## 3. 收尾验证
 
-- [ ] 3.1 跑完整 `uv run pytest -q` 全套通过
-- [ ] 3.2 准备 verify 阶段材料
+- [x] 3.1 跑完整 `uv run pytest -q` 全套通过
+- [x] 3.2 准备 verify 阶段材料

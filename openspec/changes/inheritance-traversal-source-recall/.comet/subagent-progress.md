@@ -21,11 +21,11 @@ TDD mode: tdd
 - Implementation: searcher.py step 3.5 (import re + _INHERITANCE_CLASS_NAME_RE + inheritance_intent gated recall, score=90.0, signal=inheritance_recall.class_summary)
 - D4 gating test: test_non_inheritance_query_does_not_trigger_inheritance_recall
 
-## Current Task: Task 3
-- Plan task: Task 3: eval-search 验证 + 锁定 final 基线 + 收尾
-- OpenSpec tasks: 2.1, 2.2, 2.3, 3.1, 3.2
-- Phase: implementing
-- Implementer: dispatching
-- BASE commit: (pending)
-- Commits: (none yet)
-- RED/GREEN evidence: N/A (verification task)
+## Task 3: COMPLETE
+- Commits: e2de393
+- eval: Node inherits Object rank=None→1, Hit@5=97.37%, MRR@5=90.13%, zero regression
+- final baseline: docs/search-quality/inheritance-recall-final.json + baseline.json updated
+- pytest: 292/0
+
+## Phase: final-review
+- All tasks complete, proceeding to final lightweight code reviewer

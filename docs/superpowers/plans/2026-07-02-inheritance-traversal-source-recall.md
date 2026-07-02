@@ -484,7 +484,7 @@ rtk git commit -m "feat(searcher): recall class_summary for inheritance-intent q
 - Consumes: `./godot_rag.db`（已含修复后的 searcher，因为 `uv run godot-rag` 从源码加载）、`rst2md/rag/search_eval_queries.json`、stage-0 基线
 - Produces: final 基线 + 更新的 canonical baseline + verify 阶段材料清单
 
-- [ ] **Step 1: 跑 eval-search 对比 stage-0 基线（tasks.md 2.1 + 2.2）**
+- [x] **Step 1: 跑 eval-search 对比 stage-0 基线（tasks.md 2.1 + 2.2）**
 
 Run:
 ```bash
@@ -498,7 +498,7 @@ Expected:
 
 若 `class-inheritance-node-object` 仍 rank > 5，说明 step 3.5 在生产 DB 上未把 Node 推进 top_k=3——回到 Task 2 Step 3 检查 PascalCase 提取或 DB 验证查询是否在生产 DB 上命中（设计文档 D1 已确认 Node class_summary symbol="Node"）。
 
-- [ ] **Step 2: 写 final 基线（tasks.md 2.3）**
+- [x] **Step 2: 写 final 基线（tasks.md 2.3）**
 
 Run:
 ```bash
@@ -506,13 +506,13 @@ rtk uv run godot-rag eval-search --db ./godot_rag.db --write-baseline --baseline
 ```
 Expected: 退出码 0；写入 `docs/search-quality/inheritance-recall-final.json`。
 
-- [ ] **Step 3: 更新 canonical baseline.json**
+- [x] **Step 3: 更新 canonical baseline.json**
 
 ```bash
 rtk cp docs/search-quality/inheritance-recall-final.json docs/search-quality/baseline.json
 ```
 
-- [ ] **Step 4: 复跑全套 pytest 收尾（tasks.md 3.1）**
+- [x] **Step 4: 复跑全套 pytest 收尾（tasks.md 3.1）**
 
 Run:
 ```bash
@@ -520,7 +520,7 @@ rtk uv run pytest -q
 ```
 Expected: 全绿。
 
-- [ ] **Step 5: 准备 verify 阶段材料（tasks.md 3.2）**
+- [x] **Step 5: 准备 verify 阶段材料（tasks.md 3.2）**
 
 在仓库根创建临时汇总（不入库，仅供 `/comet-verify` 读取）：
 ```bash
@@ -546,7 +546,7 @@ rtk cat > /tmp/inheritance-recall-verify-summary.md <<'EOF'
 EOF
 ```
 
-- [ ] **Step 6: Commit final 基线 + canonical baseline 更新**
+- [x] **Step 6: Commit final 基线 + canonical baseline 更新**
 
 ```bash
 rtk git add docs/search-quality/inheritance-recall-final.json docs/search-quality/baseline.json
