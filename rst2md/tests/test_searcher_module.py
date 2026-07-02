@@ -5,68 +5,6 @@ import pytest
 from rag.query_rewrite import expand_query_variants, doc_type_boost
 
 
-# --- Searcher module import tests ---
-
-def test_import_smart_tokenize():
-    from rag.retrieval import _smart_tokenize
-    assert callable(_smart_tokenize)
-
-
-def test_import_escape_fts5():
-    from rag.retrieval import _escape_fts5
-    assert callable(_escape_fts5)
-
-
-def test_import_vector_search():
-    from rag.retrieval import vector_search
-    assert callable(vector_search)
-
-
-def test_import_rrf_fusion():
-    from rag.fusion import rrf_fusion
-    assert callable(rrf_fusion)
-
-
-def test_import_search_database():
-    from rag.searcher import search_database
-    assert callable(search_database)
-
-
-def test_import_search_database_with_metadata():
-    from rag.searcher import search_database_with_metadata
-    assert callable(search_database_with_metadata)
-
-
-def test_import_extract_snippet():
-    from rag.snippet import _extract_snippet
-    assert callable(_extract_snippet)
-
-
-def test_import_vector_availability():
-    from rag.retrieval import _vector_availability
-    assert callable(_vector_availability)
-
-
-def test_import_run_vector_query():
-    from rag.retrieval import _run_vector_query
-    assert callable(_run_vector_query)
-
-
-def test_import_fts5_special():
-    from rag.retrieval import _FTS5_SPECIAL
-    assert isinstance(_FTS5_SPECIAL, set)
-
-
-def test_import_search_database_impl():
-    from rag.searcher import _search_database_impl
-    assert callable(_search_database_impl)
-
-
-def test_import_rerank_results():
-    from rag.fusion import rerank_results
-    assert callable(rerank_results)
-
-
 def test_searcher_reexports_legacy_helper_imports():
     from rag import fusion, retrieval, snippet
     from rag.searcher import (
