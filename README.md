@@ -7,13 +7,11 @@ Hybrid RAG search for Godot documentation and addons. Search by type for precise
 ## Installation
 
 ```bash
+# As a global tool (recommended)
+uv tool install godot-rag
+
+# Or install into current environment
 uv pip install godot-rag
-```
-
-Or from wheel:
-
-```bash
-uv pip install godot_rag-4.7.0-py3-none-any.whl
 ```
 
 ## Usage

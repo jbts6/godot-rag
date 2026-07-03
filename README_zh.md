@@ -7,13 +7,11 @@ Godot 文档与 addon 的混合 RAG 搜索。按类型搜索，精准命中。
 ## 安装
 
 ```bash
+# 作为全局工具（推荐）
+uv tool install godot-rag
+
+# 或安装到当前环境
 uv pip install godot-rag
-```
-
-或从 wheel 安装：
-
-```bash
-uv pip install godot_rag-4.7.0-py3-none-any.whl
 ```
 
 ## 使用方法
