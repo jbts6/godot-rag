@@ -556,17 +556,6 @@ def test_get_stats_returns_correct_chunk_count():
 
         assert stats["chunks"]["total"] == 2  # class_summary + method
 
-def test_cli_stats_command_works():
-    """godot-rag stats should work."""
-    result = subprocess.run(
-        [sys.executable, "-m", "rag.cli", "stats", "--help"],
-        text=True,
-        capture_output=True,
-        env=TEST_ENV,
-    )
-    assert result.returncode == 0
-
-
 def _build_snippet_db(tmp):
     """Build a test database with multi-line content."""
     docs = Path(tmp) / "docs"
@@ -753,18 +742,6 @@ def test_search_args_default_to_bundled_database():
 
     with patch("rag.cli.default_db_path", return_value=Path("/tmp/godot_docs.sqlite")):
         assert _db_path_from_args(Args()) == Path("/tmp/godot_docs.sqlite")
-
-def test_cli_diagnostics_help():
-    result = subprocess.run(
-        [sys.executable, "-m", "rag.cli", "diagnostics", "--help"],
-        capture_output=True,
-        text=True,
-        env=TEST_ENV,
-    )
-
-    assert result.returncode == 0
-    assert "--db" in result.stdout
-    assert "--json" in result.stdout
 
 def test_cli_search_debug_json_includes_metadata():
     from rag import embeddings

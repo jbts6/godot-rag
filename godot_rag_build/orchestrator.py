@@ -225,53 +225,62 @@ def _stage_twine_check(ctx: StageContext) -> list[str]:
     return [wheel]
 
 
-def _fingerprint_common(ctx: StageContext, stage: str) -> str:
-    inputs = {
-        "stage": stage,
-        "with_wiki": str(ctx.options["with_wiki"]).lower(),
-        "python_version": _tool_version(ctx, ["python3", "--version"]),
-        "uv_version": _tool_version(ctx, ["uv", "--version"]),
+def _fingerprint_docs_md(ctx: StageContext) -> str:
+    return fingerprint_items({
+        "godot_docs": _submodule_commit_hash(ctx, "godot-docs"),
+        "rst2md": fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml")),
         "pandoc_version": _tool_version(ctx, ["pandoc", "--version"]),
-        "pyproject": fingerprint_file(ctx.root / "pyproject.toml"),
-        "uv_lock": fingerprint_file(ctx.root / "uv.lock"),
+    })
+
+
+def _fingerprint_wiki(ctx: StageContext) -> str:
+    if not ctx.options["with_wiki"]:
+        return fingerprint_items({"wiki_cache": "disabled"})
+    wiki_source = _wiki_dir(ctx)
+    return fingerprint_items({
+        "wiki_cache": fingerprint_tree(wiki_source, exclude_dirs=(".git",)) if wiki_source.exists() else "missing",
+    })
+
+
+def _fingerprint_rag_db(ctx: StageContext) -> str:
+    wiki_source = _wiki_dir(ctx)
+    return fingerprint_items({
+        "with_wiki": str(ctx.options["with_wiki"]).lower(),
+        "godot_docs": _submodule_commit_hash(ctx, "godot-docs"),
+        "rst2md": fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml")),
+        "wiki_cache": fingerprint_tree(wiki_source, exclude_dirs=(".git",)) if wiki_source.exists() else "missing",
+        "addons": fingerprint_tree(ctx.root / "addons", include_suffixes=(".md", ".rst", ".gd", ".cs", ".json", ".yaml", ".yml", ".cfg"), exclude_dirs=(".git", ".godot", "__pycache__")),
+        "addon_configs": fingerprint_tree(ctx.root / "rst2md/rag/addon_configs", include_suffixes=(".py", ".json", ".yaml", ".yml")),
+    })
+
+
+def _fingerprint_package_tree(ctx: StageContext) -> str:
+    return fingerprint_items({
+        "rag_source": fingerprint_tree(ctx.root / "rst2md/rag", include_suffixes=(".py", ".json", ".yaml", ".yml")),
+        "addon_configs": fingerprint_tree(ctx.root / "rst2md/rag/addon_configs", include_suffixes=(".py", ".json", ".yaml", ".yml")),
         "build_tool": fingerprint_tree(ctx.root / "godot_rag_build", include_suffixes=(".py",)),
-        "build_sh": fingerprint_file(ctx.root / "build.sh"),
-    }
+    })
 
-    if stage in {"docs-md", "rag-db"}:
-        inputs["godot_docs"] = _submodule_commit_hash(ctx, "godot-docs")
-        inputs["rst2md"] = fingerprint_tree(ctx.root / "rst2md", include_suffixes=(".py", ".json", ".yaml", ".yml"))
 
-    if stage in {"wiki", "rag-db"}:
-        wiki_source = _wiki_dir(ctx)
-        inputs["wiki_cache"] = fingerprint_tree(wiki_source, exclude_dirs=(".git",)) if wiki_source.exists() else "missing"
-
-    if stage in {"rag-db", "package-tree"}:
-        inputs["addons"] = fingerprint_tree(ctx.root / "addons", include_suffixes=(".md", ".rst", ".gd", ".cs", ".json", ".yaml", ".yml", ".cfg"), exclude_dirs=(".git", ".godot", "__pycache__"))
-        inputs["addon_configs"] = fingerprint_tree(ctx.root / "rst2md/rag/addon_configs", include_suffixes=(".py", ".json", ".yaml", ".yml"))
-
-    if stage == "package-tree":
-        inputs["rag_source"] = fingerprint_tree(ctx.root / "rst2md/rag", include_suffixes=(".py", ".json", ".yaml", ".yml"))
-
-    if stage == "readme":
-        inputs["merge_readme"] = fingerprint_file(ctx.root / "scripts/merge_readme.py")
-        inputs["readme"] = fingerprint_file(ctx.root / "README.md")
-        inputs["readme_zh"] = fingerprint_file(ctx.root / "README_zh.md")
-
-    return fingerprint_items(inputs)
+def _fingerprint_readme(ctx: StageContext) -> str:
+    return fingerprint_items({
+        "merge_readme": fingerprint_file(ctx.root / "scripts/merge_readme.py"),
+        "readme": fingerprint_file(ctx.root / "README.md"),
+        "readme_zh": fingerprint_file(ctx.root / "README_zh.md"),
+    })
 
 
 def create_build_stages(options: BuildOptions) -> list[StageSpec]:
     return [
         StageSpec("submodule", _stage_submodule),
         StageSpec("version", _stage_version, dependencies=("submodule",)),
-        StageSpec("docs-md", _stage_docs_md, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "docs-md"), output_check=lambda ctx: (ctx.root / "godot_rag/docs-md").exists(), dependencies=("version",)),
-        StageSpec("wiki", _stage_wiki, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "wiki"), output_check=lambda ctx: (not ctx.options["with_wiki"]) or _wiki_dir(ctx).exists(), dependencies=("docs-md",)),
-        StageSpec("rag-db", _stage_rag_db, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "rag-db"), output_check=lambda ctx: (ctx.root / "godot_rag/rag/godot_docs.sqlite").exists(), dependencies=("wiki",)),
+        StageSpec("docs-md", _stage_docs_md, cacheable=True, fingerprint=_fingerprint_docs_md, output_check=lambda ctx: (ctx.root / "godot_rag/docs-md").exists(), dependencies=("version",)),
+        StageSpec("wiki", _stage_wiki, cacheable=True, fingerprint=_fingerprint_wiki, output_check=lambda ctx: (not ctx.options["with_wiki"]) or _wiki_dir(ctx).exists(), dependencies=("docs-md",)),
+        StageSpec("rag-db", _stage_rag_db, cacheable=True, fingerprint=_fingerprint_rag_db, output_check=lambda ctx: (ctx.root / "godot_rag/rag/godot_docs.sqlite").exists(), dependencies=("wiki",)),
         StageSpec("diagnostics", _stage_diagnostics, dependencies=("rag-db",)),
         StageSpec("cleanup-wiki", _stage_cleanup_wiki, dependencies=("diagnostics",)),
-        StageSpec("package-tree", _stage_package_tree, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "package-tree"), output_check=lambda ctx: (ctx.root / "godot_rag/rag").exists(), dependencies=("cleanup-wiki",)),
-        StageSpec("readme", _stage_readme, cacheable=True, fingerprint=lambda ctx: _fingerprint_common(ctx, "readme"), output_check=lambda ctx: (ctx.root / "README_PYPI.md").exists(), dependencies=("package-tree",)),
+        StageSpec("package-tree", _stage_package_tree, cacheable=True, fingerprint=_fingerprint_package_tree, output_check=lambda ctx: (ctx.root / "godot_rag/rag").exists(), dependencies=("cleanup-wiki",)),
+        StageSpec("readme", _stage_readme, cacheable=True, fingerprint=_fingerprint_readme, output_check=lambda ctx: (ctx.root / "README_PYPI.md").exists(), dependencies=("package-tree",)),
         StageSpec("wheel", _stage_wheel, dependencies=("readme",)),
         StageSpec("twine-check", _stage_twine_check, dependencies=("wheel",)),
     ]
@@ -305,10 +314,3 @@ def run_build(options: BuildOptions) -> BuildReport:
     write_last_run(report, cache_dir)
     print_summary(report)
     return report
-
-
-def run_release_diagnostics(db_path: Path) -> int:
-    runner = CommandRunner()
-    root = Path(".").resolve()
-    result = runner.run(["uv", "run", "python3", "-m", "rag.cli", "diagnostics", "--db", str(db_path)], cwd=root, env=_env_with_pythonpath(root), check=False)
-    return result.returncode

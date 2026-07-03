@@ -7,17 +7,8 @@ import sys
 from pathlib import Path
 from importlib import resources
 
-from rag.diagnostics import run_diagnostics
-from rag.search_eval import (
-    apply_baseline,
-    evaluate_database,
-    format_text_report,
-    load_queries,
-    report_to_dict,
-)
 from rag.store import (
     build_database,
-    get_stats,
     list_addons,
     search_database,
     search_database_with_metadata,
@@ -190,56 +181,9 @@ def cmd_addons(args):
         print(f"\n{len(addons)} addons, {total} chunks total")
 
 
-def cmd_stats(args):
-    """Show database statistics."""
-    db_path = _require_db(args)
-
-    stats = get_stats(db_path)
-
-    if args.json:
-        print(json.dumps(stats, ensure_ascii=False, indent=2))
-    else:
-        print("=== Database Statistics ===")
-        print(f"\nChunks: {stats['chunks']['total']}")
-        for doc_type, count in stats['chunks']['by_type'].items():
-            print(f"  {doc_type}: {count}")
-
-        print(f"\nSymbols: {stats['symbols']['total']}")
-        for kind, count in stats['symbols']['by_kind'].items():
-            print(f"  {kind}: {count}")
-
-        print(f"\nRelations: {stats['relations']['total']}")
-        for relation, count in stats['relations']['by_type'].items():
-            print(f"  {relation}: {count}")
-
-        if stats['addons']:
-            print(f"\nAddons: {len(stats['addons'])}")
-            for a in stats['addons']:
-                print(f"  {a['addon']}: {a['chunk_count']} chunks")
-
-
 def cmd_search_addon(args):
     """Search addon docs and examples."""
     _run_search(args, doc_types=["addon"], addon=getattr(args, "addon", None))
-
-
-def cmd_diagnostics(args):
-    db_path = _db_path_from_args(args)
-    report = run_diagnostics(db_path, check_model=not args.no_model)
-    if args.json:
-        print(json.dumps(report, ensure_ascii=False, indent=2))
-    else:
-        print(f"database: {report['db_path']}")
-        print(f"ok: {report['ok']}")
-        print(f"sqlite_vec_available: {report['sqlite_vec_available']}")
-        print(f"vec_chunks: {report['vec_chunks_count']}")
-        print(f"chunks: {report['chunks_count']}")
-        print(f"row_parity: {report['row_parity']}")
-        print(f"model_available: {report['model_available']}")
-        if report["errors"]:
-            print("errors: " + ", ".join(report["errors"]))
-    if not report["ok"]:
-        sys.exit(1)
 
 
 def _add_search_args(parser):
@@ -250,43 +194,6 @@ def _add_search_args(parser):
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--debug-search", action="store_true", help="Include search-path metadata")
     parser.add_argument("--no-expand", action="store_true", help="Disable graph expansion")
-
-
-def _default_eval_queries_path() -> Path:
-    return Path(__file__).with_name("search_eval_queries.json")
-
-
-def cmd_eval_search(args):
-    """Evaluate search quality against golden queries."""
-    db_path = _require_db(args)
-    queries_path = Path(args.queries) if args.queries else _default_eval_queries_path()
-    queries = load_queries(queries_path)
-    report = evaluate_database(
-        db_path,
-        queries,
-        limit=args.limit,
-        compare_graph=args.compare_graph,
-        diagnostic_limit=args.diagnostic_limit,
-    )
-    baseline_path = Path(args.baseline) if args.baseline else None
-    try:
-        report = apply_baseline(
-            report,
-            baseline_path,
-            write_baseline=args.write_baseline,
-            hit5_drop_threshold=args.hit5_drop_threshold,
-            mrr5_relative_drop_threshold=args.mrr5_relative_drop_threshold,
-            p95_latency_threshold_ms=args.p95_latency_threshold_ms,
-        )
-    except ValueError as exc:
-        print(f"Error: {exc}", file=sys.stderr)
-        sys.exit(1)
-    if args.json:
-        print(json.dumps(report_to_dict(report), ensure_ascii=False, indent=2))
-    else:
-        print(format_text_report(report))
-    if report.regression_failed:
-        sys.exit(1)
 
 
 def main():
@@ -326,37 +233,11 @@ def main():
     addons_parser.add_argument("--json", action="store_true", help="Output as JSON")
     addons_parser.set_defaults(func=cmd_addons)
 
-    # stats command
-    stats_parser = subparsers.add_parser("stats", help="Show database statistics")
-    stats_parser.add_argument("--db", help="Path to SQLite database")
-    stats_parser.add_argument("--json", action="store_true", help="Output as JSON")
-    stats_parser.set_defaults(func=cmd_stats)
-
     # s-addon command
     addon_parser = subparsers.add_parser("s-addon", aliases=["search-addon"], help="Search addon docs and examples")
     _add_search_args(addon_parser)
     addon_parser.add_argument("--addon", help="Filter by addon name (e.g. statecharts)")
     addon_parser.set_defaults(func=cmd_search_addon)
-
-    diagnostics_parser = subparsers.add_parser("diagnostics", help="Validate semantic search readiness")
-    diagnostics_parser.add_argument("--db", help="Path to SQLite database")
-    diagnostics_parser.add_argument("--json", action="store_true", help="Output as JSON")
-    diagnostics_parser.add_argument("--no-model", action="store_true", help="Skip embedding model availability check")
-    diagnostics_parser.set_defaults(func=cmd_diagnostics)
-
-    eval_parser = subparsers.add_parser("eval-search", help="Evaluate search quality")
-    eval_parser.add_argument("--db", help="Path to SQLite database")
-    eval_parser.add_argument("--queries", help="Path to golden query JSON file")
-    eval_parser.add_argument("--baseline", help="Path to baseline JSON file")
-    eval_parser.add_argument("--write-baseline", action="store_true", help="Write baseline JSON and skip comparison")
-    eval_parser.add_argument("--json", action="store_true", help="Output as JSON")
-    eval_parser.add_argument("--limit", type=int, default=5, help="Max results per query")
-    eval_parser.add_argument("--compare-graph", action="store_true", help="Compare graph expansion enabled and disabled")
-    eval_parser.add_argument("--diagnostic-limit", type=int, help="Result window for failure diagnostics")
-    eval_parser.add_argument("--hit5-drop-threshold", type=float, default=0.05, help="Allowed hit@5 drop before failing")
-    eval_parser.add_argument("--mrr5-relative-drop-threshold", type=float, default=0.10, help="Allowed relative MRR@5 drop before failing")
-    eval_parser.add_argument("--p95-latency-threshold-ms", type=float, help="Allowed p95 latency increase in ms before failing")
-    eval_parser.set_defaults(func=cmd_eval_search)
 
     args = parser.parse_args()
     args.func(args)
