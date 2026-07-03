@@ -49,6 +49,9 @@ def write_last_run(report: BuildReport, cache_dir: Path) -> Path:
 
 
 def print_summary(report: BuildReport) -> None:
+    if report.overall_status == "FAIL" and not report.stages:
+        print(f"FAILED: {report.artifacts.get('publish_error', 'unknown error')}")
+        return
     print(f"{'Stage':<24} {'Status':<6} {'Time':<8} Reason")
     for stage in report.stages:
         elapsed = f"{stage.elapsed_seconds:.2f}s"
