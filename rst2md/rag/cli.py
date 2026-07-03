@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 from importlib import resources
 
+from rag.diagnostics import run_diagnostics
 from rag.store import (
     build_database,
     list_addons,
@@ -186,6 +187,25 @@ def cmd_search_addon(args):
     _run_search(args, doc_types=["addon"], addon=getattr(args, "addon", None))
 
 
+def cmd_diagnostics(args):
+    db_path = _db_path_from_args(args)
+    report = run_diagnostics(db_path, check_model=not args.no_model)
+    if args.json:
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+    else:
+        print(f"database: {report['db_path']}")
+        print(f"ok: {report['ok']}")
+        print(f"sqlite_vec_available: {report['sqlite_vec_available']}")
+        print(f"vec_chunks: {report['vec_chunks_count']}")
+        print(f"chunks: {report['chunks_count']}")
+        print(f"row_parity: {report['row_parity']}")
+        print(f"model_available: {report['model_available']}")
+        if report["errors"]:
+            print("errors: " + ", ".join(report["errors"]))
+    if not report["ok"]:
+        sys.exit(1)
+
+
 def _add_search_args(parser):
     """Add common search arguments to a subparser."""
     parser.add_argument("query", help="Search query")
@@ -238,6 +258,13 @@ def main():
     _add_search_args(addon_parser)
     addon_parser.add_argument("--addon", help="Filter by addon name (e.g. statecharts)")
     addon_parser.set_defaults(func=cmd_search_addon)
+
+    # diagnostics command (used internally by build pipeline)
+    diagnostics_parser = subparsers.add_parser("diagnostics", help="Validate semantic search readiness")
+    diagnostics_parser.add_argument("--db", help="Path to SQLite database")
+    diagnostics_parser.add_argument("--json", action="store_true", help="Output as JSON")
+    diagnostics_parser.add_argument("--no-model", action="store_true", help="Skip embedding model availability check")
+    diagnostics_parser.set_defaults(func=cmd_diagnostics)
 
     args = parser.parse_args()
     args.func(args)
