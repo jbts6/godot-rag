@@ -14,6 +14,16 @@ uv tool install godot-rag
 uv pip install godot-rag
 ```
 
+### AI Agent Skill
+
+为 AI 编程助手（Claude Code、opencode、Cursor 等）安装 godot-rag skill：
+
+```bash
+npx skills add jbts6/skills --skill godot-rag
+```
+
+该 skill 会引导 AI 在编写 Godot 代码前先查询文档，并对自然语言查询启用 HyDE 增强搜索。
+
 ## 使用方法
 
 > **语言说明**：查询必须使用英文。非英文查询请先翻译为英文（例如："怎么做二段跳" → "how to double jump"）。Embedding 模型仅支持英文。
