@@ -34,7 +34,4 @@ README_PYPI.md
 # Build cache (wiki clones, etc.)
 .cache/
 
-# opencode workspace
-.opencode/
-
 node_modules
