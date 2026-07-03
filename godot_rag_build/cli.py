@@ -11,14 +11,14 @@ def create_parser() -> argparse.ArgumentParser:
 
     build = subparsers.add_parser("build", help="Build local release artifacts")
     build.add_argument("--no-bump", action="store_true", help="Use the current pyproject.toml version")
-    build.add_argument("--with-wiki", action="store_true", help="Include Scene Manager wiki input")
+    build.add_argument("--no-wiki", action="store_false", dest="with_wiki", help="Exclude Scene Manager wiki input")
     build.add_argument("--cache-dir", default=".cache/build-release", help="Build cache directory")
     build.set_defaults(func=_cmd_build)
 
     publish = subparsers.add_parser("publish", help="Build and publish after required gates")
     publish.add_argument("--target", choices=["pypi", "testpypi"], required=True)
     publish.add_argument("--no-bump", action="store_true", help="Use the current pyproject.toml version")
-    publish.add_argument("--with-wiki", action="store_true", help="Include Scene Manager wiki input")
+    publish.add_argument("--no-wiki", action="store_false", dest="with_wiki", help="Exclude Scene Manager wiki input")
     publish.add_argument("--cache-dir", default=".cache/build-release", help="Build cache directory")
     publish.set_defaults(func=_cmd_publish)
 

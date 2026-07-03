@@ -9,7 +9,7 @@ usage() {
   --no-bump      构建时不递增 pyproject.toml 版本
   --publish      构建并发布到 PyPI
   --test-pypi    构建并发布到 TestPyPI
-  --with-wiki    拉取 Scene Manager wiki 文档并纳入 RAG 构建
+  --no-wiki      构建时不包含 Scene Manager wiki 文档
   -h, --help     显示帮助
 
 新入口:
@@ -19,7 +19,7 @@ EOF
 }
 
 NO_BUMP=0
-WITH_WIKI=0
+NO_WIKI=0
 PUBLISH_TARGET=""
 
 while [ "$#" -gt 0 ]; do
@@ -27,8 +27,8 @@ while [ "$#" -gt 0 ]; do
         --no-bump)
             NO_BUMP=1
             ;;
-        --with-wiki)
-            WITH_WIKI=1
+        --no-wiki)
+            NO_WIKI=1
             ;;
         --publish|publish)
             if [ -n "$PUBLISH_TARGET" ]; then
@@ -66,8 +66,8 @@ fi
 if [ "$NO_BUMP" -eq 1 ]; then
     CMD+=(--no-bump)
 fi
-if [ "$WITH_WIKI" -eq 1 ]; then
-    CMD+=(--with-wiki)
+if [ "$NO_WIKI" -eq 1 ]; then
+    CMD+=(--no-wiki)
 fi
 
 if [ "${GODOT_RAG_BUILD_WRAPPER_DRY_RUN:-0}" = "1" ]; then

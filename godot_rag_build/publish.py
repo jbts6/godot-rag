@@ -16,7 +16,7 @@ from godot_rag_build.runner import CommandRunner
 class PublishOptions:
     target: Literal["pypi", "testpypi"]
     no_bump: bool = False
-    with_wiki: bool = False
+    with_wiki: bool = True
     cache_dir: Path = Path(".cache/build-release")
     root: Path = Path(".")
     runner: CommandRunner | None = None

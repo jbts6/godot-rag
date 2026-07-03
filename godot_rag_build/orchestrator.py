@@ -17,7 +17,7 @@ from godot_rag_build.stages import StageContext, StageError, StageSpec, StageSta
 @dataclass(frozen=True)
 class BuildOptions:
     no_bump: bool = False
-    with_wiki: bool = False
+    with_wiki: bool = True
     cache_dir: Path = Path(".cache/build-release")
     root: Path = Path(".")
     runner: CommandRunner | None = None

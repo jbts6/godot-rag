@@ -108,9 +108,6 @@ cd godot-docs && git pull origin stable
 # Rebuild docs and RAG
 uv run godot-rag-build build
 
-# Include Scene Manager wiki docs
-uv run godot-rag-build build --with-wiki
-
 # Build and publish to PyPI
 uv run godot-rag-build publish --target pypi
 
